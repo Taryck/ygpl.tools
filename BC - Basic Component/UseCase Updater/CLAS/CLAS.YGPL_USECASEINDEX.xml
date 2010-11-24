@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CB1E65C8E5A23DD063F395F5F29E7614" CODE_SIGNATURE="17B8B146DB08EF6E3F5B27C13580E376" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_USECASEINDEX" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6194B192197380A568641B09DC3DE14D" CODE_SIGNATURE="BCFE7E68AA320C28B04C225F2C6A8658" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_USECASEINDEX" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-USECASEINDEX" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_USECASEINDEX">
    <TEXTS>
     <ITEM LANG="E" TEXT="Update UseCase Indexes (standalone)">U1&amp;FUNCTIONALITY&amp;
 ASThis class allows to update the &quot;UseCase&quot; indexes. This indexes are
@@ -25,6 +25,11 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
    </TEXTS>
   </A0_MAINDATA>
   <ATTRIBUTS>
+   <ITEM CMPNAME="BLOC_SIZE" STATE="1" ATTDECLTYP="2" ATTVALUE="100" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number of programs updated by one wave"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="COMPONENTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_GENSETC">
     <TEXTS>
      <ITEM LANG="E" TEXT="Generation Set for ABAP Objects and BSP Applications"/>
@@ -33,6 +38,21 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
    <ITEM CMPNAME="GC_GEN_TYPES" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1CFJKMST&apos;" TYPTYPE="1" TYPE="STRING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Activable program types"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="LAST_P" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Last Percentage displayed"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="STEP" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Percentage step"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_COUNT" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Program Count"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="T_PROGS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="PROGRAMT">
@@ -166,6 +186,25 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
   ENDLOOP.
   SORT result. DELETE ADJACENT DUPLICATES FROM result.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="DETERMINE_STEP" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Determine Step depending of number of object to process"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA d_string  TYPE string.
+
+  t_count = LINES( t_progs ).
+  step = t_count / bloc_size.
+  IF step &lt; 4.      step = 4.       ENDIF.
+  IF step &gt; 100.    step = 100.     ENDIF.
+  step = step / 100.
+  IF step &lt; 1.      step = 1.       ENDIF.
+  IF step &gt; 100.    step = 100.     ENDIF.
+  IF NOT sy-batch IS INITIAL.
+    d_string = t_count.
+    MESSAGE i001 WITH d_string.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="EXTEND_PACKAGE" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <PARAMETERS>
      <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_PACK">
@@ -241,22 +280,22 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
      <ITEM LANG="E" TEXT="Get object list from TADIR : Package, type, author,..."/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="AUTHOR" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AUTHOR">
+     <ITEM SCONAME="AUTHOR" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AUTHOR" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Range of author (person reponsible of the component)"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="EXT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PARVALUE="ABAP_TRUE">
+     <ITEM SCONAME="EXT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PARVALUE="ABAP_TRUE" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Extend to sub package"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPNAME">
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPNAME" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Range of component name"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Range of package"/>
       </TEXTS>
@@ -266,12 +305,17 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
        <ITEM LANG="E" TEXT="List of component keys"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="SRCSYSTEM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SRCSYSTEM">
+     <ITEM SCONAME="SOFTCOMP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SOFTCOMP" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Software Component"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SRCSYSTEM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SRCSYSTEM" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Range of source system"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPTYPE">
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPTYPE" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Range of component types"/>
       </TEXTS>
@@ -285,7 +329,9 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
   FIELD-SYMBOLS: &lt;p&gt; LIKE LINE OF t_exclu.
   DATA t_ext_pack TYPE tr_packages.
 
-  IF packages IS INITIAL.
+  t_ext_pack = limit_packages( softcomp = softcomp
+                               packages = packages ).
+  IF t_ext_pack IS INITIAL.
     CHECK srcsystem IS NOT INITIAL OR type IS NOT INITIAL OR name IS NOT INITIAL OR author IS NOT INITIAL. &quot; to prevent extracting all tadir
     SELECT object obj_name
       INTO TABLE result
@@ -297,10 +343,9 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
     EXIT.
   ENDIF.
 
-  IF ext = abap_true.   t_ext_pack = extend_packages( packages ).    ELSE.     t_ext_pack = packages.    ENDIF.
+  IF ext = abap_true.   t_ext_pack = extend_packages( t_ext_pack ).    ENDIF.
 
-  r_exclu = t_ext_pack.
-  DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+  r_exclu = t_ext_pack.     DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
 
 * Package selection
   SELECT devclass
@@ -383,6 +428,49 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
   SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
   s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="LIMIT_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Limit/extend packages to Software component"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SOFTCOMP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SOFTCOMP">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Software Component"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  result = packages.
+  CHECK NOT softcomp IS INITIAL.
+
+* Package selection
+  SELECT devclass AS low
+      FROM tdevc
+      INTO CORRESPONDING FIELDS OF TABLE result
+      WHERE devclass IN packages
+        AND dlvunit IN softcomp.
+
+  r_exclu = packages.   DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+
+  APPEND LINES OF r_exclu TO result.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="RESET" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Reset program list"/>
@@ -390,14 +478,69 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
     <SOURCE>`
   REFRESH t_progs.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="SHOW_PROGRESS" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Display progress to user"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="POSITION" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Actual position"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA d_percent TYPE i.
+  DATA d_string  TYPE string.
+  DATA d_delta   TYPE i.
+
+  d_percent = position * 100 / t_count.
+  d_delta = ( d_percent - last_p ).
+
+  IF d_delta &lt; step.   EXIT.   ENDIF.
+
+  d_string = d_percent.   CONDENSE d_string.
+  IF sy-batch IS INITIAL.
+    MESSAGE i000 WITH d_string INTO d_string.
+    CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;
+      EXPORTING
+        percentage = d_percent
+        text       = d_string.
+  ELSE.
+    MESSAGE i000 WITH d_string.
+  ENDIF.
+  last_p = d_percent.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="UPDATE_INDEX" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Update index"/>
     </TEXTS>
     <SOURCE>`
-  cl_wb_crossreference=&gt;activate_index( t_progs ).</SOURCE>
+  DATA t_bloc   TYPE programt.
+  DATA d_index  TYPE i.
+  DATA d_to     TYPE i.
+
+  determine_step( ).
+  d_index = 1.
+  WHILE d_index &lt;= t_count.
+    d_to = d_index + bloc_size.
+    IF d_to &gt; t_count.    d_to = t_count.   ENDIF.
+    CLEAR t_bloc. APPEND LINES OF t_progs FROM d_index TO d_to TO t_bloc.
+    cl_wb_crossreference=&gt;activate_index( t_bloc ).
+    COMMIT WORK.
+    d_index = d_to + 1.
+    show_progress( d_index ).
+    IF d_index &gt; t_count.     EXIT.     ENDIF.
+  ENDWHILE.</SOURCE>
    </ITEM>
   </METHODS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="UIP">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Update in progress ..." LENGTH="80 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
   </TYPEGROUPS>
@@ -438,6 +581,13 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Range of package"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_SOFTCOMP" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tr_softcomp TYPE RANGE OF tdevc-DLVUNIT
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Software Component"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TR_SRCSYSTEM" EXPOSURE="2" STATE="1" TYPTYPE="4">
