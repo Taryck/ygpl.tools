@@ -1,0 +1,897 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="A5518C2D31B7C23903F64BCFBE029FD2" CODE_SIGNATURE="A141B0C26114636CA3DC97AFA92EA53D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORI"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Message communication between process"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="1" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYS_CATEGORIES"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TR_CATEGORIES"/>
+   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CLEAR_OBJ" EXPOSURE="2" STATE="1" ATTVALUE="&apos; &apos;" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Supprime les messages Oui &apos;X&apos; ou &apos;N&apos;"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CONFIRMED_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="4">
+    BEGIN OF confirmed_objects,
+      count     TYPE td_count,
+      t_status  TYPE tt_status_list,
+    END OF confirmed_objects
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object confirmation informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MSG_IN_BACKGROUND" EXPOSURE="2" STATE="1" ATTVALUE="&apos;X&apos;" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Envoi message progression en arrière plan Oui &apos;X&apos; ou &apos;N&apos;"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Categories for this run type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="RUN_ID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="T_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run unique ID"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_MT_CATEGORI" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <EVENTS>
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="YGPL_MT_CATEGORI=&gt;_CATEG">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégory"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RAWDATA" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="T_RAWDATA">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message à traiter"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event to handle objects status update (count raised)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT_COUNT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Number of object confirmed"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="STATUS" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TT_STATUS_LIST">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Detailed status count"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+  </EVENTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORIES" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Categories for this run type"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA:_run TYPE ts_run.
+
+* Check Run_ID
+  ASSERT NOT run_id IS INITIAL.
+  me-&gt;run_id = run_id.
+
+  ASSERT categories IS BOUND.
+  o_categories = categories.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Converti les donnée brute en donnée typé"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Donnée typée"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RAWDATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RAWDATA">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Donnée brute à décoder avec CONV_RAW2DATA"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  TRY.
+      IMPORT msg = data FROM DATA BUFFER rawdata.
+**CX_SY_CONVERSION_CODEPAGE
+**CX_SY_IMPORT_MISMATCH_ERROR
+**CX_SY_IMPORT_FORMAT_ERROR
+    CATCH cx_root.
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delete all messages"/>
+    </TEXTS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  DELETE FROM ygpl_msgs.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DELETE_RUN" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delete all message for a run ID"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FAILED" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Delete has failed"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL METHOD _lock
+    EXPORTING
+      run_id       = run_id
+    EXCEPTIONS
+      foreign_lock = 1
+      sys_failure  = 2
+      OTHERS       = 3.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE failed.
+  ENDIF.
+
+  DELETE FROM ygpl_msgs WHERE run_id = run_id.
+
+  CALL METHOD _unlock( run_id = run_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_MESSAGES" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Look for message"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="MESSAGE_READED" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="&apos;X&apos; if any message was read"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA: it_msg TYPE tt_msgs.
+  DATA: it_sys_msg TYPE tt_msgs.
+
+  SELECT mandt msg_id categ msg_data INTO TABLE it_msg
+    FROM ygpl_msgs
+    WHERE run_id = run_id.
+  IF it_msg IS INITIAL.
+    RETURN.
+  ENDIF.
+
+  message_readed = abap_true.
+
+  it_sys_msg = it_msg.
+  DELETE it_sys_msg WHERE NOT categ IN ygpl_mt_categori=&gt;x_categ.
+  DELETE it_msg WHERE categ IN ygpl_mt_categori=&gt;x_categ.
+
+  SORT it_sys_msg BY categ.
+  SORT it_msg BY categ.
+
+  IF NOT it_sys_msg IS INITIAL.
+    handle_system_messages( it_sys_msg ).
+  ENDIF.
+
+  IF NOT it_msg IS INITIAL.
+    handle_specific_messages( it_msg ).
+  ENDIF.
+** Security delete
+*  DELETE ygpl_msgs FROM TABLE it_msg.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_OBJECT_CONFIRMATION" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle System Message : Object Confirmation."/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="MSG_DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_MSGDATA">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Donnée de Message"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA: status TYPE	tt_status_list.
+  FIELD-SYMBOLS:
+    &lt;statut&gt; LIKE LINE OF status.
+
+  IMPORT msg = status FROM DATA BUFFER msg_data.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.
+
+  LOOP AT status ASSIGNING &lt;statut&gt;.
+    ADD &lt;statut&gt;-count TO confirmed_objects-count.
+    COLLECT &lt;statut&gt; INTO confirmed_objects-t_status.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGES" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle your own message"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="MESSAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_MSGS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Messages à traiter"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FAILED" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message processing has failed (abort futher processing)"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  FIELD-SYMBOLS:
+*    &lt;data&gt; TYPE ANY,
+*    &lt;dt&gt; LIKE LINE OF msg_cat_types,
+    &lt;msg&gt; LIKE LINE OF messages.
+
+  DATA:
+*    _data TYPE REF TO data,
+    _has_failed TYPE td_boolean.
+
+  LOOP AT messages ASSIGNING &lt;msg&gt;.
+** Get Categorie data Type
+*    READ TABLE msg_cat_types WITH TABLE KEY cat = &lt;msg&gt;-categ ASSIGNING &lt;dt&gt;.
+*    IF sy-subrc &lt;&gt; 0.
+*      _has_failed = abap_true.
+*      DELETE msgs.
+*      CONTINUE.
+*    ENDIF.
+*
+** Create specific data Type
+*    TRY.
+*        CREATE DATA _data TYPE (&lt;dt&gt;-type).
+*      CATCH cx_sy_create_data_error.
+*        _has_failed = abap_true.
+*        DELETE msgs.
+*        CONTINUE.
+*    ENDTRY.
+*
+** Need to use field symobl
+*    ASSIGN _data TO &lt;data&gt;.
+*    IF sy-subrc &lt;&gt; 0.
+*      _has_failed = abap_true.
+*      DELETE msgs.
+*      CONTINUE.
+*    ENDIF.
+*
+** Convert stored information into this data type
+*    TRY.
+**      IMPORT msg = _data FROM DATA BUFFER &lt;msg&gt;-msg_data.
+** This command is refused by ABAP Compiler
+**      IMPORT msg = &lt;data&gt; FROM DATA BUFFER &lt;msg&gt;-msg_data.
+**CX_SY_CONVERSION_CODEPAGE
+**CX_SY_IMPORT_MISMATCH_ERROR
+**CX_SY_IMPORT_FORMAT_ERROR
+*      CATCH cx_root.
+*        _has_failed = abap_true.
+*        DELETE msgs.
+*        CONTINUE.
+*    ENDTRY.
+
+* Call external event handler
+    RAISE EVENT handle_specific_message
+      EXPORTING
+        cat     = &lt;msg&gt;-categ
+        rawdata = &lt;msg&gt;-msg_data.
+  ENDLOOP.
+
+  DELETE ygpl_msgs FROM TABLE messages.
+
+*Raise exception if one of the message couldn&apos;t be processed
+  IF _has_failed = abap_true. RAISE failed. ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_SYSTEM_MESSAGES" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle systemes messages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="MESSAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_MSGS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Messages à traiter"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FAILED" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message Processing has failed"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  FIELD-SYMBOLS: &lt;msg&gt; LIKE LINE OF messages.
+  DATA f_obj_conf TYPE td_boolean.
+
+  CLEAR confirmed_objects.
+
+  LOOP AT messages ASSIGNING &lt;msg&gt;.
+    CASE &lt;msg&gt;-categ.
+      WHEN sys_categories-obj_conf.
+        f_obj_conf = abap_true.
+        handle_object_confirmation( &lt;msg&gt;-msg_data ).
+      WHEN OTHERS.
+* Un expected messages
+    ENDCASE.
+  ENDLOOP.
+
+  RAISE EVENT objects_confirmed
+    EXPORTING
+      object_count = confirmed_objects-count
+      status       = confirmed_objects-t_status.
+
+  DELETE ygpl_msgs FROM TABLE messages.
+  IF sy-subrc &lt;&gt; 0.
+*    ROLLBACK WORK.
+*    CALL METHOD _unlock( run_id = run_id
+*      cat = ygpl_mt_categori=&gt;run_info ).
+*    RAISE failed.
+  ENDIF.
+*
+*  COMMIT WORK AND WAIT.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SEND_MESSAGE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Send message to DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_MT_CATEGORI=&gt;_CATEG">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="MESSAGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Donnée du message"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA: _msg TYPE ygpl_msgs.
+
+  CHECK NOT o_categories-&gt;is_valid_category( category ) IS INITIAL.
+
+  _msg-msg_id = _generate_msg_id( ).
+  _msg-run_id = run_id.
+  _msg-categ = category.
+
+  EXPORT msg = message TO DATA BUFFER _msg-msg_data COMPRESSION ON.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.
+
+  GET TIME STAMP FIELD _msg-timestamp.
+  INSERT ygpl_msgs FROM _msg.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_DEL_MSG" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delete messages records"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FAILED" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Delete has failed"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL METHOD _lock
+    EXPORTING
+      run_id       = run_id
+    EXCEPTIONS
+      foreign_lock = 1
+      sys_failure  = 2
+      OTHERS       = 3.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE failed.
+  ENDIF.
+
+*  IF _run-run_id &lt;&gt; run_id.
+  DELETE FROM ygpl_msgs WHERE run_id = run_id.
+
+  COMMIT WORK AND WAIT.
+
+  CALL METHOD _unlock( run_id = run_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_GENERATE_MSG_ID" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create a new Msg_ID"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="MSG_ID" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="T_MSGKEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID de message"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;GUID_CREATE&apos;
+    IMPORTING
+*     EV_GUID_16       =
+*     EV_GUID_22       =
+      EV_GUID_32       = MSG_ID.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Lock a catégorie (private)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_CAT" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FOREIGN_LOCK" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objet déjà bloqué"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYS_FAILURE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Erreur interne du serveur enqueue"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPL_RUN&apos;
+    EXPORTING
+      mode_ygpl_run_info       = &apos;X&apos;
+      run_id                   = run_id
+      categ                    = cat
+*   X_RUN_ID                 = &apos; &apos;
+*   X_CATEG                  = &apos; &apos;
+      _scope                   = &apos;2&apos;
+      _wait                    = &apos;X&apos;
+      _collect                 = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock             = 1
+      system_failure           = 2
+      OTHERS                   = 3.
+  IF sy-subrc = 1.
+    RAISE foreign_lock.
+  ELSEIF sy-subrc &lt;&gt; 0.
+    RAISE sys_failure.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlock run categorie (private)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_CAT" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="T_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;DEQUEUE_EYGPL_RUN&apos;
+    EXPORTING
+      MODE_YGPL_RUN_INFO       = &apos;X&apos;
+      RUN_ID                   = run_id
+      CATEG                    = cat
+*      X_RUN_ID                 = &apos; &apos;
+*      X_CATEG                  = &apos; &apos;
+      _SCOPE                   = &apos;3&apos;
+      _SYNCHRON                = &apos; &apos;
+      _COLLECT                 = &apos; &apos;.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="R_TYPE_KIND" STATE="1" TYPTYPE="4">
+    r_type_kind TYPE RANGE OF abap_typekind
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range de type_kind."/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_CATEGORIES" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Categories for this run type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_BLOC" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_bloc,
+      bloc_id TYPE ygpl_bloc_id,
+    END OF ts_bloc
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Structure d&apos;un bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_BLOC_NFO" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_bloc_nfo,  &quot; acces by line number
+      id TYPE t_obj_num,
+      size TYPE t_bloc_size,
+      objs TYPE tt_idlst_nfo,
+    END OF ts_bloc_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Info dépendance bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_IDLST_NFO" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_idlst_nfo,
+       id TYPE t_obj_num,
+     END OF ts_idlst_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste d&apos;objet"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_JOBLIST" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_joblist,
+      Num type t_threads,
+      jobname TYPE tbtcjob-jobname,
+      jobcount TYPE tbtcjob-jobcount,
+    END OF ts_joblist
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Structure d&apos;un Job"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_JOB_INFO" STATE="1" TYPTYPE="1" TYPE="TBTCJOB">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Description des valeurs d&apos;un job (BI-API)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_LINE_NFO" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_line_nfo,
+      key TYPE t_obj_num,
+      val TYPE t_obj_num,
+    END OF ts_line_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Info dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_MSG" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_msg,
+* Adding Table Key for delete
+      mandt TYPE ygpl_msgs-mandt,
+      msg_id TYPE	ygpl_msgs-msg_id,
+* End of key
+      categ	TYPE ygpl_msgs-categ,
+      msg_data TYPE	ygpl_msgs-msg_data,
+    END OF ts_msg
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message à traiter"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_MSG_CAT_TYPE" EXPOSURE="1" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_msg_cat_type,
+      cat TYPE string,
+      ok TYPE td_boolean,
+      type TYPE td_data_type,
+    END OF ts_msg_cat_type
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Structure déf. les types de données pour les msgs par cat"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    begin of TS_RUN,
+        RUN_ID type	YGPL_RUN_ID,
+        THREADS type YGPL_THREAD_COUNT,
+        OBJECTS type YGPL_OBJ_COUNT,
+        OBJ_LEFT type	YGPL_OBJ_LEFT,
+        BLOC_SIZE type YGPL_BLOC_SIZE,
+        BLOCS type YGPL_Bloc_COUNT,
+      end of TS_RUN
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="donnée d&apos;un run"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_STEPINFO" STATE="1" TYPTYPE="1" TYPE="TBTCSTEP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Structure de ligne info de step de job"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_BLOCS" STATE="1" TYPTYPE="4">
+    tt_blocs TYPE STANDARD TABLE OF ts_bloc
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Blocs envoyé"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_BLOCS_NFO" STATE="1" TYPTYPE="4">
+    tt_blocs_nfo TYPE SORTED TABLE OF ts_bloc_nfo WITH UNIQUE KEY id
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_IDLST_NFO" STATE="1" TYPTYPE="4">
+    tt_idlst_nfo TYPE STANDARD TABLE OF ts_idlst_nfo WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste d&apos;objet"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_JOBLIST" STATE="1" TYPTYPE="4">
+    tt_joblist TYPE STANDARD TABLE OF ts_joblist
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste des threads"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_LINES_NFO" STATE="1" TYPTYPE="4">
+    tt_lines_nfo TYPE SORTED TABLE OF ts_line_nfo WITH UNIQUE KEY KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_MSGS" STATE="1" TYPTYPE="4">
+    tt_msgs TYPE STANDARD TABLE OF ts_msg
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste de message à traiter"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_MSG_CAT_TYPES" EXPOSURE="1" STATE="1" TYPTYPE="4">
+    tt_msg_cat_types TYPE HASHED TABLE OF ts_msg_cat_type WITH UNIQUE KEY cat
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table des types de donnée pour catégorie de msg"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_STEPINFO" STATE="1" TYPTYPE="4">
+    tt_stepinfo TYPE STANDARD TABLE OF ts_stepinfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Steps d&apos;un job"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_BLOC_COUNT" STATE="1" TYPTYPE="1" TYPE="YGPL_BLOC_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Nombre de bloc pour traitement //"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_BLOC_SIZE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_BLOC_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Taille d&apos;un bloc (unité mini de traitement)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_CAT" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_RUN_DATA_CAT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_DATA_TYPE" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="STRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Type de donnée"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_FN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="ABAP_COMPNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Field Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_JOBCOUNT" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBCOUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="N° du job arrière plan"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_JOBNAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Nom du job arrière plan"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_MEM_SIZE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_MEM_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_MSGDATA" STATE="1" TYPTYPE="1" TYPE="YGPL_EXPDATA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Donnée de Message"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_MSGKEY" STATE="1" TYPTYPE="1" TYPE="YGPL_MSG_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ID de message"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_OBJKEY" STATE="1" TYPTYPE="1" TYPE="YGPL_BLOC_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ID unique du bloc d&apos;objet"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_OBJ_NUM" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_PROGRESS" EXPOSURE="2" STATE="1" TYPTYPE="4">t_progress(6) TYPE p DECIMALS 3
+`</ITEM>
+   <ITEM CMPNAME="T_RAWDATA" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="XSTRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Donnée brute à décoder avec CONV_RAW2DATA"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_RUN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_RUN_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_THREADS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Nombre de thread"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_TIME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Temps en seconde"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_TIMESTAMP" STATE="1" TYPTYPE="1" TYPE="TIMESTAMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Horodatage UTC sous forme étendue (AAAAMMJJhhmmssmmmuuun)"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

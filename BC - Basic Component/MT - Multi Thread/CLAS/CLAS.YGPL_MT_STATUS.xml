@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="23120499BB9041267A7FBAFD6C3FC55A" CODE_SIGNATURE="487E908438C5898548E38BA226E2BC9B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_STATUS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
+    <ITEM LANG="F" TEXT="Status des enregistrements MT"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="DONE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;D&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Enregistrement traités"/>
+     <ITEM LANG="F" TEXT="Enregistrement traités"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="INCONSISTENCY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;X&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status Object OK"/>
+     <ITEM LANG="F" TEXT="Status Object OK"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="IN_PROGRESS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;I&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Enregistrement traités"/>
+     <ITEM LANG="F" TEXT="Enregistrement traités"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="KO" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;K&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status Object KO"/>
+     <ITEM LANG="F" TEXT="Status Object KO"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="OK" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;O&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status Object OK"/>
+     <ITEM LANG="F" TEXT="Status Object OK"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_ARCHIVE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;A&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Enregistrement à archiver"/>
+     <ITEM LANG="F" TEXT="Enregistrement à archiver"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_DO" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;T&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Enregistrement à traiter"/>
+     <ITEM LANG="F" TEXT="Enregistrement à traiter"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_LIST" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_KEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste des clés"/>
+     <ITEM LANG="F" TEXT="Liste des clés"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+     <ITEM LANG="F" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  SELECT status
+    INTO TABLE _list
+    FROM ygpl_run_status.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DO_EXISTS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check that key exists"/>
+     <ITEM LANG="F" TEXT="Check that key exists"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="EXISTS" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="ABAP_BOOL">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="&apos;X&apos; Exists &apos; &apos; non trouvé"/>
+       <ITEM LANG="F" TEXT="&apos;X&apos; Exists &apos; &apos; non trouvé"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="KEY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="_STATUS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Status des enregistrements"/>
+       <ITEM LANG="F" TEXT="Status des enregistrements"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  READ TABLE _list WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
+  IF sy-subrc = 0.
+    exists = abap_true.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TS_KEY" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_key,
+      key TYPE _status,
+    END OF ts_key
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Ligne clé"/>
+     <ITEM LANG="F" TEXT="Ligne clé"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_KEYS" STATE="1" TYPTYPE="4">
+    tt_keys TYPE HASHED TABLE OF ts_key WITH UNIQUE KEY KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Liste des clés"/>
+     <ITEM LANG="F" TEXT="Liste des clés"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_STATUS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status des enregistrements"/>
+     <ITEM LANG="F" TEXT="Status des enregistrements"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

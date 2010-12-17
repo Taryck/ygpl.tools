@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="22715F7F6A64C640FC5612CFB3738215" CODE_SIGNATURE="1B6D1CC37C065776799C384F26047231" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : Job process"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+ </RAW>
+</ZL_OBJECT>

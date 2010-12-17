@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="8C56994923C1BBD6C16F5935D6328301" CODE_SIGNATURE="6DD01C42A3913A6E717F44A38DC1553D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCKS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : Lock managment"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_PROCESS_ID"/>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="LOCK" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Lock a catégorie (private)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FOREIGN_LOCK" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objet déjà bloqué"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYS_FAILURE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Erreur interne du serveur enqueue"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPL_RUN&apos;
+    EXPORTING
+      mode_ygpl_run_info       = &apos;X&apos;
+      run_id                   = run_id
+      categ                    = cat
+*   X_RUN_ID                 = &apos; &apos;
+*   X_CATEG                  = &apos; &apos;
+      _scope                   = &apos;2&apos;
+      _wait                    = &apos;X&apos;
+      _collect                 = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock             = 1
+      system_failure           = 2
+      OTHERS                   = 3.
+  IF sy-subrc = 1.
+    RAISE foreign_lock.
+  ELSEIF sy-subrc &lt;&gt; 0.
+    RAISE sys_failure.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="LOCK_CATEGORY" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Lock a catégorie (protected)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CAT_NOT_FOUND" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catérogie non définie dans YGPL_RUN_CAT"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="FOREIGN_LOCK" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objet déjà bloqué"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYSTEM_CAT" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Utilisation d&apos;une catégorie systeme (non autorisé)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYS_FAILURE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Erreur interne du serveur enqueue"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  IF cat IN ygpl_mt_categori=&gt;x_categ. RAISE system_cat. ENDIF.
+  IF ygpl_mt_categori=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
+
+  CALL METHOD lock
+    EXPORTING
+      run_id       = process_id
+      cat          = cat
+    EXCEPTIONS
+      foreign_lock = 1
+      sys_failure  = 2
+      OTHERS       = 3.
+  IF sy-subrc = 1.
+    RAISE foreign_lock.
+  ELSEIF sy-subrc &lt;&gt; 0.
+    RAISE sys_failure.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UNLOCK" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlock run categorie (private)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;DEQUEUE_EYGPL_RUN&apos;
+    EXPORTING
+      MODE_YGPL_RUN_INFO       = &apos;X&apos;
+      RUN_ID                   = run_id
+      CATEG                    = cat
+*      X_RUN_ID                 = &apos; &apos;
+*      X_CATEG                  = &apos; &apos;
+      _SCOPE                   = &apos;3&apos;
+      _SYNCHRON                = &apos; &apos;
+      _COLLECT                 = &apos; &apos;.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UNLOCK_CATEGORY" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlock run categorie (protected)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CAT_NOT_FOUND" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Catérogie non définie dans YGPL_RUN_CAT"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYSTEM_CAT" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Utilisation d&apos;une catégorie systeme (non autorisé)"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  IF cat IN ygpl_mt_categori=&gt;x_categ. RAISE system_cat. ENDIF.
+  IF ygpl_mt_categori=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
+
+  CALL METHOD unlock
+    EXPORTING
+      run_id         = process_id
+      cat            = cat.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

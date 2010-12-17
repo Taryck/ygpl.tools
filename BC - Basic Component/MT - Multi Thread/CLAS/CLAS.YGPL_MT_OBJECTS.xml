@@ -1,0 +1,1425 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="C0A7E6E3529A372587EA84D41235DA58" CODE_SIGNATURE="E5855FDDF032BAEFA0617AEA4D86C97C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Object store engine"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_ID"/>
+   <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_FN"/>
+   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_MEMORY_SIZE"/>
+   <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_NUM_KEY"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_BLOCS_NFO"/>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
+   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_LINES_NFO"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CURRENT_BLOCS" STATE="1" TYPTYPE="1" TYPE="TT_BLOCS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of bloc ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_RUN" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Run Process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="PROCESSED_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number of processed objects"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_WEIGHT_TYPE_KIND" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TR_TYPE_KIND">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ABAP Type Kind allowed for weight Field"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TOTAL_BLOCS_COUNT" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number total of blocs"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TOTAL_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Total object count"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="ADD_BLOC" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add object bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE" PARVALUE="-1" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA _bloc TYPE ygpl_objects.
+
+  _bloc-bloc_id =  generate_bloc_id( ).
+  _bloc-run_id = o_run-&gt;run_id.
+  _bloc-status = ygpl_mt_status=&gt;to_do.
+  DESCRIBE TABLE objects LINES _bloc-nb.
+  IF bloc_size &lt;= 0.
+    _bloc-bloc_size = _bloc-nb.
+  ELSE.
+    _bloc-bloc_size = bloc_size.
+  ENDIF.
+  _bloc-mem_size = get_size( objects ).
+  EXPORT objects = objects TO DATA BUFFER _bloc-obj_data COMPRESSION ON.
+  IF sy-subrc = 0.
+    GET TIME STAMP FIELD _bloc-timestamp.
+    INSERT ygpl_objects FROM _bloc.
+    ADD 1 TO total_blocs_count.
+  ENDIF.
+  ASSERT sy-subrc &lt;&gt; 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Generic Run initialisation"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE" PARVALUE="10" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table des dépendences"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="THREADS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Nombre de thread"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA _bs TYPE Td_BLOC_SIZE.
+
+* Check Objects
+  DESCRIBE TABLE objects LINES TOTAL_OBJECTS.
+  IF TOTAL_OBJECTS &lt; 1. EXIT. ENDIF.
+
+* Check Bloc_Size
+  IF bloc_size &lt; 1.
+    _bs = 1.
+  ELSE.
+    _bs = bloc_size.
+  ENDIF.
+
+** Add run record
+*  CALL METHOD _add_run
+*    EXPORTING
+*      threads   = threads
+*      count     = TOTAL_OBJECTS
+*      bloc_size = _bs
+*    EXCEPTIONS
+*      failed    = 1
+*      OTHERS    = 2.
+*  IF sy-subrc &lt;&gt; 0.
+*    ROLLBACK WORK.
+*    RAISE failed.
+*  ENDIF.
+
+  CALL METHOD create_blocs
+    EXPORTING
+      OBJECTS      = objects
+      bloc_size    = _bs
+      weight_fn    = weight_fn
+      dependencies = dependencies.
+*  IF sy-subrc &lt;&gt; 0.
+*      ROLLBACK WORK.
+*      RAISE failed.
+*  ENDIF.
+*
+*  COMMIT WORK AND WAIT.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ADD_OBJECTS_2_MICRO_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add object to micro bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro de bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="M_BLOC" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_BLOCS_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ2BLOCS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  FIELD-SYMBOLS:
+    &lt;bloc&gt; LIKE LINE OF m_bloc.
+  DATA _obj LIKE LINE OF &lt;bloc&gt;-objs.
+
+  READ TABLE m_bloc WITH TABLE KEY id = bloc ASSIGNING &lt;bloc&gt;.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.
+
+  ADD size TO &lt;bloc&gt;-size.
+  _obj-id = obj.
+  APPEND _obj TO &lt;bloc&gt;-objs.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.
+
+  CALL METHOD set_relation_object_bloc
+    EXPORTING
+      obj       = obj
+      bloc      = bloc
+    changing
+      obj2blocs = obj2blocs.
+*    EXCEPTIONS
+*      failed    = 1
+*      others    = 2.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHECK_WEIGHT_FN" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Controle validité du champs Weight"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA: abap_type TYPE REF TO cl_abap_typedescr.
+  DATA: abap_structure TYPE REF TO cl_abap_structdescr.
+  DATA line_ref TYPE REF TO data.
+
+  FIELD-SYMBOLS :
+    &lt;field&gt; LIKE LINE OF cl_abap_structdescr=&gt;components,
+    &lt;wa&gt; TYPE ANY.
+
+  abap_type = cl_abap_typedescr=&gt;describe_by_data( objects ).
+
+  ASSERT abap_type-&gt;kind = cl_abap_typedescr=&gt;kind_table.
+*  if abap_type-&gt;kind &lt;&gt; cl_abap_typedescr=&gt;kind_table.
+**    RAISE failed.
+*  ENDIF.
+
+  CREATE DATA line_ref LIKE LINE OF objects.
+  ASSIGN line_ref-&gt;* TO &lt;wa&gt;.
+
+  abap_type = cl_abap_typedescr=&gt;describe_by_data( &lt;wa&gt; ).
+  ASSERT abap_type-&gt;kind = cl_abap_typedescr=&gt;kind_struct.
+*  IF abap_type-&gt;kind &lt;&gt; cl_abap_typedescr=&gt;kind_struct.
+*    RAISE failed.
+*  ENDIF.
+
+  abap_structure ?= abap_type.
+
+  READ TABLE abap_structure-&gt;components ASSIGNING &lt;field&gt; WITH KEY name = weight_fn.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ELSEIF NOT &lt;field&gt;-type_kind IN r_weight_type_kind.
+*    RAISE failed.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA tk LIKE LINE OF r_weight_type_kind.
+
+* Génerate Weight Typekind
+  tk-sign = &apos;I&apos;. tk-option = &apos;EQ&apos;.
+  tk-low = cl_abap_typedescr=&gt;typekind_num.     APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_packed.  APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_float.   APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_int.     APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_int1.    APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_int2.    APPEND tk TO r_weight_type_kind.
+  tk-low = cl_abap_typedescr=&gt;typekind_numeric. APPEND tk TO r_weight_type_kind.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_RUN" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MT : Run Process"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  me-&gt;o_run = o_run.
+  ASSERT me-&gt;o_run IS BOUND.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_BLOCS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create blocs"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X"/>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA _wfn     TYPE td_fn.
+  DATA tab_ref  TYPE REF TO data.
+  DATA _from    TYPE i.
+  DATA _to      TYPE i.
+
+  FIELD-SYMBOLS :
+    &lt;fs&gt; LIKE objects.
+
+  IF NOT weight_fn IS INITIAL.
+    CALL METHOD check_weight_fn
+      EXPORTING
+        OBJECTS   = OBJECTS
+        weight_fn = weight_fn.
+    _wfn = weight_fn.
+  ENDIF.
+
+  IF _wfn IS INITIAL AND dependencies IS INITIAL.
+* Quick Bloc Generation
+    CREATE DATA tab_ref LIKE objects.
+    ASSIGN tab_ref-&gt;* TO &lt;fs&gt;.
+    _from = 1.
+    DO.
+      _to = _from + bloc_size - 1.
+      IF _to &gt; total_objects. _to = total_objects. ENDIF.
+      APPEND LINES OF objects FROM _from TO _to TO &lt;fs&gt;.
+      CALL METHOD add_bloc
+        EXPORTING
+          OBJECTS = &lt;fs&gt;.
+      IF _to &gt;= total_objects.
+        EXIT.
+      ELSE.
+        _from = _to + 1.
+      ENDIF.
+      CLEAR &lt;fs&gt;.
+    ENDDO.
+  ELSE.
+    CALL METHOD create_complex_blocs
+      EXPORTING
+        OBJECTS      = OBJECTS
+        bloc_size    = bloc_size
+        weight_fn    = weight_fn
+        dependencies = dependencies.
+  ENDIF.
+
+  o_run-&gt;set_bloc_count( total_blocs_count ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_COMPLEX_BLOCS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create blocs complexes (avec dépendant et/ou par poids)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table des dépendences"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA it_objlst TYPE tt_lines_nfo.
+  DATA tab_ref TYPE REF TO data.
+  DATA fn TYPE string.
+  DATA weight     TYPE td_bloc_size.
+  DATA b_weight   TYPE td_bloc_size.
+  DATA line_ref   TYPE REF TO data.
+
+  FIELD-SYMBOLS :
+    &lt;obj&gt; TYPE ANY,
+    &lt;weight&gt; TYPE ANY,
+    &lt;objects&gt; LIKE objects,
+    &lt;wa&gt; TYPE ANY.
+
+  IF NOT dependencies IS INITIAL.
+    CALL METHOD create_with_dependencies
+      EXPORTING
+        OBJECTS      = OBJECTS
+        bloc_size    = bloc_size
+        weight_fn    = weight_fn
+        dependencies = dependencies
+      IMPORTING
+        done_obj     = it_objlst.
+  ENDIF.
+
+  CREATE DATA line_ref LIKE LINE OF objects.
+  ASSIGN line_ref-&gt;* TO &lt;wa&gt;.
+
+  CREATE DATA tab_ref LIKE objects.
+  ASSIGN tab_ref-&gt;* TO &lt;objects&gt;.
+
+  IF NOT weight_fn IS INITIAL. CONCATENATE &apos;&lt;obj&gt;-&apos; weight_fn INTO fn. ENDIF.
+  LOOP AT objects ASSIGNING &lt;obj&gt;.
+* check obj allready done
+    READ TABLE it_objlst WITH TABLE KEY key = sy-tabix TRANSPORTING NO FIELDS.
+    IF sy-subrc = 0.
+      CONTINUE.
+    ENDIF.
+* Weight determine
+    weight = 1.
+    IF NOT fn IS INITIAL.
+      ASSIGN (fn) TO &lt;weight&gt;.
+      IF sy-subrc = 0.
+        weight = &lt;weight&gt;.
+      ENDIF.
+    ENDIF.
+* Add bloc
+    ADD weight TO b_weight.
+    IF b_weight &gt;= bloc_size.
+      SUBTRACT weight FROM b_weight.
+      CALL METHOD add_bloc
+        EXPORTING
+          OBJECTS   = &lt;objects&gt;
+          bloc_size = b_weight.
+      b_weight = weight.
+      FREE: &lt;objects&gt;.
+    ENDIF.
+* DO the line
+    &lt;wa&gt; = &lt;obj&gt;.
+    APPEND &lt;wa&gt; TO &lt;objects&gt;.
+  ENDLOOP.
+
+* Add last bloc
+  IF NOT &lt;objects&gt; IS INITIAL.
+    CALL METHOD add_bloc
+      EXPORTING
+        OBJECTS   = &lt;objects&gt;
+        bloc_size = b_weight.
+    FREE &lt;objects&gt;.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_MICRO_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create a new micro bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC" CMPTYPE="1" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro de bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="M_BLOC" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_BLOCS_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ2BLOCS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  STATICS next_id TYPE td_num_key.
+  DATA _wa LIKE LINE OF m_bloc.
+  DATA _obj LIKE LINE OF _wa-objs.
+
+  ADD 1 TO next_id.
+  _wa-id = next_id.
+  IF size &lt; 1. _wa-size = 1. ELSE. _wa-size = size. ENDIF.
+  _obj-id = obj. APPEND _obj TO _wa-objs.
+  INSERT _wa INTO TABLE m_bloc.
+  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+  ENDIF.
+
+  bloc = _wa-id.
+
+  CALL METHOD set_relation_object_bloc
+    EXPORTING
+      obj       = obj
+      bloc      = bloc
+    CHANGING
+      obj2blocs = obj2blocs.
+*    EXCEPTIONS
+*      failed    = 1
+*      OTHERS    = 2.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_WITH_DEPENDENCIES" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create blocs complexes (avec dépendances)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table des dépendences"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DONE_OBJ" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objets déjà envoyés"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA:
+    it_obj2blocs TYPE tt_lines_nfo,   &quot; Index = Obj, ID = Bloc
+    it_mini_blocs TYPE tt_blocs_nfo,
+    obj_size  TYPE td_bloc_size,
+    obj1_bloc TYPE td_num_key,
+    obj2_bloc TYPE td_num_key,
+    _dependencies TYPE tt_dependencies,
+    obj_count TYPE i.
+
+  FIELD-SYMBOLS :
+    &lt;dep&gt; LIKE LINE OF dependencies.
+
+  DESCRIBE TABLE objects LINES obj_count.
+  _dependencies = dependencies.
+  DELETE _dependencies WHERE obj1 &lt; 1 OR obj1 &gt; obj_count
+                         OR obj2 &lt; 1 OR obj2 &gt; obj_count.
+* Create µblocs
+  LOOP AT _dependencies ASSIGNING &lt;dep&gt;.
+    IF &lt;dep&gt;-obj1 = &lt;dep&gt;-obj2. CONTINUE. ENDIF.
+    AT NEW obj1.
+* check if obj1 afected to
+      obj1_bloc = get_object_bloc( num = &lt;dep&gt;-obj1
+                                 table = it_obj2blocs ).
+    ENDAT.
+* check if obj1 afected to
+    obj2_bloc = get_object_bloc( num = &lt;dep&gt;-obj2
+                               table = it_obj2blocs ).
+    IF obj1_bloc IS INITIAL AND obj2_bloc IS INITIAL.
+* Creat new µbloc
+      obj_size = get_object_size( objects = objects
+                                weight_fn = weight_fn
+                                  obj_num = &lt;dep&gt;-obj1 ).
+      CALL METHOD create_micro_bloc
+        EXPORTING
+          obj       = &lt;dep&gt;-obj1
+          size      = obj_size
+        IMPORTING
+          bloc      = obj1_bloc
+        CHANGING
+          m_bloc    = it_mini_blocs
+          obj2blocs = it_obj2blocs.
+*        EXCEPTIONS
+*          failed    = 1
+*          OTHERS    = 2.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+    ENDIF.
+    IF obj2_bloc IS INITIAL.
+* Affect µbloc obj1 to obj2
+      obj_size = get_object_size( objects = objects
+                                weight_fn = weight_fn
+                                  obj_num = &lt;dep&gt;-obj2 ).
+      CALL METHOD add_objects_2_micro_bloc
+        EXPORTING
+          obj       = &lt;dep&gt;-obj2
+          size      = obj_size
+          bloc      = obj1_bloc
+        CHANGING
+          m_bloc    = it_mini_blocs
+          obj2blocs = it_obj2blocs.
+*        EXCEPTIONS
+*          failed    = 1
+*          OTHERS    = 2.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+    ELSE.
+* Join µbloc obj1 &amp; Obj2
+      CALL METHOD join_2_micro_blocs
+        EXPORTING
+          bloc1     = obj1_bloc
+          bloc2     = obj2_bloc
+        CHANGING
+          m_bloc    = it_mini_blocs
+          obj2blocs = it_obj2blocs.
+*        EXCEPTIONS
+*          failed    = 1
+*          OTHERS    = 2.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+  FREE it_obj2blocs.
+* Groups µbloc to get wanted size
+  CALL METHOD generate_blocs
+    EXPORTING
+      bloc_size = bloc_size
+    CHANGING
+      m_bloc    = it_mini_blocs.
+*    EXCEPTIONS
+*      failed    = 1
+*      OTHERS    = 2.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
+
+  CALL METHOD send_blocs
+    EXPORTING
+      OBJECTS   = OBJECTS
+      blocs     = it_mini_blocs
+      weight_fn = weight_fn
+    IMPORTING
+      done_obj  = done_obj.
+*    EXCEPTIONS
+*      failed    = 1
+*      OTHERS    = 2.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GENERATE_BLOCS" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Group µblocs into Blocs"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="M_BLOC" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_BLOCS_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  TYPES:
+    t_line LIKE LINE OF m_bloc.
+  DATA:
+    size  TYPE td_bloc_size,
+    new_b TYPE t_line,
+    blocs TYPE STANDARD TABLE OF t_line.
+  FIELD-SYMBOLS:
+    &lt;b&gt; TYPE t_line.
+
+  blocs = m_bloc.
+  REFRESH m_bloc.
+  SORT blocs BY size DESCENDING.
+  DO.
+    IF blocs IS INITIAL. EXIT. ENDIF.
+    READ TABLE blocs INDEX 1 ASSIGNING &lt;b&gt;.
+    new_b = &lt;b&gt;.
+    DELETE blocs INDEX 1.
+    IF sy-subrc &lt;&gt; 0.
+*      RAISE failed.
+    ENDIF.
+    IF new_b-size &lt; bloc_size AND NOT blocs IS INITIAL.
+      size = bloc_size - new_b-size.
+      LOOP AT blocs ASSIGNING &lt;b&gt;.
+        IF &lt;b&gt;-size &lt; size.
+          ADD &lt;b&gt;-size TO new_b-size.
+          size = bloc_size - new_b-size.
+          APPEND LINES OF &lt;b&gt;-objs TO new_b-objs.
+          IF sy-subrc &lt;&gt; 0.
+*            RAISE failed.
+          ENDIF.
+          DELETE blocs.
+          IF sy-subrc &lt;&gt; 0.
+*            RAISE failed.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+    INSERT new_b INTO TABLE m_bloc.
+    IF sy-subrc &lt;&gt; 0.
+*      RAISE failed.
+    ENDIF.
+  ENDDO.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GENERATE_BLOC_ID" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create a new Bloc_ID"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_ID" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BLOC_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ID unique du bloc d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  CALL FUNCTION &apos;GUID_CREATE&apos;
+    IMPORTING
+*     EV_GUID_16       =
+*     EV_GUID_22       =
+      EV_GUID_32       = BLOC_ID.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get a batch (n blocs)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WAIT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PARVALUE="&apos;X&apos;" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Attendre"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA tab_ref TYPE REF TO data.
+  FIELD-SYMBOLS :
+    &lt;fs&gt; LIKE objects.
+  DATA maxrow TYPE i.
+  DATA rows TYPE i.
+  DATA mem_size   TYPE td_memory_size.
+  DATA t_size     TYPE td_memory_size.
+*  DATA _run       TYPE ts_run.
+  DATA _blocs     TYPE STANDARD TABLE OF ygpl_mt__objects.
+  DATA o_job      TYPE to_job.
+
+  FIELD-SYMBOLS :
+    &lt;wa&gt; LIKE LINE OF _blocs.
+
+  o_job ?= o_run.
+
+  IF NOT current_blocs[] IS INITIAL.
+*    RAISE batch_not_confirmed.
+  ENDIF.
+
+  CREATE DATA tab_ref LIKE objects.
+  ASSIGN tab_ref-&gt;* TO &lt;fs&gt;.
+
+  CALL METHOD ygpl_mt_locks=&gt;lock
+    EXPORTING
+      run_id = o_job-&gt;run_id
+      cat    = ygpl_mt_categori=&gt;data_bloc.
+*    EXCEPTIONS
+*      foreign_lock = 1
+*      sys_failure  = 2
+*      OTHERS       = 3.
+*  IF sy-subrc = 1.
+*    RAISE foreign_lock.
+*  ELSEIF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
+
+* Determine Maxrow
+*  o_job-&gt;refresh_from_db( ).
+*  CALL METHOD get_run
+*    IMPORTING
+*      run_data = _run.
+**    EXCEPTIONS
+**      not_found = 1
+**      OTHERS    = 2.
+**  IF sy-subrc &lt;&gt; 0.
+**    CALL METHOD _unlock( run_id = run_id
+**      cat = ygpl_mt_categori=&gt;data_bloc ).
+**    RAISE failed.
+**  ENDIF.
+
+*  maxrow = ( _run-obj_left / _run-objects * _run-blocs * batch_rate ) DIV _run-threads + 1.
+  IF maxrow &lt; 1. maxrow = 1. ENDIF.
+
+* Get data : Big ones first
+  SELECT * INTO TABLE _blocs
+    FROM ygpl_mt__objects UP TO maxrow ROWS
+    WHERE run_id = o_job-&gt;run_id
+      AND status = ygpl_mt_status=&gt;to_do
+      AND bloc_size &gt; o_job-&gt;infos-bloc_size.
+
+  IF NOT o_job-&gt;infos-bloc_size IS INITIAL.
+* When no more big ones
+    DESCRIBE TABLE _blocs LINES rows.
+    SUBTRACT rows FROM maxrow.
+    IF maxrow &gt; 0.
+      SELECT * APPENDING TABLE _blocs
+        FROM ygpl_mt__objects UP TO maxrow ROWS
+        WHERE run_id = o_job-&gt;run_id
+          AND status = ygpl_mt_status=&gt;to_do
+          AND bloc_size &lt;= o_job-&gt;infos-bloc_size.
+* si _blocs était vide inutile de recherche avec bloc_size =&amp;gt; RAZ
+* mais pas avant car on s&amp;apos;en sert dans cette requette avec
+*          AND mem_size &amp;lt;= _bloc_size.
+      IF rows = 0. CLEAR o_job-&gt;infos-bloc_size. ENDIF.
+    ENDIF.
+  ENDIF.
+
+  IF NOT _blocs IS INITIAL.
+    SORT _blocs BY mem_size DESCENDING.
+    LOOP AT _blocs ASSIGNING &lt;wa&gt;.
+* Memory limits
+      IF o_job-&gt;max_memory &gt; 0.
+        t_size = mem_size + &lt;wa&gt;-mem_size.
+        IF t_size &gt; o_job-&gt;max_memory AND mem_size &gt; 0.
+          CONTINUE.
+        ENDIF.
+        ADD &lt;wa&gt;-mem_size TO mem_size.
+      ENDIF.
+      IMPORT objects = &lt;fs&gt; FROM DATA BUFFER &lt;wa&gt;-obj_data.
+      IF sy-subrc = 0.
+        APPEND LINES OF &lt;fs&gt; TO objects.
+        IF sy-subrc = 0.
+          APPEND &lt;wa&gt;-bloc_id TO current_blocs.
+          IF sy-subrc = 0.
+            UPDATE ygpl_objects SET status = ygpl_mt_status=&gt;in_progress
+              WHERE bloc_id = &lt;wa&gt;-bloc_id.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+      ASSERT sy-subrc &lt;&gt; 0.
+*      IF sy-subrc &lt;&gt; 0.
+*        ROLLBACK WORK.
+*        CALL METHOD _unlock( run_id = run_id
+*          cat = ygpl_mt_categori=&gt;data_bloc ).
+*        RAISE failed.
+*      ENDIF.
+    ENDLOOP.
+  ENDIF.
+
+  DESCRIBE TABLE objects LINES maxrow.
+  ADD maxrow TO total_objects.
+  processed_objects = maxrow.
+*  CLEAR msg_objects.
+
+*  COMMIT WORK AND WAIT.
+*  CALL METHOD _unlock( run_id = run_id
+*    cat = ygpl_mt_categori=&gt;data_bloc ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Object&apos;s Bloc number if assigned"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_NUM_KEY"/>
+     <ITEM SCONAME="NUM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY"/>
+     <ITEM SCONAME="TABLE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  FIELD-SYMBOLS :
+  &lt;obj2b&gt; LIKE LINE OF table.
+
+  READ TABLE table with TABLE KEY key = num ASSIGNING &lt;obj2b&gt;.
+  IF sy-subrc = 0.
+    bloc = &lt;obj2b&gt;-val.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_OBJECT_SIZE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Object Size (weigthed)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects list"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ_NUM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SIZE" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA fn TYPE string.
+
+  FIELD-SYMBOLS :
+    &lt;obj&gt; TYPE ANY,
+    &lt;weight&gt; TYPE ANY.
+
+  size = 1.
+  IF weight_fn IS INITIAL.
+    RETURN.
+  ENDIF.
+
+  CONCATENATE &apos;&lt;obj&gt;-&apos; weight_fn INTO fn.
+
+  READ TABLE objects INDEX obj_num ASSIGNING &lt;obj&gt;.
+  IF sy-subrc &lt;&gt; 0.
+    RETURN.
+  ENDIF.
+
+  ASSIGN (fn) TO &lt;weight&gt;.
+  IF sy-subrc &lt;&gt; 0.
+    RETURN.
+  ENDIF.
+
+  size = &lt;weight&gt;.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_SIZE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get memory use"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object to get size"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA xstr TYPE xstring.
+
+  TRY.
+      CALL METHOD cl_abap_memory_utilities=&gt;get_memory_size_of_object
+        EXPORTING
+          object                     = object
+*          ignore_string_sharing      =
+*          ignore_table_sharing       =
+        IMPORTING
+*          bound_size_alloc           =
+          bound_size_used            = result
+*          referenced_size_alloc      =
+*          referenced_size_used       =
+*          is_part_of_non_trivial_szk =
+*          szk_size_alloc             =
+*          szk_size_used              =
+*          low_mem                    =
+*          is_in_shared_memory        =
+*          sizeof_alloc               =
+*          sizeof_used                = size
+          .
+    CATCH cx_root.
+      EXPORT x = object TO DATA BUFFER xstr COMPRESSION OFF.
+      result = XSTRLEN( xstr ).
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="JOIN_2_MICRO_BLOCS" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Join 2 Micro blocs"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC1" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="BLOC2" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="M_BLOC" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_BLOCS_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ2BLOCS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  FIELD-SYMBOLS:
+    &lt;b1&gt; LIKE LINE OF m_bloc,
+    &lt;b2&gt; LIKE LINE OF m_bloc.
+
+  READ TABLE m_bloc WITH TABLE KEY id = bloc1 ASSIGNING &lt;b1&gt;.
+  ASSERT sy-subrc &lt;&gt; 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
+  READ TABLE m_bloc WITH TABLE KEY id = bloc2 ASSIGNING &lt;b2&gt;.
+  ASSERT sy-subrc &lt;&gt; 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
+
+  ADD &lt;b2&gt;-size TO &lt;b1&gt;-size.
+  APPEND LINES OF &lt;b2&gt;-objs TO &lt;b1&gt;-objs.
+  ASSERT sy-subrc &lt;&gt; 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
+
+  DELETE TABLE m_bloc WITH TABLE KEY id = bloc2.
+  ASSERT sy-subrc &lt;&gt; 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SEND_BLOCS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Send blocs to DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOCS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_BLOCS_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DONE_OBJ" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objets déjà envoyés"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste des objets"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA tab_ref TYPE REF TO data.
+  DATA obj_id LIKE LINE OF done_obj.
+  DATA weight   TYPE td_bloc_size.
+  DATA b_weight TYPE td_bloc_size.
+  DATA fn TYPE string.
+
+  FIELD-SYMBOLS :
+    &lt;weight&gt; TYPE ANY,
+    &lt;b&gt; LIKE LINE OF blocs,
+    &lt;id&gt; LIKE LINE OF &lt;b&gt;-objs,
+    &lt;obj&gt; TYPE ANY,
+    &lt;objects&gt; LIKE objects.
+
+  CREATE DATA tab_ref LIKE objects.
+  ASSIGN tab_ref-&gt;* TO &lt;objects&gt;.
+
+  IF NOT weight_fn IS INITIAL. CONCATENATE &apos;&lt;obj&gt;-&apos; weight_fn INTO fn. ENDIF.
+* Creation bloc
+  LOOP AT blocs ASSIGNING &lt;b&gt;.
+    LOOP AT &lt;b&gt;-objs ASSIGNING &lt;id&gt;.
+      READ TABLE objects INDEX &lt;id&gt;-id ASSIGNING &lt;obj&gt;.
+      ASSERT sy-subrc &lt;&gt; 0.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+* Weight determine
+      weight = 1.
+      IF NOT fn IS INITIAL.
+        ASSIGN (fn) TO &lt;weight&gt;.
+        IF sy-subrc = 0.
+          weight = &lt;weight&gt;.
+        ENDIF.
+      ENDIF.
+      ADD weight TO b_weight.
+
+      APPEND &lt;obj&gt; TO &lt;objects&gt;.
+      ASSERT sy-subrc &lt;&gt; 0.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+      obj_id-key = &lt;id&gt;-id.
+      INSERT obj_id INTO TABLE done_obj.
+      ASSERT sy-subrc &lt;&gt; 0.
+*      IF sy-subrc &lt;&gt; 0.
+*        RAISE failed.
+*      ENDIF.
+    ENDLOOP.
+    CALL METHOD add_bloc
+      EXPORTING
+        OBJECTS   = &lt;objects&gt;
+        bloc_size = b_weight.
+*      EXCEPTIONS
+*        failed    = 1
+*        OTHERS    = 2.
+*    IF sy-subrc &lt;&gt; 0.
+*      RAISE failed.
+*    ENDIF.
+    REFRESH &lt;objects&gt;.
+    CLEAR: b_weight.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_RELATION_OBJECT_BLOC" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set Object&apos;s Bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro de bloc"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_NUM_KEY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Numéro d&apos;objet"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJ2BLOCS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_LINES_NFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table dépendance bloc : OBJ-&gt;Bloc ou Bloc-&gt;Obj"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="FAILED" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="action a échouée"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA wa LIKE LINE OF obj2blocs.
+
+  wa-key = obj.
+  wa-val = bloc.
+  INSERT wa INTO TABLE obj2blocs.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE failed.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TO_JOB" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_JOB">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Job process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Run Process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_TYPE_KIND" STATE="1" TYPTYPE="4">
+    tr_type_kind TYPE RANGE OF abap_typekind
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of ABAP Type Kind"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_BLOC" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_bloc,
+      bloc_id TYPE ygpl_bloc_id,
+    END OF ts_bloc
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Bloc ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_BLOCS" STATE="1" TYPTYPE="4">
+    tt_blocs TYPE STANDARD TABLE OF ts_bloc
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of bloc ID"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="E5C09C1C8C7C4A4B857F9A394EAA8250" CODE_SIGNATURE="DCF6B42A4C1E0587D2B02D9E3578CF93" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_CATEGORIES" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_CATEGORIES" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Mes catégorie de msg et info"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="PARAMS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;PA&apos;" TYPTYPE="1" TYPE="_CATEG"/>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+ </RAW>
+</ZL_OBJECT>

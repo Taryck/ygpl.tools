@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="D44A10B4C3EA2CCB33438ACBDD7A8096" CODE_SIGNATURE="8E945037EC4050033D16AF04AE7560F9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_CATEGORY" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" CATEGORY="40" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" VARCL="X" UNICODE="X" RSTAT="S" MSG_ID="YGPL_MT_CX">
+   <INHERITANCE REFCLSNAME="YGPL_MT_CX" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MultyThread : Root exception class">U1&amp;FUNCTIONALITY&amp;
+ASZAPLink framework root exception class. All Exception classes raised
+  from the framework inherit from this class. Have a look to each method
+  for more details.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS
+U1Memories
+ASThis application is dedicated to the memories of :
+B2My father : Lamri BENSIALI (1940-2004) without whom I never started
+  programming
+B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
+  application</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
+   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CATEGORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_CATEGORY"/>
+   <ITEM CMPNAME="CATEGORY_DO_NOT_EXISTS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_DO_NOT_EXISTS,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;001&apos;,
+      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      attr2 type scx_attrname value &apos;CATEGORY_TABLE&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of CATEGORY_DO_NOT_EXISTS
+`</ITEM>
+   <ITEM CMPNAME="CATEGORY_NOT_DEFINE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_NOT_DEFINE,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;006&apos;,
+      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of CATEGORY_NOT_DEFINE
+`</ITEM>
+   <ITEM CMPNAME="CATEGORY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPL_MT_CATEGORY&apos;" TYPTYPE="1" TYPE="TABNAME16">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Name of the category list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="DATA_TYPE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="INCORRECT_DATA_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INCORRECT_DATA_TYPE,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;002&apos;,
+      attr1 type scx_attrname value &apos;DATA_TYPE&apos;,
+      attr2 type scx_attrname value &apos;CX_NAME&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of INCORRECT_DATA_TYPE
+`</ITEM>
+   <ITEM CMPNAME="SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SYSTEM_CATEGORY,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;000&apos;,
+      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of SYSTEM_CATEGORY
+`</ITEM>
+   <ITEM CMPNAME="YGPL_MT_CX_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_CATEGORY,
+      msgid type symsgid value &apos;ZAPLINK&apos;,
+      msgno type symsgno value &apos;105&apos;,
+      attr1 type scx_attrname value &apos;CX_NAME&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of YGPL_MT_CX_CATEGORY</ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <INTERFACES>
+    <ITEM TYPEGROUP="IF_T100_MESSAGE" TPUTYPE="2" EXPLICIT="X"/>
+   </INTERFACES>
+  </DEFERRED>
+  <FRIENDS>
+   <ITEM REFCLSNAME="ZAPLINK_CX" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS
+
+INCLUDE zaplink_macros.</MACROS>
+  </LOCAL>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="ICON" EXPLICIT="X"/>
+  </TYPEGROUPS>
+ </RAW>
+</ZL_OBJECT>

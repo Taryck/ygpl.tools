@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="889961C40A6E7C689F50B7BDFF68DDDB" CODE_SIGNATURE="35CF231CD938CE7B26DC7790E82CBB46" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : PRocess info"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_AS_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_AS_NAME"/>
+   <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_MEMORY_SIZE"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_WP_INDEX" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_INDEX"/>
+   <ITEM CMPNAME="TD_WP_NO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_NO"/>
+   <ITEM CMPNAME="TD_WP_PID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_PID"/>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="F_NONEW" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Do not create new ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WP_INDEX" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_INDEX">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Index of SAP Work Process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WP_NO" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_NO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="SAP Work process no."/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WP_PID" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_PID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="SAP Work Process Identification"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WP_SERVER" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_AS_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Application Server Name"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA subrc    TYPE sy-subrc.
+*  DATA tk       LIKE LINE OF _weigth_tk.
+
+  CALL FUNCTION &apos;TH_GET_ACTIVE_SERVER&apos;
+    EXPORTING
+      tabname              = space
+      local_tabname        = space
+    IMPORTING
+      SERVER               = wp_server
+    EXCEPTIONS
+      NO_SERVER_LIST       = 1
+      NO_SERVER            = 2
+      OTHERS               = 3.
+  assert sy-subrc = 0.
+
+  CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
+    IMPORTING
+      subrc    = subrc
+      wp_no    = wp_no
+      wp_pid   = wp_pid
+      wp_index = wp_index.
+
+** Génerate Weight Typekind
+*  tk-sign = &apos;I&apos;. tk-option = &apos;EQ&apos;.
+*  tk-low = cl_abap_typedescr=&gt;typekind_num. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_packed. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_float. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_int. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_int1. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_int2. APPEND tk TO _weigth_tk.
+*  tk-low = cl_abap_typedescr=&gt;typekind_numeric. APPEND tk TO _weigth_tk.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_process TYPE ygpl_mt__process.
+
+  IF f_nonew IS INITIAL.
+    s_process-process_id = process_id = generate_new_process_id( ).
+    s_process-status = ygpl_mt_status=&gt;in_progress.
+    s_process-wp_server = wp_server.
+    s_process-wp_index = wp_index.
+    s_process-wp_no = wp_no.
+    s_process-wp_pid = wp_pid.
+    GET TIME STAMP FIELD s_process-timestamp.
+    INSERT ygpl_mt__process FROM s_process .
+    ASSERT sy-subrc &lt;&gt; 0.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GENERATE_NEW_PROCESS_ID" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create a new Process ID"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CALL FUNCTION &apos;GUID_CREATE&apos;
+    IMPORTING
+      ev_guid_16 = result.
+*     EV_GUID_22       =
+*     EV_GUID_32       = RUN_ID</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

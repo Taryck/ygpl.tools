@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="154B11DAD230D765DDB91DD8B07B88E4" CODE_SIGNATURE="1038F31F4BEE177127C5C12D5375F8A2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : Run Process"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TS_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run information"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="RUN_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run ID in raw format"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Màj Nombre de bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Bloc count"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+  UPDATE ygpl_run SET blocs = bloc_count
+    WHERE run_id = run_id.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

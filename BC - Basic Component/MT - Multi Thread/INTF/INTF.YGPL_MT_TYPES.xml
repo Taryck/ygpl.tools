@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="814184B4D137931ECB0015035E04AF3F" CODE_SIGNATURE="21DB98F4F302BE4061F7D46F135741E6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MultyThreads data Types"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
+    BEGIN OF sys_categories,
+      data_bloc   TYPE td_category VALUE &apos;_D&apos;,              &quot;#EC NOTEXT
+      run_info    TYPE td_category VALUE &apos;_I&apos;,              &quot;#EC NOTEXT
+      obj_conf    TYPE td_category VALUE &apos;_O&apos;,              &quot;#EC NOTEXT
+    END OF sys_categories
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="System reserved categories"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_AS_LOAD" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Application server load"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_AS_NAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="RSBATCHCTRL-SERVER">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Application Server Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_BLOC_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Bloc ID (unique key)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_MT__OBJECTS-BLOC_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Bloc size (smallest qty of object)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="ABAP_BOOL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Boolean : (&apos;X&apos; = True, &apos; &apos; = false)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_RUN_DATA_CAT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Information / Message category"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object/Bloc/Thread/... count"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Data type definition"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_FN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="ABAP_COMPNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Field Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_GROUP" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBGROUP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Summary of jobs for a group"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBCOUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Job ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Background job name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_MT__OBJECTS-MEM_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Memory used (octet)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Obkect/Bloc Key as number"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_PRIORITY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TBTCJOB-JOBCLASS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Job classification"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_MT__PROCESS-PROCESS_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_PROGRESS" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    td_progress(6) TYPE p DECIMALS 3
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Progression in % (xxx.xxx)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="XSTRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Raw data type to decode with CONV_RAW2DATA"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object&apos;s status"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_THREAD_COUNT" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number of thread"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Time in second"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TIMESTAMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_WP_COUNT" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number of the Work Process on the Application Server"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_WP_INDEX" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="WPINFO-WP_INDEX">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Index of Work Process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_WP_NO" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="WPINFO-WP_NO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Work process no."/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_WP_PID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="WPINFO-WP_PID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Process Identification"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_AS_NAME" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tr_as_name TYPE RANGE OF td_as_name
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of Application Server Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tr_categories TYPE RANGE OF td_category
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of category"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_AS" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_as,
+        name     TYPE td_as_name,
+        wp       TYPE td_wp_count,
+        load     TYPE td_as_load,
+      END OF ts_as
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Application Server informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_BLOC_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_bloc_nfo,  &quot; acces by line number
+      id    TYPE td_num_key,
+      size  TYPE td_bloc_size,
+      objs  TYPE tt_idlst_nfo,
+    END OF ts_bloc_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Bloc information"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_DEPENDENCY" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_dependency,
+        obj1 TYPE td_num_key,
+        obj2 TYPE td_num_key,
+      END OF ts_dependency
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define dependency relation between 2 object"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_IDLST_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_idlst_nfo,
+       id TYPE td_num_key,
+     END OF ts_idlst_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_JOB_KEY" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_job_key,
+         name   TYPE td_jobname,
+         id     TYPE td_jobid,
+       END OF ts_job_key
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Job key (Name &amp; ID)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_LINE_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_line_nfo,
+      key TYPE td_num_key,
+      val TYPE td_num_key,
+    END OF ts_line_nfo
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Relation structure Bloc &lt;=&gt; Object"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_run,
+      run_id    TYPE  ygpl_mt_runs-run_id.
+  INCLUDE TYPE ygpl_mt_run_info.
+  TYPES:
+     END OF ts_run
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run information"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_STATUS_INFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    BEGIN OF ts_status_info,
+      status  TYPE td_status,
+      count   TYPE td_count,
+    END OF ts_status_info
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object count for a status"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_AS" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_as TYPE STANDARD TABLE OF ts_as WITH KEY name
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of Application Server with load"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_blocs_nfo TYPE SORTED TABLE OF ts_bloc_nfo WITH UNIQUE KEY id
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of bloc information"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_dependencies TYPE SORTED TABLE OF ts_dependency WITH UNIQUE KEY obj1 obj2
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of dependencies for an object batch"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_IDLST_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_idlst_nfo TYPE STANDARD TABLE OF ts_idlst_nfo WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set of object ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_lines_nfo TYPE SORTED TABLE OF ts_line_nfo WITH UNIQUE KEY KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Relation list Bloc &lt;=&gt; Object"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_status_list TYPE SORTED TABLE OF ts_status_info WITH UNIQUE KEY status
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of object&apos;s status with count"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

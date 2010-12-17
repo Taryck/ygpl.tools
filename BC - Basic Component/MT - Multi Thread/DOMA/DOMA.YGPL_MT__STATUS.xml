@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="1FD1CB380024ED35A3E8749B96690101" CONNECTOR="5079624B82531D63E1000000AC120173" NAME="YGPL_MT__STATUS" TYPE="DOMA" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA DATATYPE="CHAR" LENG="000001" OUTPUTLEN="000001" VALEXI="X"/>
+  <TEXTS>
+   <ITEM LANGU="E" SHORT_TXT="Run/Job/Object Status"/>
+   <ITEM LANGU="F" SHORT_TXT="Status des enregistrements"/>
+  </TEXTS>
+  <VALUES>
+   <ITEM VALPOS="0001" DOMVALUE_L="T">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Todo (Object Bloc)"/>
+     <ITEM LANGU="F" SHORT_TXT="To do"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM VALPOS="0002" DOMVALUE_L="D">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Done (Object Bloc)"/>
+     <ITEM LANGU="F" SHORT_TXT="Done"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM VALPOS="0003" DOMVALUE_L="I">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="In progress (Object Bloc)"/>
+     <ITEM LANGU="F" SHORT_TXT="In Progress"/>
+    </TEXTS>
+   </ITEM>
+  </VALUES>
+ </RAW>
+</ZL_OBJECT>

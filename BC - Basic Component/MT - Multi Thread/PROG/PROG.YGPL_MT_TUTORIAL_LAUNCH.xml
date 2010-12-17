@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="10D6B2AF9BEFBA7E86347C4BBBBE728B" CODE_SIGNATURE="B1E70460EF17A35E425E801D57E6A41F" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="F" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YGPL_MT_TUTORIAL
+*&amp;---------------------------------------------------------------------*
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+
+REPORT  ygpl_mt_tutorial_launch.
+PARAMETERS :
+  clr_all TYPE oax AS CHECKBOX DEFAULT &apos; &apos;,
+  thread TYPE ygpl_mt_template=&gt;t_threads DEFAULT 2 OBLIGATORY,
+  bloc_s TYPE ygpl_mt_template=&gt;t_bloc_size DEFAULT 10 OBLIGATORY,
+  wait_m TYPE ygpl_mt_template=&gt;t_time DEFAULT 30,
+  prog_m TYPE ygpl_mt_template=&gt;t_progress DEFAULT 1,
+  mem_size TYPE ygpl_mt_template=&gt;t_mem_size DEFAULT 0,
+  wait_t TYPE i DEFAULT 1,
+  obj_c TYPE i DEFAULT 50 OBLIGATORY,
+  immed TYPE oax AS CHECKBOX DEFAULT &apos;X&apos;.
+
+TYPES:
+  BEGIN OF ts_ctrl,
+    msg TYPE t100a-arbgb,
+    msg_ctrl TYPE string,
+  END OF ts_ctrl,
+  tt_ctrl TYPE STANDARD TABLE OF ts_ctrl,
+  BEGIN OF ts_data,
+      msg TYPE t100a-arbgb,
+      langu TYPE t100t-sprsl,
+      text TYPE string,
+    END OF ts_data .
+TYPES:
+  tt_data TYPE STANDARD TABLE OF ts_data WITH NON-UNIQUE KEY msg .
+DATA:
+  it_data TYPE tt_data,
+  my_run TYPE REF TO ygpl_mt_template,
+*  progression TYPE string,
+  is_finished TYPE oax,
+*  id TYPE ygpl_mt_template=&gt;t_run,
+  _jobname TYPE tbtcjob-jobname,
+  _jobcount TYPE tbtcjob-jobcount,
+  it_ctrl TYPE tt_ctrl,
+  it_dep TYPE ygpl_mt_template=&gt;tt_dependencies,
+  1st_c TYPE c,
+  line TYPE i,
+  c_line TYPE i,
+  w_dep LIKE LINE OF it_dep,
+  it_objects TYPE ygpl_mt_template=&gt;tt_data,
+  int TYPE i,
+  w_obj LIKE LINE OF it_objects,
+  w_lang LIKE LINE OF w_obj-lang.
+
+FIELD-SYMBOLS:
+  &lt;wa&gt; LIKE LINE OF it_data,
+  &lt;msg&gt; LIKE LINE OF it_ctrl,
+  &lt;st&gt; LIKE LINE OF my_run-&gt;my_status.
+
+*----------------------------------------------------------------------*
+*       CLASS Handler DEFINITION
+*----------------------------------------------------------------------*
+*
+*----------------------------------------------------------------------*
+CLASS handler DEFINITION.
+  PUBLIC SECTION.
+    METHODS: submit FOR EVENT submit_thread OF ygpl_mt_template
+                    IMPORTING
+                      thread_number
+                      jobname
+                      jobcount.
+ENDCLASS.                    &quot;Handler DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS Handler IMPLEMENTATION
+*----------------------------------------------------------------------*
+*
+*----------------------------------------------------------------------*
+CLASS handler IMPLEMENTATION.
+
+  METHOD submit.
+    SUBMIT ygpl_mt_tutorial
+      WITH run_id = my_run-&gt;run_id
+      WITH wait_t = wait_t
+      WITH obj_c = obj_c
+      WITH mem_size = mem_size
+      VIA JOB jobname NUMBER jobcount
+      AND RETURN.
+    IF sy-subrc = 0.
+      IF NOT sy-batch IS INITIAL.
+        MESSAGE s004(ygpl_mt_rootclass) WITH thread_number jobname jobcount.
+      ENDIF.
+    ELSE.
+      MESSAGE i005(ygpl_mt_rootclass) WITH thread_number jobname jobcount.
+    ENDIF.
+  ENDMETHOD.                    &quot;SUBMIT
+
+ENDCLASS.                    &quot;Handler IMPLEMENTATION
+
+DATA:
+  my_handler TYPE REF TO handler.
+
+START-OF-SELECTION.
+  IF NOT clr_all IS INITIAL.
+    CALL METHOD ygpl_mt_template=&gt;delete_all.
+  ENDIF.
+
+  CREATE OBJECT my_run.
+  CREATE OBJECT my_handler.
+
+  SET HANDLER my_handler-&gt;submit FOR my_run.
+
+  MESSAGE i002(ygpl_mt_rootclass) WITH my_run-&gt;run_id.
+
+* Clear Controle table
+  DELETE FROM ygpl_t100t.
+  COMMIT WORK AND WAIT.
+
+* GET worklist
+  SELECT t~arbgb l~sprsl l~stext
+    INTO TABLE it_data
+    FROM t100a AS t LEFT JOIN t100t AS l ON l~arbgb = t~arbgb
+*  where arbgb &lt; &apos;D&apos;
+    .
+
+  SORT it_data BY msg langu.
+  LOOP AT it_data ASSIGNING &lt;wa&gt;.
+    AT NEW msg.
+      ADD 1 TO c_line.
+      CLEAR w_obj.
+      w_obj-msg = &lt;wa&gt;-msg.
+      IF 1st_c &lt;&gt; w_obj-msg(1).
+        1st_c = w_obj-msg(1).
+        line = c_line.
+      ENDIF.
+      IF 1st_c &gt; &apos;A&apos;. CLEAR 1st_c. ENDIF.
+    ENDAT.
+
+    w_lang-langu = &lt;wa&gt;-langu.
+    w_lang-text = &lt;wa&gt;-text.
+    int = STRLEN( w_lang-text ).
+    ADD int TO w_obj-weight.
+    APPEND w_lang TO w_obj-lang.
+
+    AT END OF msg.
+      APPEND w_obj TO it_objects.
+      IF line &lt;&gt; c_line AND NOT 1st_c IS INITIAL.
+        w_dep-obj1 = line.
+        w_dep-obj2 = c_line.
+        INSERT w_dep INTO TABLE it_dep.
+      ELSEIF 1st_c CO &apos;123456789&apos;. &quot; regouper 0 à 9 ensemble
+        w_dep-obj1 = line - 1.
+        w_dep-obj2 = c_line.
+        INSERT w_dep INTO TABLE it_dep.
+      ENDIF.
+    ENDAT.
+  ENDLOOP.
+
+* Prepare MT
+  CALL METHOD my_run-&gt;load_run
+    EXPORTING
+      threads      = thread
+      OBJECTS      = it_objects
+      bloc_size    = bloc_s
+      dependencies = it_dep
+    EXCEPTIONS
+      failed       = 1
+      OTHERS       = 2.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE e069(/bdl/d-) WITH &apos;INITIALIZATION&apos;(e01).
+  ENDIF.
+
+  IF NOT immed IS INITIAL.
+* Launch threads
+    CALL METHOD my_run-&gt;start_threads
+      EXCEPTIONS
+        failed        = 1
+        submit_thread = 2
+        OTHERS        = 3.
+    IF sy-subrc &lt;&gt; 0.
+    ENDIF.
+  ELSE.
+    CLEAR bloc_s.
+    DO thread TIMES.
+      ADD 1 TO bloc_s.
+      _jobname = bloc_s.
+      CONDENSE _jobname.
+      CONCATENATE sy-cprog &apos; MT N°&apos;(i01) _jobname INTO _jobname.
+      CALL FUNCTION &apos;JOB_OPEN&apos;
+        EXPORTING
+*     DELANFREP              = &apos; &apos;
+*     JOBGROUP               = &apos; &apos;
+          jobname                = _jobname
+*     SDLSTRTDT              = NO_DATE
+*     SDLSTRTTM              = NO_TIME
+*     JOBCLASS               =
+        IMPORTING
+          jobcount               = _jobcount
+*   CHANGING
+*     RET                    =
+       EXCEPTIONS
+         cant_create_job        = 1
+         invalid_job_data       = 2
+         jobname_missing        = 3
+         OTHERS                 = 4.
+      IF sy-subrc &lt;&gt; 0.
+        MESSAGE e069(/bdl/d-) WITH &apos;JOB_OPEN&apos;(e02).
+      ENDIF.
+
+      CALL METHOD my_run-&gt;add_thread
+        EXPORTING
+          jobname          = _jobname
+          jobcount         = _jobcount
+        EXCEPTIONS
+          job_doesnt_exist = 1
+          failed           = 2
+          OTHERS           = 3.
+      IF sy-subrc &lt;&gt; 0.
+        MESSAGE e069(/bdl/d-) WITH &apos;ADD_THREAD&apos;(e06).
+      ENDIF.
+
+      SUBMIT ygpl_mt_tutorial
+        WITH run_id = my_run-&gt;run_id
+        WITH wait_t = wait_t
+        WITH obj_c = obj_c
+        WITH mem_size = mem_size
+        VIA JOB _jobname NUMBER _jobcount
+        AND RETURN.
+      IF sy-subrc &lt;&gt; 0.
+        MESSAGE e069(/bdl/d-) WITH &apos;SUBMIT&apos;(e03).
+      ENDIF.
+
+      CALL FUNCTION &apos;JOB_CLOSE&apos;
+        EXPORTING
+*     AT_OPMODE                         = &apos; &apos;
+*     AT_OPMODE_PERIODIC                = &apos; &apos;
+*     CALENDAR_ID                       = &apos; &apos;
+*     EVENT_ID                          = &apos; &apos;
+*     EVENT_PARAM                       = &apos; &apos;
+*     EVENT_PERIODIC                    = &apos; &apos;
+          jobcount                          = _jobcount
+          jobname                           = _jobname
+*     LASTSTRTDT                        = NO_DATE
+*     LASTSTRTTM                        = NO_TIME
+*     PRDDAYS                           = 0
+*     PRDHOURS                          = 0
+*     PRDMINS                           = 0
+*     PRDMONTHS                         = 0
+*     PRDWEEKS                          = 0
+*     PREDJOB_CHECKSTAT                 = &apos; &apos;
+*     PRED_JOBCOUNT                     = &apos; &apos;
+*     PRED_JOBNAME                      = &apos; &apos;
+*     SDLSTRTDT                         = NO_DATE
+*     SDLSTRTTM                         = NO_TIME
+*     STARTDATE_RESTRICTION             = BTC_PROCESS_ALWAYS
+          strtimmed                         = abap_true
+*     TARGETSYSTEM                      = &apos; &apos;
+*     START_ON_WORKDAY_NOT_BEFORE       = SY-DATUM
+*     START_ON_WORKDAY_NR               = 0
+*     WORKDAY_COUNT_DIRECTION           = 0
+*     RECIPIENT_OBJ                     =
+*     TARGETSERVER                      = &apos; &apos;
+*     DONT_RELEASE                      = &apos; &apos;
+*     TARGETGROUP                       = &apos; &apos;
+*     DIRECT_START                      =
+*   IMPORTING
+*     JOB_WAS_RELEASED                  =
+*   CHANGING
+*     RET                               =
+       EXCEPTIONS
+         cant_start_immediate              = 1
+         invalid_startdate                 = 2
+         jobname_missing                   = 3
+         job_close_failed                  = 4
+         job_nosteps                       = 5
+         job_notex                         = 6
+         lock_failed                       = 7
+         invalid_target                    = 8
+         OTHERS                            = 9.
+      IF sy-subrc &gt; 1.
+        MESSAGE e069(/bdl/d-) WITH &apos;JOB_CLOSE&apos;(e04).
+      ENDIF.
+
+    ENDDO.
+  ENDIF.
+
+* Watching Threads.
+  DO.
+    CALL METHOD my_run-&gt;wait_progress
+      EXPORTING
+        mini_wait     = wait_m
+        mini_progress = prog_m
+      IMPORTING
+*        progress      = progression
+        finish        = is_finished
+      EXCEPTIONS
+        failed        = 2
+        OTHERS        = 3.
+    IF sy-subrc &lt;&gt; 0.
+      MESSAGE e069(/bdl/d-) WITH &apos;WAIT PROGRESS&apos;(e05).
+    ENDIF.
+    IF NOT is_finished IS INITIAL.
+      EXIT.
+    ENDIF.
+*    MESSAGE i000(0k) WITH progression.
+*  MESSAGE i111(hrbas00_service).
+  ENDDO.
+
+  LOOP AT my_run-&gt;my_status ASSIGNING &lt;st&gt;.
+    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
+  ENDLOOP.
+
+* Clear Controle table
+  SELECT t~arbgb c~arbgb
+    INTO TABLE it_ctrl
+    FROM t100a AS t LEFT JOIN ygpl_t100t AS c ON c~arbgb = t~arbgb.
+
+  DELETE it_ctrl WHERE NOT msg_ctrl IS INITIAL.
+  IF NOT it_ctrl IS INITIAL.
+    DESCRIBE TABLE it_ctrl LINES obj_c.
+    WRITE:/ &apos;list of missing objects&apos;(i03), obj_c.
+    LOOP AT it_ctrl ASSIGNING &lt;msg&gt;.
+      WRITE:/ &lt;msg&gt;-msg.
+    ENDLOOP.
+  ENDIF.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="MT tutorial (test obj *_MT_TEMPLATE) - Lanceur" LENGTH="46 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="BLOC_S">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Taille des blocs" LENGTH="24 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="CLR_ALL">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Purge tout les RUN" LENGTH="26 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="IMMED">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Lancer les Thread" LENGTH="25 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="MEM_SIZE">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Taille limite batch en octets" LENGTH="37 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="OBJ_C">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Nb d&apos;objet par temps d&apos;attente" LENGTH="38 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="PROG_M">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Min. Progression entre 2 msgs" LENGTH="37 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="THREAD">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Nombre de Thread" LENGTH="24 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="WAIT_M">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Attente mini entre 2 messages" LENGTH="37 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="WAIT_T">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Temps d&apos;attente en S pour nb O" LENGTH="38 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

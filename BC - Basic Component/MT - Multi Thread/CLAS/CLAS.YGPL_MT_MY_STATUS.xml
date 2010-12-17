@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="55D6374F246B2C872C1016B66CFFC7F3" CODE_SIGNATURE="076CC5336EB6BDFCC6D11CCDB0BA6F2B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_STATUS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_STATUS" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Mes status propres"/>
+    <ITEM LANG="F" TEXT="Mes status propres"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="ERROR" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;E&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Objets en Erreur"/>
+     <ITEM LANG="F" TEXT="Objets en Erreur"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="REJECT" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;R&apos;" TYPTYPE="1" TYPE="_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Objets rejetés"/>
+     <ITEM LANG="F" TEXT="Objets rejetés"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+ </RAW>
+</ZL_OBJECT>
