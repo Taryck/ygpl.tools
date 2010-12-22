@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="54BC223C08AA7C10B954308DE614E77D" CODE_SIGNATURE="CBAC034B11EC78A7351B45F8C6F88538" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : Task process"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="BLOC_SIZE" STATE="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Minimal bloc size"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECTS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object store engine"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_RUN" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Run Process"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Confirm to correct handling of previous batch of objects"/>
+    </TEXTS>
+    <SOURCE>`
+  o_objects-&gt;confirm_batch( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
+    </PARAMETERS>
+    <SOURCE>`
+  o_objects-&gt;confirm_objects( status = status
+                               count = count ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CALL METHOD super-&gt;constructor.
+  CREATE OBJECT o_run
+    EXPORTING
+      run_id = run_id.
+  bloc_size = o_run-&gt;infos-bloc_size.
+  CREATE OBJECT o_objects
+    EXPORTING
+      o_run = o_run.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get a batch of objects"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
+     <ITEM SCONAME="WAIT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PARVALUE="&apos;X&apos;" PAROPTIONL="X"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  o_objects-&gt;get_batch( importing objects = objects ).</SOURCE>
+   </ITEM>
+  </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="SAVE">
+    <SOURCE>`
+  DATA _task TYPE ygplmt_tasks.
+
+  super-&gt;save( ).
+
+  _task-task_id = process_id.
+  _task-status = ygpl_mt_status=&gt;in_progress.
+  MODIFY ygplmt_tasks FROM _task.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+  <TYPES>
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="1" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Run Process"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

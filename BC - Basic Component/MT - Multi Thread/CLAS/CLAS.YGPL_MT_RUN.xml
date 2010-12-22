@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="154B11DAD230D765DDB91DD8B07B88E4" CODE_SIGNATURE="1038F31F4BEE177127C5C12D5375F8A2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="BD01F0B7DE7B2B77DCAC25D28081F985" CODE_SIGNATURE="21B794612DEB0C74D71E84FB7CD902CF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
+ </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -8,18 +11,80 @@
     <ITEM LANG="E" TEXT="MT : Run Process"/>
    </TEXTS>
   </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_FN"/>
+   <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_JOBID"/>
+   <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_JOBNAME"/>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
+  </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TS_RUN">
+   <ITEM CMPNAME="FACTORY_MODE" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Constructor in factory mode"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="FROM_FACTORY" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Is a new run"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_RUN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="RUN_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Run ID in raw format"/>
+     <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Categories for this run type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_JOB_MONITORING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_JOB_MONITORING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Job monitoring"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECTS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object store engine"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WEIGHT_FN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_FN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Weight Fieldname in object data table"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
+  <EVENTS>
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MSG" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle specific messages (non system)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raised to let submit program"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="JOBCOUNT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBID"/>
+     <ITEM SCONAME="JOBNAME" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME"/>
+     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+    </PARAMETERS>
+   </ITEM>
+  </EVENTS>
+  <FRIENDS>
+   <ITEM STATE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
+  </FRIENDS>
   <LOCAL>
    <TYPES>`
 *&quot;* use this source file for any type declarations (class
@@ -34,6 +99,162 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add thread manually"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="For existing Run"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA length TYPE i.
+
+  CALL METHOD super-&gt;constructor.
+
+  length = XSTRLEN( run_id ).
+  ASSERT factory_mode IS NOT INITIAL OR length = 16.
+
+  IF factory_mode IS NOT INITIAL.
+    CREATE OBJECT o_job_monitoring.
+    from_factory = abap_true.
+  ELSE.
+    from_factory = abap_false.
+    me-&gt;process_id = run_id.
+    infos = read_run( ).
+  ENDIF.
+
+  CREATE OBJECT o_objects
+    EXPORTING
+      o_run = me.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_OBJECTS_CONFIRMATION" EXPOSURE="1" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="OBJECTS_CONFIRMED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="NEW_RUN" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Generate new Run instance"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Requested size of bloc counted in weight unit if provided"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="CATEGORIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Categories for this run type"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="MAX_MEMORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_ME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MT : Run Process"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="THREAD_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Number of thread to launch"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Name of the field in object data table where obj. weight is"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA run_id TYPE td_process_id.
+
+  factory_mode = abap_true.
+  CREATE OBJECT result
+    EXPORTING
+      run_id = run_id.
+  CLEAR factory_mode.
+
+  IF categories IS BOUND.   result-&gt;o_categories = categories.    ELSE.     CREATE OBJECT result-&gt;o_categories.   ENDIF.
+  CREATE OBJECT result-&gt;o_messaging
+    EXPORTING
+      run_id     = result-&gt;process_id
+      categories = result-&gt;o_categories.
+  SET HANDLER result-&gt;handle_objects_confirmation FOR result-&gt;o_messaging.
+
+  result-&gt;set_thread_count( thread_count ).
+  result-&gt;set_bloc_size( bloc_size ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="READ_RUN" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Récupération des information d&apos;un bloc"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_DATA" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run&apos;s information"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA _run TYPE ygpl_run.
+
+*  IF NOT lock IS INITIAL.
+*    CALL METHOD _lock
+*      EXPORTING
+*        run_id       = run_id
+*        cat          = ygpl_mt_categori=&gt;run_info
+*      EXCEPTIONS
+*        foreign_lock = 1
+*        sys_failure  = 2
+*        OTHERS       = 3.
+*    IF sy-subrc &lt;&gt; 0.
+*      RAISE failed.
+*    ENDIF.
+*  ENDIF.
+
+*  IF _run-run_id &lt;&gt; run_id.
+  SELECT SINGLE * INTO _run
+    FROM ygpl_run
+    WHERE run_id = process_id.
+  ASSERT sy-subrc = 0.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE not_found.
+*  ENDIF.
+*  ENDIF.
+
+*  IF NOT lock IS INITIAL.
+*    CALL METHOD _unlock( run_id = run_id
+*      cat = ygpl_mt_categori=&gt;run_info ).
+*  ENDIF.
+  times-start = _run-timestamp.
+  MOVE-CORRESPONDING _run TO run_data.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="REFRESH" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Refresh run informations"/>
+    </TEXTS>
+    <SOURCE>`
+  infos = read_run( ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Màj Nombre de bloc"/>
@@ -52,8 +273,100 @@
 **********************************************************************
 
   UPDATE ygpl_run SET blocs = bloc_count
-    WHERE run_id = run_id.</SOURCE>
+    WHERE run_id = process_id.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Change the bloc size value"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Requested size of bloc counted in weight unit if provided"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  infos-bloc_size = bloc_size.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Change the thread count value"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="THREAD_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Number of thread to launch"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK o_job_monitoring IS BOUND.
+  IF o_job_monitoring-&gt;threads = 0.
+    infos-threads = thread_count.
+  ELSE.
+* To do
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="START_THREADS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Start threads automaticly"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Wait Thread progressing"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_ADD_OBJECTS" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add Objects to work list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X"/>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _bs      TYPE td_bloc_size.
+  DATA _count   TYPE i.
+
+* Check Objects
+  DESCRIBE TABLE objects LINES _count.
+  CHECK _count &gt;= 1.
+
+* Check Bloc_Size
+  IF infos-bloc_size &lt; 1.   infos-bloc_size = 1.    ENDIF.
+
+  o_objects-&gt;add_objects( objects = objects
+                        bloc_size = infos-bloc_size
+                        weight_fn = me-&gt;weight_fn
+                     dependencies = dependencies ).</SOURCE>
    </ITEM>
   </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="SAVE">
+    <SOURCE>`
+  DATA _run TYPE ygpl_run.
+
+  CHECK from_factory = abap_true.
+  super-&gt;save( ).
+
+  _run-run_id = process_id.
+  _run-threads = infos-threads.
+  _run-obj_left = o_objects-&gt;total_objects.
+  _run-bloc_size = infos-bloc_size.
+  _run-timestamp = times-start.
+  _run-blocs = o_objects-&gt;total_blocs_count.
+  MODIFY ygpl_run FROM _run.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+  <TYPES>
+   <ITEM CMPNAME="TO_ME" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Run Process"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
  </RAW>
 </ZL_OBJECT>
