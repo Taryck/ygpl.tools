@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CACAD6AED2B363559130794D7D315C84" CODE_SIGNATURE="CC036DB3D979F83D1388182804AC5C9F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6884AA038615B2F81404F3ED5BCEC7D6" CODE_SIGNATURE="68FCCD66F4D5E497C0A105B3C5E5F5BA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORI"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
@@ -56,7 +56,7 @@
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
-    <ITEM TYPEGROUP="YGPL_MT_CATEGORI" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_MT_CATEGORIES" TPUTYPE="1" EXPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
   <EVENTS>
@@ -65,14 +65,14 @@
      <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CAT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="YGPL_MT_CATEGORI=&gt;_CATEG">
+     <ITEM SCONAME="CAT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Catégory"/>
+       <ITEM LANG="E" TEXT="Message Category"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="RAWDATA" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Message à traiter"/>
+       <ITEM LANG="E" TEXT="Message to handle"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -279,8 +279,8 @@
   message_readed = abap_true.
 
   it_sys_msg = it_msg.
-  DELETE it_sys_msg WHERE NOT categ IN ygpl_mt_categori=&gt;x_categ.
-  DELETE it_msg WHERE categ IN ygpl_mt_categori=&gt;x_categ.
+  DELETE it_sys_msg WHERE NOT categ IN ygpl_mt_categories=&gt;r_sys_categories.
+  DELETE it_msg WHERE categ IN ygpl_mt_categories=&gt;r_sys_categories.
 
   SORT it_sys_msg BY categ.
   SORT it_msg BY categ.
@@ -311,14 +311,12 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  DATA: status TYPE	tt_status_list.
+  DATA status TYPE  tt_status_list.
   FIELD-SYMBOLS:
     &lt;statut&gt; LIKE LINE OF status.
 
-  IMPORT msg = status FROM DATA BUFFER msg_data.
-  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-  ENDIF.
+  decode_data( EXPORTING buffer = msg_data
+                CHANGING    any = status ).
 
   LOOP AT status ASSIGNING &lt;statut&gt;.
     ADD &lt;statut&gt;-count TO confirmed_objects-count.
@@ -435,8 +433,6 @@
   FIELD-SYMBOLS: &lt;msg&gt; LIKE LINE OF messages.
   DATA f_obj_conf TYPE td_boolean.
 
-  CLEAR confirmed_objects.
-
   LOOP AT messages ASSIGNING &lt;msg&gt;.
     CASE &lt;msg&gt;-categ.
       WHEN sys_categories-obj_conf.
@@ -451,14 +447,16 @@
     EXPORTING
       object_count = confirmed_objects-count
       status       = confirmed_objects-t_status.
+  CLEAR confirmed_objects.
 
   DELETE ygplmt_messages FROM TABLE messages.
-  IF sy-subrc &lt;&gt; 0.
-*    ROLLBACK WORK.
-*    CALL METHOD _unlock( run_id = run_id
-*      cat = ygpl_mt_categori=&gt;run_info ).
-*    RAISE failed.
-  ENDIF.
+  ASSERT sy-subrc = 0.
+*  IF sy-subrc &lt;&gt; 0.
+**    ROLLBACK WORK.
+**    CALL METHOD _unlock( run_id = run_id
+**      cat = ygpl_mt_categori=&gt;run_info ).
+**    RAISE failed.
+*  ENDIF.
 *
 *  COMMIT WORK AND WAIT.</SOURCE>
    </ITEM>
@@ -467,14 +465,14 @@
      <ITEM LANG="E" TEXT="Send message to DB"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_MT_CATEGORI=&gt;_CATEG">
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
+       <ITEM LANG="E" TEXT="Message category"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="MESSAGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Donnée du message"/>
+       <ITEM LANG="E" TEXT="Message data"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>

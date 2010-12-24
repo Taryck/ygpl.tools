@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5FD7687A1577FBD7F5A73187F065966C" CODE_SIGNATURE="738E52270C848EC694017B07EC95A3EE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="199E851E405E308F8CEB4F809A770FCA" CODE_SIGNATURE="3046599D1B3295904B511FB7B8DB24CB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -18,6 +18,8 @@
    <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_NUM_KEY"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIME"/>
+   <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_CHRONO"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_BLOCS_NFO"/>
    <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
@@ -26,7 +28,7 @@
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="BATCH_RATE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;50&apos;" TYPTYPE="4">
-    BATCH_RATE type p LENGTH 3 DECIMALS 2
+    batch_rate TYPE p LENGTH 3 DECIMALS 2
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Rate of Batch load (0%&lt;R&lt;100%) recommended (25&lt;R&lt;75)"/>
@@ -47,14 +49,39 @@
      <ITEM LANG="E" TEXT="Set of bloc ID"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="ESTIMATED_END_TIME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_TIME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Extimated time after all objects processed to end program"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="GLOBAL_STATUS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_STATUS_LIST">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number of object processed by Status"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="LAST_MESSAGE" STATE="1" TYPTYPE="4">
+    BEGIN OF last_message,
+      progress TYPE td_progress,
+      time     TYPE timestampl,
+    END OF last_message
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Progresion and time of the last message send"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="MAXIMUM_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MINI_PROGRESS" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_PROGRESS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Minimum progress to send new message"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;60&apos;" TYPTYPE="1" TYPE="TD_TIME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Minimum time to send new message"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
@@ -87,6 +114,11 @@
      <ITEM LANG="E" TEXT="Status information to send to parent"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TIMES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TS_CHRONO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Timestamp"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TOTAL_BLOCS_COUNT" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number total of blocs"/>
@@ -98,6 +130,13 @@
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
+  <EVENTS>
+   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event to handle objects status update (count raised)"/>
+    </TEXTS>
+   </ITEM>
+  </EVENTS>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
@@ -143,7 +182,7 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  DATA _bloc TYPE ygpl_objects.
+  DATA _bloc TYPE ygplmt_objects.
 
   _bloc-bloc_id =  generate_bloc_id( ).
   _bloc-run_id = o_run-&gt;process_id.
@@ -158,7 +197,7 @@
   _bloc-obj_data = encode_data( objects ).
   IF sy-subrc = 0.
     GET TIME STAMP FIELD _bloc-timestamp.
-    INSERT ygpl_objects FROM _bloc.
+    INSERT ygplmt_objects FROM _bloc.
     ADD 1 TO total_blocs_count.
   ENDIF.
   ASSERT sy-subrc &lt;&gt; 0.
@@ -386,7 +425,7 @@
   ASSERT current_blocs IS NOT INITIAL.
 
   IF NOT status_to_send IS INITIAL.
-    SEND_OBJECT_CONFIRMATION( ).
+    send_object_confirmation( ).
   ENDIF.
 
   IF processed_objects &lt;&gt; confirmed_objects.
@@ -394,11 +433,11 @@
     _correction = processed_objects - confirmed_objects. &quot; aurait du etre envoyé - réellement envoyé
     confirm_objects( status = ygpl_mt_status=&gt;inconsistency
                      count  = _correction ).
-    SEND_OBJECT_CONFIRMATION( ).
+    send_object_confirmation( ).
   ENDIF.
 
   LOOP AT current_blocs ASSIGNING &lt;wa_b&gt;.
-    UPDATE ygpl_objects SET status = ygpl_mt_status=&gt;done
+    UPDATE ygplmt_objects SET status = ygpl_mt_status=&gt;done
       WHERE bloc_id = &lt;wa_b&gt;-bloc_id.
     ASSERT sy-subrc = 0.
   ENDLOOP.
@@ -428,7 +467,16 @@
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="MAXIMUM_MEMORY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE" PAROPTIONL="X"/>
+     <ITEM SCONAME="ESTIMATED_END_TIME" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="5">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Extimated time after all objects processed to end program"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="MAXIMUM_MEMORY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE" PARVALUE="0">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
@@ -450,6 +498,7 @@
   ASSERT me-&gt;o_run IS BOUND.
   IF o_messaging IS BOUND.
     me-&gt;o_messaging = o_messaging.
+    SET HANDLER handle_objects_confirmation FOR o_messaging.
     me-&gt;o_categories = o_messaging-&gt;o_categories.
   ELSE.
     IF o_categories IS BOUND.
@@ -462,7 +511,12 @@
         process_id   = o_run-&gt;process_id
         o_categories = me-&gt;o_categories.
   ENDIF.
-  set_maximum_memory( maximum_memory ).</SOURCE>
+
+  set_maximum_memory( maximum_memory ).
+  me-&gt;estimated_end_time = estimated_end_time.
+
+  GET TIME STAMP FIELD times-start.
+  last_message-time = times-start.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CREATE_BLOCS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -890,6 +944,86 @@
     <SOURCE>`
   IMPORT objects = any FROM DATA BUFFER buffer.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="DISPLAY_PROGRESS" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA pos      TYPE i.
+  DATA new_p    TYPE td_progress.
+  DATA delta_p  TYPE td_progress.
+  DATA _tmp     TYPE timestampl.
+  DATA _delta   TYPE timestampl.
+  DATA _now     TYPE timestampl.
+  DATA _sec     TYPE td_time.
+  DATA duration TYPE sy-uzeit.
+  DATA d_str(15) TYPE c.
+  DATA end_str(50) TYPE c.
+  DATA duree    TYPE p LENGTH 4 DECIMALS 5.
+  DATA duree_p  TYPE p LENGTH 4 DECIMALS 5.
+  DATA tmp_line(10) TYPE c.
+  DATA str      TYPE string.
+
+  new_p = processed_objects / total_objects * 100.
+  delta_p = new_p - last_message-progress.
+  IF delta_p &gt; mini_progress.
+    GET TIME STAMP FIELD _now.
+    _delta = _now - last_message-time.
+    _sec = _delta.
+    IF _sec &gt;= mini_wait.
+      last_message-progress = new_p.
+      last_message-time = _now.
+      WRITE last_message-progress DECIMALS 1 TO tmp_line.
+      CONDENSE tmp_line.
+
+* Calcul remaining time
+      IF last_message-progress &gt; 0.
+        TRY.
+            duree = cl_abap_tstmp=&gt;subtract(
+                tstmp1 = _now
+                tstmp2 = times-start
+                ).
+          CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
+            duree = ( _now - times-start ).
+        ENDTRY.
+        duree_p = duree * 100 / last_message-progress.
+
+        _tmp = ( duree_p - duree ). &quot;temps restant
+        IF _tmp &lt; 0. _tmp = 0. ENDIF.
+        _tmp = _tmp + estimated_end_time.
+        duration = _tmp.
+        WRITE duration TO d_str.
+
+* End time
+        TRY.
+            _tmp = cl_abap_tstmp=&gt;add(
+                tstmp   = times-start
+                secs    = duree_p
+                ).
+          CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
+            _tmp = times-start + duree_p.
+        ENDTRY.
+        WRITE _tmp TIME ZONE sy-zonlo TO end_str.
+        FIND FIRST OCCURRENCE OF &apos;,&apos; IN end_str MATCH OFFSET pos.
+        IF sy-subrc = 0.
+          end_str = end_str(pos).
+        ENDIF.
+      ENDIF.
+
+* Display progress
+      IF NOT sy-batch IS INITIAL.
+        MESSAGE i000(ygpl_mt_rootclass) WITH tmp_line d_str end_str.
+      ELSE.
+        MESSAGE i001(ygpl_mt_rootclass) WITH tmp_line d_str end_str INTO str.
+        CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;
+          EXPORTING
+            percentage = last_message-progress
+            text       = str.
+      ENDIF.
+
+    ENDIF.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="ENCODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Encode data to buffer"/>
@@ -1032,6 +1166,7 @@
   DATA t_size     TYPE td_memory_size.
   DATA _run       TYPE ts_run.
   DATA _blocs     TYPE STANDARD TABLE OF ygplmt_objects.
+  DATA _bloc      like LINE OF current_blocs.
 
   FIELD-SYMBOLS:
     &lt;fs&gt; LIKE objects,
@@ -1114,9 +1249,10 @@
 
       APPEND LINES OF &lt;fs&gt; TO objects.
       IF sy-subrc = 0.
-        APPEND &lt;wa&gt;-bloc_id TO current_blocs.
+        _bloc-bloc_id = &lt;wa&gt;-bloc_id.
+        APPEND _bloc TO current_blocs.
         IF sy-subrc = 0.
-          UPDATE ygpl_objects SET status = ygpl_mt_status=&gt;in_progress
+          UPDATE ygplmt_objects SET status = ygpl_mt_status=&gt;in_progress
             WHERE bloc_id = &lt;wa&gt;-bloc_id.
         ENDIF.
       ENDIF.
@@ -1278,6 +1414,28 @@
       result = XSTRLEN( xstr ).
   ENDTRY.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="HANDLE_OBJECTS_CONFIRMATION" EXPOSURE="1" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="OBJECTS_CONFIRMED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT_COUNT" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_STATUS_LIST"/>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS &lt;line&gt; LIKE LINE OF status.
+
+  CHECK object_count &lt;&gt; 0.
+
+  ADD object_count TO processed_objects.
+  LOOP AT status ASSIGNING &lt;line&gt;.
+    COLLECT &lt;line&gt; INTO global_status.
+  ENDLOOP.
+
+  display_progress( ).
+
+  RAISE EVENT objects_confirmed.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="JOIN_2_MICRO_BLOCS" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Join 2 Micro blocs"/>
@@ -1343,6 +1501,13 @@
 *  IF sy-subrc &lt;&gt; 0.
 *    RAISE failed.
 *  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="REFRESH_STARTTIME" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Reset the strart date and time"/>
+    </TEXTS>
+    <SOURCE>`
+  GET TIME STAMP FIELD times-start.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_BLOCS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1515,6 +1680,8 @@
   </METHODS>
   <TYPES>
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" TYPTYPE="1" TYPE="YGPLMT_OBJECTS-OBJ_DATA"/>
+   <ITEM CMPNAME="TD_PROGRESS" STATE="1" TYPTYPE="4">td_progress TYPE p LENGTH 3 DECIMALS 3
+`</ITEM>
    <ITEM CMPNAME="TO_CATEGORIES" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_CATEGORIES">
     <TEXTS>
      <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
@@ -1525,7 +1692,7 @@
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_RUN">
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_PARENT">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Run Process"/>
     </TEXTS>
@@ -1544,7 +1711,7 @@
    </ITEM>
    <ITEM CMPNAME="TS_BLOC" STATE="1" TYPTYPE="4">
     BEGIN OF ts_bloc,
-      bloc_id TYPE ygpl_bloc_id,
+      bloc_id TYPE TD_BLOC_ID,
     END OF ts_bloc
 `
     <TEXTS>

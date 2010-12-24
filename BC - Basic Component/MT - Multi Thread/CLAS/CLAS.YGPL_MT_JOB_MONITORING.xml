@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="53C0B50E97B207AE31B5223B00F653A1" CODE_SIGNATURE="9C408BE8646F08C124010284F01ABC84" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="FF2FA18BF8369E9A62787B7E2DE24F6B" CODE_SIGNATURE="F2D6BC879B5E6BB3B822674AF08D9D1B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -29,6 +29,11 @@
    <ITEM CMPNAME="ALL_AS_LIST" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_AS">
     <TEXTS>
      <ITEM LANG="E" TEXT="List of Application Server with load"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="BYPASS_SLEEP" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Do not go into sleep mode"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="CURRENT_JOB" STATE="1" TYPTYPE="1" TYPE="TS_JOB_KEY">
@@ -94,11 +99,25 @@
    </ITEM>
   </ATTRIBUTS>
   <EVENTS>
+   <ITEM CMPNAME="BEFORE_SLEEP_MODE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raised before going into sleep mode for a while"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TO_ME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MT : Job monitoring"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
    <ITEM CMPNAME="ON_THREAD_END" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Event raised when thread ended"/>
     </TEXTS>
     <PARAMETERS>
+     <ITEM SCONAME="JOBID" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBID"/>
+     <ITEM SCONAME="JOBNAME" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME"/>
      <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TO_ME">
       <TEXTS>
        <ITEM LANG="E" TEXT="MT : Job monitoring (me)"/>
@@ -106,7 +125,7 @@
      </ITEM>
      <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Thread Number of the curren submit"/>
+       <ITEM LANG="E" TEXT="Thread Number of the current submit"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -156,31 +175,26 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Ajout un thread"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TBTCJOB-JOBCOUNT">
+     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBID">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Numéro d&apos;identification d&apos;un job"/>
+       <ITEM LANG="E" TEXT="Job ID"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TBTCJOB-JOBNAME">
+     <ITEM SCONAME="JOBNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Nom d&apos;un job d&apos;arrière-plan"/>
+       <ITEM LANG="E" TEXT="Job name"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="FAILED" LANGU="E">
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Echec d&apos;ajout"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="JOB_DOESNT_EXIST" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Le job n&apos;existe pas"/>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
      </ITEM>
     </EXCEPTIONS>
@@ -196,23 +210,15 @@
 
   CALL METHOD get_thread
     EXPORTING
-      jobname          = _job-jobname
-      jobcount         = _job-jobcount
-    EXCEPTIONS
-      job_doesnt_exist = 1
-      others           = 2.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE job_doesnt_exist.
-  ENDIF.
+      jobname  = _job-jobname
+      jobcount = _job-jobcount.
 
-  DESCRIBE TABLE thread_launched lines _job-num.
-  add 1 to _job-num.
+  DESCRIBE TABLE thread_launched LINES _job-num.
+  ADD 1 TO _job-num.
   APPEND _job TO thread_launched.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE failed.
-  ENDIF.
+  ASSERT sy-subrc = 0.
 
-  DESCRIBE TABLE thread_launched lines threads.</SOURCE>
+  DESCRIBE TABLE thread_launched LINES threads.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CANCEL_JOB" EXPOSURE="2" STATE="1">
     <TEXTS>
@@ -221,10 +227,24 @@
     <SOURCE>`
   CLEAR current_job.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CHECK_ACTIVE_THREADS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="CANCEL_NEXT_SLEEP" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='Cancel next &quot;gooing into sleep mode&quot; action'/>
+    </TEXTS>
+    <SOURCE>`
+  BYPASS_SLEEP = abap_true.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHECK_ACTIVE_THREADS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Check threads active"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
 **********************************************************************
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
@@ -235,16 +255,22 @@
     &lt;th&gt; LIKE LINE OF thread_launched.
 
   LOOP AT thread_launched ASSIGNING &lt;th&gt;.
-    CALL METHOD get_thread
-      EXPORTING
-        jobname          = &lt;th&gt;-jobname
-        jobcount         = &lt;th&gt;-jobcount
-      IMPORTING
-        job_info         = job_info
-      EXCEPTIONS
-        job_doesnt_exist = 1
-        OTHERS           = 2.
-    IF sy-subrc &lt;&gt; 0 OR job_info-status = job_status-aborted OR job_info-status = job_status-finished.
+    TRY.
+        CALL METHOD get_thread
+          EXPORTING
+            jobname  = &lt;th&gt;-jobname
+            jobcount = &lt;th&gt;-jobcount
+          IMPORTING
+            job_info = job_info.
+      CATCH ygpl_mt_cx_job_monitoring INTO o_cx.
+        IF o_cx-&gt;IS_EXCEPTION_TEXT( ygpl_mt_cx_job_monitoring=&gt;job_dont_exists ) is not initial.
+*          job_info-status = job_status-aborted.
+          job_info-status = job_status-finished.
+        ELSE.
+          RAISE EXCEPTION o_cx.
+        ENDIF.
+    ENDTRY.
+    IF job_info-status = job_status-aborted OR job_info-status = job_status-finished.
       IF job_info-status = job_status-finished.
         IF NOT sy-batch IS INITIAL.
           MESSAGE i006(ygpl_mt_rootclass) WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
@@ -256,6 +282,10 @@
           MESSAGE w007(ygpl_mt_rootclass) WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
         ENDIF.
       ENDIF.
+      RAISE EVENT on_thread_end EXPORTING o_job_monitoring = me
+                                             thread_number = &lt;th&gt;-num
+                                                   jobname = &lt;th&gt;-jobname
+                                                     jobid = &lt;th&gt;-jobcount.
       DELETE thread_launched.
     ENDIF.
   ENDLOOP.
@@ -461,7 +491,7 @@
 
   ADD 1 TO roundrobin_as_index.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_THREAD" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="GET_THREAD" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get job information"/>
     </TEXTS>
@@ -483,9 +513,9 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="JOB_DOESNT_EXIST" LANGU="E">
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Le job n&apos;existe pas"/>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
      </ITEM>
     </EXCEPTIONS>
@@ -494,7 +524,7 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  DATA: ret_val TYPE i.
+  DATA ret_val TYPE i.
 *  btc_edit_btcctl_tbl       LIKE btch0000-int4 VALUE  1,
 *  btc_show_btcctl_tbl       LIKE btch0000-int4 VALUE  2,
 *  btc_edit_user_eventids    LIKE btch0000-int4 VALUE  3,
@@ -540,7 +570,7 @@
       job_read_opcode             = 19 &quot; btc_read_jobhead_only
 *     JOB_STEP_NUMBER             =
     IMPORTING
-      JOB_READ_JOBHEAD            = JOB_INFO
+      job_read_jobhead            = job_info
 *     JOBLOG_ATTRIBUTES           =
 *   TABLES
 *     JOB_READ_STEPLIST           =
@@ -552,8 +582,15 @@
       job_doesnt_exist            = 2
       job_doesnt_have_steps       = 3
       OTHERS                      = 4.
-  IF sy-subrc &lt;&gt; 0 OR ret_val &lt;&gt; 0.
-    RAISE job_doesnt_exist.
+  IF ret_val &lt;&gt; 0 OR sy-subrc = 2.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
+          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;job_dont_exists
+                      name = jobname
+                        id = jobcount.
+  ELSEIF sy-subrc &lt;&gt; 0.
+    o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname = &apos;BP_JOB_READ&apos;
+                                              subrc = sy-subrc
+                                          classname = &apos;YGPL_MT_CX_JOB_MONITORING&apos; ).
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_THREAD_DETAILS" STATE="1" MTDDECLTYP="1">
@@ -736,17 +773,9 @@
 
   CALL METHOD add_thread
     EXPORTING
-      jobname          = current_job-name
-      jobcount         = current_job-id
-    EXCEPTIONS
-      job_doesnt_exist = 1
-      failed           = 2
-      OTHERS           = 3.
-  IF sy-subrc = 0.
-    current_job-name = _jobname.
-  ELSE.
-    result = current_job.
-  ENDIF.</SOURCE>
+      jobname  = current_job-name
+      jobcount = current_job-id.
+  result = current_job.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SLEEP" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -921,30 +950,8 @@
    </ITEM>
    <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Récupération des information de progression"/>
+     <ITEM LANG="E" TEXT="Wait and survey the progression"/>
     </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="FINISH" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="All threads have ended"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="MINI_PROGRESS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROGRESS" PARVALUE="1" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Progression"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="MINI_WAIT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Temps en seconde"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="PROGRESS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="% de progression"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
@@ -957,121 +964,22 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-*  DATA:  _in TYPE timestampl,
-*         _delta TYPE timestampl,
-*         _out TYPE timestampl,
-*         _sec TYPE td_time.
-*  DATA pos      TYPE i.
-*  DATA new_p    TYPE td_progress.
-*  DATA delta_p  TYPE td_progress.
-*  DATA msg_read TYPE oax.
-*  DATA: duration TYPE sy-uzeit, d_str(15) TYPE c.
-*  DATA: end_str(50) TYPE c.
-*  DATA str      TYPE string.
-*  DATA duree(9) TYPE p DECIMALS 5.
-*  DATA duree_p(9) TYPE p DECIMALS 5.
-*  DATA tmp_line(10) TYPE c.
-*
-*  IF mini_wait &gt; 0.
-*    GET TIME STAMP FIELD _in.
-*  ENDIF.
-*  DO.
-*    new_p = processed_objects / total_objects * 100.
-*    delta_p = new_p - last_progress.
-*    IF delta_p &gt; mini_progress.
-*      GET TIME STAMP FIELD _out.
-*      _delta = _out - _in.
-*      _sec = _delta.
-*      IF _sec &gt;= mini_wait.
-*        EXIT.
-*      ENDIF.
-*    ENDIF.
-*
-*    msg_read = o_messaging-&gt;handle_messages( ).
-*
-*    IF msg_read IS INITIAL.
-*      CALL METHOD sleep.
-*    ENDIF.
-*
-*    o_job_monitoring-&gt;check_active_threads( ).
-*    IF o_job_monitoring-&gt;threads = 0.
-*
-** To collect last sended messages after threads has ended.
-*      msg_read = o_messaging-&gt;handle_messages( ).
-*
-** Clear blocs
-*      IF NOT clear_blocs IS INITIAL.
-*        CALL METHOD _del_obj
-*          EXPORTING
-*            run_id = run_id
-*          EXCEPTIONS
-*            failed = 1
-*            OTHERS = 2.
-*        IF sy-subrc &lt;&gt; 0.
-** Ingore exceptions
-*        ENDIF.
-*      ENDIF.
-*
-*      new_p = 100.
-*      finish = abap_true.
-*      EXIT.
-*    ENDIF.
-*
-*  ENDDO.
-*
-*  last_progress = new_p.
-*  WRITE last_progress DECIMALS 1 TO tmp_line.
-*  CONDENSE tmp_line.
-*
-** Calcul temps restant
-*  IF new_p &gt; 0.
-*    GET TIME STAMP FIELD _in.
-*
-*    TRY.
-*        duree = cl_abap_tstmp=&gt;subtract(
-*            tstmp1 = _in
-*            tstmp2 = _starttime
-*            ).
-*      CATCH cx_parameter_invalid_range .
-*        duree = ( _in - _starttime ).
-*      CATCH cx_parameter_invalid_type .
-*        duree = ( _in - _starttime ).
-*    ENDTRY.
-*    duree_p = duree * 100 / new_p.
-*
-*    _out = ( duree_p - duree ). &quot;temps restant
-*    IF _out &lt; 0. _out = 0. ENDIF.
-*    _out = _out + end_time.
-*    duration = _out.
-*    WRITE duration TO d_str.
-*
-*    TRY.
-*        _out = cl_abap_tstmp=&gt;add(
-*            tstmp   = _starttime
-*            secs    = duree_p
-*            ).
-*      CATCH cx_parameter_invalid_range .
-*        _out = _starttime + duree_p.
-*      CATCH cx_parameter_invalid_type .
-*        _out = _starttime + duree_p.
-*    ENDTRY.
-*    WRITE _out TIME ZONE sy-zonlo TO end_str.
-*    FIND FIRST OCCURRENCE OF &apos;,&apos; IN end_str MATCH OFFSET pos.
-*    IF sy-subrc = 0.
-*      end_str = end_str(pos).
-*    ENDIF.
-*  ENDIF.
-*
-*  IF NOT sy-batch IS INITIAL.
-*    MESSAGE i000(ygpl_mt_rootclass) WITH tmp_line d_str end_str.
-*  ELSE.
-*    MESSAGE i001(ygpl_mt_rootclass) WITH tmp_line d_str end_str INTO str.
-*    CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;
-*      EXPORTING
-*        percentage = new_p
-*        text       = str.
-*  ENDIF.
-*  progress = tmp_line.</SOURCE>
+
+  DO.
+    RAISE EVENT before_sleep_mode EXPORTING o_job_monitoring = me.
+
+    IF bypass_sleep IS INITIAL.
+      sleep( ).
+    ELSE.
+      CLEAR bypass_sleep.
+    ENDIF.
+
+    check_active_threads( ).
+    IF me-&gt;threads = 0.
+      EXIT.
+    ENDIF.
+
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_AS_LOAD" STATE="1" MTDDECLTYP="1">
     <TEXTS>

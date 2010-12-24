@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8C56994923C1BBD6C16F5935D6328301" CODE_SIGNATURE="6DD01C42A3913A6E717F44A38DC1553D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCKS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="14A587149553ACC1D7D6383E50331B94" CODE_SIGNATURE="025DCAAC617FEE9D09D3832832DBDCD0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCKS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
    <TEXTS>
     <ITEM LANG="E" TEXT="MT : Lock managment"/>
    </TEXTS>
@@ -123,8 +123,8 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  IF cat IN ygpl_mt_categori=&gt;x_categ. RAISE system_cat. ENDIF.
-  IF ygpl_mt_categori=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
+  IF cat IN ygpl_mt_categories=&gt;r_sys_categories. RAISE system_cat. ENDIF.
+  IF ygpl_mt_categories=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
 
   CALL METHOD lock
     EXPORTING
@@ -201,13 +201,13 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  IF cat IN ygpl_mt_categori=&gt;x_categ. RAISE system_cat. ENDIF.
-  IF ygpl_mt_categori=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
+  IF cat IN ygpl_mt_categories=&gt;r_sys_categories. RAISE system_cat. ENDIF.
+  IF ygpl_mt_categories=&gt;do_exists( cat ) IS INITIAL. RAISE cat_not_found. ENDIF.
 
   CALL METHOD unlock
     EXPORTING
-      run_id         = process_id
-      cat            = cat.</SOURCE>
+      run_id = process_id
+      cat    = cat.</SOURCE>
    </ITEM>
   </METHODS>
  </RAW>
