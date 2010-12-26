@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C6B69BAC1A2E310106E9A680BE05649E" CODE_SIGNATURE="DE2468380C1CE452850F03FDB785F720" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4A6C43D4A1CB2A1C93480BB637C5A8C5" CODE_SIGNATURE="F172D53883A0EC9EF1F7DD55C11DEAFA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -7,6 +7,19 @@
     <ITEM LANG="E" TEXT="MT Framework : Lock Managment"/>
    </TEXTS>
   </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYS_CATEGORIES"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+  </ALIASES>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
   <LOCAL>
    <TYPES>`
 *&quot;* use this source file for any type declarations (class
@@ -20,5 +33,119 @@
 *&quot;* use this source file for any macro definitions you need
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CHECK_EXISTENCE_LOCK" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check Existence lock for a process"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run/Task ID"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run/task is running"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA t_locks TYPE STANDARD TABLE OF seqg3.
+  DATA _arg TYPE seqg3-garg.
+
+  _arg = process_id.
+  CONCATENATE sy-mandt _arg actions-existence INTO _arg.
+
+  CALL FUNCTION &apos;ENQUEUE_READ&apos;
+    EXPORTING
+      gclient                     = sy-mandt
+      gname                       = &apos;YGPLMT_LOCKS&apos;
+      garg                        = _arg
+      guname                      = &apos;&apos;
+*     LOCAL                       = &apos; &apos;
+*     FAST                        = &apos; &apos;
+*   IMPORTING
+*     NUMBER                      =
+*     SUBRC                       =
+    TABLES
+      enq                         = t_locks
+    EXCEPTIONS
+      communication_failure       = 1
+      system_failure              = 2
+      OTHERS                      = 3.
+  ASSERT sy-subrc = 0.
+
+  IF NOT t_locks IS INITIAL.  result = abap_true.   ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="RELEASE_EXISTENCE_LOCK" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Release Existence lock for a process"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run/Task ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CALL FUNCTION &apos;DEQUEUE_EYGPLMT_LOCKS&apos;
+    EXPORTING
+      MODE_YGPLMT_LOCKS       = &apos;E&apos;
+      MANDT                   = SY-MANDT
+      PROCESS_ID              = Process_id
+      ACTION                  = actions-existence
+      X_PROCESS_ID            = abap_true
+      X_ACTION                = abap_true
+      _SCOPE                  = &apos;1&apos;
+*     _SYNCHRON               = &apos; &apos;
+*     _COLLECT                = &apos; &apos;
+            .</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_EXISTENCE_LOCK" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set Existence lock for a process"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run/Task ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
+    EXPORTING
+      MODE_YGPLMT_LOCKS       = &apos;E&apos;
+      MANDT                   = SY-MANDT
+      PROCESS_ID              = Process_id
+      ACTION                  = actions-existence
+      X_PROCESS_ID            = abap_true
+      X_ACTION                = abap_true
+      _SCOPE                  = &apos;1&apos;
+      _WAIT                   = ABAP_true
+*     _COLLECT                = &apos; &apos;
+    EXCEPTIONS
+      FOREIGN_LOCK            = 1
+      SYSTEM_FAILURE          = 2
+      OTHERS                  = 3.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+  </METHODS>
  </RAW>
 </ZL_OBJECT>

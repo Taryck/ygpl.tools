@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="030D6D9895AA24DB3C259115D3D9CBAC" CODE_SIGNATURE="34228C17E69EED5AB52001E271E57CA8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
- <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
- </DEPENDENCIES>
+<ZL_OBJECT CHECKSUM="CCAFE00B2EF73DC594AC2D3F6074AAE1" CODE_SIGNATURE="06960EFF13DA06B59900F7280E6823C3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -18,14 +15,9 @@
    <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="FACTORY_MODE" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+   <ITEM CMPNAME="FACTORY_MODE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Constructor in factory mode"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="FROM_FACTORY" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Is a new run"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_RUN">
@@ -148,9 +140,9 @@
 
   IF factory_mode IS NOT INITIAL.
     CREATE OBJECT o_job_monitoring.
-    from_factory = abap_true.
+*    from_factory = abap_true.
   ELSE.
-    from_factory = abap_false.
+*    from_factory = abap_false.
     me-&gt;process_id = run_id.
     infos = read_run( ).
   ENDIF.</SOURCE>
@@ -310,23 +302,5 @@
                      dependencies = dependencies ).</SOURCE>
    </ITEM>
   </METHODS>
-  <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="SAVE">
-    <SOURCE>`
-  DATA _run TYPE ygplmt_runs.
-
-  CHECK from_factory = abap_true.
-  super-&gt;save( ).
-
-  _run-run_id = process_id.
-  _run-threads = infos-threads.
-  _run-obj_left = o_objects-&gt;total_objects.
-  _run-bloc_size = infos-bloc_size.
-  _run-timestamp = times-start.
-  _run-blocs = o_objects-&gt;total_blocs_count.
-  MODIFY ygplmt_runs FROM _run.
-  ASSERT sy-subrc = 0.</SOURCE>
-   </ITEM>
-  </REDEFINITIONS>
  </RAW>
 </ZL_OBJECT>

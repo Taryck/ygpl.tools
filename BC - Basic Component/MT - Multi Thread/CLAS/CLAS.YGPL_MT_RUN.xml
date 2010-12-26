@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="FCD2CED165A58DB1864FD0D2D7C5956C" CODE_SIGNATURE="592A31341FA784BDA54B36B54C983606" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="72DB797DDEC09B314468334DC3E18627" CODE_SIGNATURE="EC62C81B7621EB0344AA714F7B7D969C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
@@ -11,13 +12,6 @@
     <ITEM LANG="E" TEXT="MT : Run as master"/>
    </TEXTS>
   </A0_MAINDATA>
-  <ATTRIBUTS>
-   <ITEM CMPNAME="FACTORY_MODE" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Constructor in factory mode"/>
-    </TEXTS>
-   </ITEM>
-  </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
     <ITEM TYPEGROUP="YGPL_MT_PARENT" TPUTYPE="1" EXPLICIT="X"/>
@@ -49,7 +43,9 @@
     </PARAMETERS>
     <SOURCE>`
 
+  factory_mode = abap_true.
   super-&gt;constructor( run_id ).
+  factory_mode = abap_false.
   SET HANDLER handle_submit_thread FOR o_job_monitoring.
   SET HANDLER handle_before_sleep_mode FOR o_job_monitoring.</SOURCE>
    </ITEM>
@@ -176,6 +172,24 @@
              thread_number = thread_number.</SOURCE>
    </ITEM>
   </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SAVE">
+    <SOURCE>`
+  DATA _run TYPE ygplmt_runs.
+
+*  CHECK from_factory = abap_true.
+  super-&gt;save( ).
+
+  _run-run_id = process_id.
+  _run-threads = infos-threads.
+  _run-obj_left = o_objects-&gt;total_objects.
+  _run-bloc_size = infos-bloc_size.
+  _run-timestamp = times-start.
+  _run-blocs = o_objects-&gt;total_blocs_count.
+  MODIFY ygplmt_runs FROM _run.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
   <TYPES>
    <ITEM CMPNAME="TO_ME" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_RUN">
     <TEXTS>

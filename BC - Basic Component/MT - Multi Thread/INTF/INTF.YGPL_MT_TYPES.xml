@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2775EE6D3697680F0705C496EB23EA50" CODE_SIGNATURE="2C629FE619C1636252F5EAC8654BBF58" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="1ECB91A6C0180943FBDB00393739E714" CODE_SIGNATURE="581FD5F19E059A1F25E61C01AD6E0ACD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -8,6 +8,19 @@
    </TEXTS>
   </A0_MAINDATA>
   <ATTRIBUTS>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
+    BEGIN OF actions,
+      existence     TyPE td_action VALUE &apos;-&apos;,              &quot;#EC NOTEXT
+      Object        TYPE td_action VALUE &apos;O&apos;,              &quot;#EC NOTEXT
+      messaging     TYPE td_action VALUE &apos;M&apos;,              &quot;#EC NOTEXT
+      Information   TYPE td_action VALUE &apos;I&apos;,              &quot;#EC NOTEXT
+      Process_data  TYPE td_action VALUE &apos;D&apos;,              &quot;#EC NOTEXT
+    END OF actions
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="All possible actions (Lock engine)"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF sys_categories,
       data_bloc   TYPE td_category VALUE &apos;_D&apos;,              &quot;#EC NOTEXT
@@ -24,6 +37,11 @@
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
   </TYPEGROUPS>
   <TYPES>
+   <ITEM CMPNAME="TD_ACTION" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPLMT_LOCKS-ACTION">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Action concet for Lock engine"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TD_AS_LOAD" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="INT4">
     <TEXTS>
      <ITEM LANG="E" TEXT="Application server load"/>
