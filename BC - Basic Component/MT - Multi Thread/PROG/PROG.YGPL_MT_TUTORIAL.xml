@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="B01AE79BC6300D8EB69B22366941800D" CODE_SIGNATURE="4EA19350082A0EEE1E0A61A045FCD263" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="AD431259CC4E9D7A07DBB56FB113EEB4" CODE_SIGNATURE="D5F2F1D4A76C99367389BC2147DCFE65" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="F" FIXPT="X" UCCHECK="X"/>
@@ -14,36 +14,30 @@
 
 REPORT  ygpl_mt_tutorial.
 PARAMETERS :
-  run_id TYPE ygpl_mt_template=&gt;t_run OBLIGATORY,
-  mem_size TYPE ygpl_mt_template=&gt;t_mem_size DEFAULT 0,
-  wait_t TYPE ygpl_mt_template=&gt;t_time DEFAULT 1,
-  obj_c TYPE i DEFAULT 100 OBLIGATORY.
+  run_id    TYPE ygpl_mt_my_task=&gt;td_process_id OBLIGATORY,
+  mem_size  TYPE ygpl_mt_my_task=&gt;td_memory_size DEFAULT 0,
+  wait_t    TYPE ygpl_mt_my_task=&gt;td_waittime DEFAULT 1,
+  obj_c     TYPE ygpl_mt_my_task=&gt;td_count DEFAULT 100 OBLIGATORY.
 
 DATA:
-  _ctrl TYPE ygpl_t100t,
-  _status TYPE ygpl_status,
-  _mini TYPE p, &quot; bseg-wrbtr,
-  _amount TYPE p, &quot; bseg-wrbtr,
-  my_run TYPE REF TO ygpl_mt_template,
-  _time TYPE ygpl_mt_template=&gt;t_time,
-  _count TYPE i,
-  it_objects TYPE ygpl_mt_template=&gt;tt_data.
+  _ctrl       TYPE ygpl_t100t,
+  _status     TYPE ygpl_mt_my_task=&gt;td_status,
+  _mini       TYPE p, &quot; bseg-wrbtr,
+  _amount     TYPE p, &quot; bseg-wrbtr,
+  my_task      TYPE REF TO ygpl_mt_my_task,
+  _time       TYPE ygpl_mt_my_task=&gt;td_waittime,
+  _count      TYPE i,
+  it_objects  TYPE ygpl_mt_my_task=&gt;tt_data.
 FIELD-SYMBOLS:
-  &lt;st&gt; LIKE LINE OF my_run-&gt;my_status,
+*  &lt;st&gt; LIKE LINE OF my_task-&gt;my_status,
   &lt;obj&gt; LIKE LINE OF it_objects,
   &lt;lang&gt; LIKE LINE OF &lt;obj&gt;-lang.
 
 START-OF-SELECTION.
-  CREATE OBJECT my_run
+
+  CREATE OBJECT my_task
     EXPORTING
-      run_id  = run_id
-      max_mem = mem_size
-    EXCEPTIONS
-      failed  = 1
-      OTHERS  = 2.
-  IF sy-subrc &lt;&gt; 0.
-    MESSAGE e069(/bdl/d-) WITH &apos;CREATE OBJECT&apos;(e01).
-  ENDIF.
+      run_id = run_id.
 
   IF wait_t &lt; 2.
     _time = wait_t.
@@ -60,31 +54,19 @@ START-OF-SELECTION.
     _time = _amount + 1.
   ENDIF.
 
-  CALL METHOD my_run-&gt;send_param
-    EXPORTING
-      wait_time = _time
-    EXCEPTIONS
-      failed    = 1
-      others    = 2.
-  IF sy-subrc &lt;&gt; 0.
-*   Ignore errors
-  ENDIF.
+*  CALL METHOD my_task-&gt;send_param
+*    EXPORTING
+*      wait_time = _time
+*    EXCEPTIONS
+*      failed    = 1
+*      OTHERS    = 2.
+*  IF sy-subrc &lt;&gt; 0.
+**   Ignore errors
+*  ENDIF.
 
   DO.
 * Get data
-    CALL METHOD my_run-&gt;get_batch
-      EXPORTING
-        wait         = abap_true
-      IMPORTING
-        OBJECTS      = it_objects
-      EXCEPTIONS
-        failed       = 1
-        foreign_lock = 2
-        OTHERS       = 3.
-    IF sy-subrc &lt;&gt; 0.
-      WRITE:/ &apos;GET_BATCH Failed&apos;(e01).
-      EXIT.
-    ENDIF.
+    it_objects = my_task-&gt;get_batch( ).
 
     IF it_objects[] IS INITIAL.
       EXIT.
@@ -111,7 +93,7 @@ START-OF-SELECTION.
         _status = ygpl_mt_my_status=&gt;ko.
       ENDIF.
 
-      CALL METHOD my_run-&gt;confirm_object
+      CALL METHOD my_task-&gt;confirm_objects
         EXPORTING
           status = _status
           count  = 1.
@@ -119,11 +101,10 @@ START-OF-SELECTION.
       IF _count &gt;= obj_c.
         CLEAR _count.
         WRITE:/ _ctrl-arbgb, _ctrl-stext.
-        CALL METHOD my_run-&gt;confirm_object
+        CALL METHOD my_task-&gt;confirm_objects
           EXPORTING
             status = ygpl_mt_my_status=&gt;error  &quot; error wanted
             count  = 1.
-        CALL METHOD my_run-&gt;send_obj_confirm.
         WAIT UP TO _time SECONDS.
       ENDIF.
     ENDLOOP.
@@ -131,45 +112,16 @@ START-OF-SELECTION.
     FREE it_objects.
 
 * Confirm Data
-    CALL METHOD my_run-&gt;confirm_batch
-      EXPORTING
-        wait   = &apos;X&apos;
-      EXCEPTIONS
-        failed = 1
-        OTHERS = 2.
-    IF sy-subrc &lt;&gt; 0.
-    ENDIF.
+    my_task-&gt;confirm_batch( ).
 
   ENDDO.
 
 END-OF-SELECTION.
 
-  WRITE:/ &apos;Total of object processed by this thread : &apos;(i02), my_run-&gt;total_objects.
+*  WRITE:/ &apos;Total of object processed by this thread : &apos;(i02), my_task-&gt;total_objects.
 
-  LOOP AT my_run-&gt;my_status ASSIGNING &lt;st&gt;.
-    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
-  ENDLOOP.</SOURCE>
-  <TEXTSPOOL>
-   <ITEM ID="R">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="MT tutorial (test obj *_MT_TEMPLATE) - Traitement" LENGTH="49 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="OBJ_C">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Nb d&apos;objet par temps d&apos;attente" LENGTH="38 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="RUN_ID">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="WAIT_T">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Temps d&apos;attente en S pour nb O" LENGTH="38 "/>
-    </TEXTS>
-   </ITEM>
-  </TEXTSPOOL>
+*  LOOP AT my_task-&gt;my_status ASSIGNING &lt;st&gt;.
+*    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
+*  ENDLOOP.</SOURCE>
  </RAW>
 </ZL_OBJECT>

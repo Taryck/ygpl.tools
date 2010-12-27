@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E5F88B47A91A5DDA3C501FBCAF80272A" CODE_SIGNATURE="428F3EC9EC70E7EB49C7BC9704F91E5C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="EAE0E43D5B7F4828723405621A162E09" CODE_SIGNATURE="2940D97DE0B65F4234D7EABE9C9FF34C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -8,22 +8,48 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="LOCK_MODES"/>
    <ITEM CMPNAME="TD_AS_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_AS_NAME"/>
    <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_MEMORY_SIZE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
    <ITEM CMPNAME="TD_WP_INDEX" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_INDEX"/>
    <ITEM CMPNAME="TD_WP_NO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_NO"/>
    <ITEM CMPNAME="TD_WP_PID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_WP_PID"/>
+   <ITEM CMPNAME="TS_BATCH_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_BATCH_INFO"/>
    <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_CHRONO"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_WP_INFO"/>
   </ALIASES>
   <ATTRIBUTS>
+   <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_BATCH_INFO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Batch informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object has changed"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="F_IS_FINAL" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object is final"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_PROCESS_ID">
     <TEXTS>
      <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Processus Status"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TIMES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TS_CHRONO">
@@ -31,24 +57,9 @@
      <ITEM LANG="E" TEXT="Timestamps"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="WP_INDEX" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_INDEX">
+   <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_WP_INFO">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Index of SAP Work Process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="WP_NO" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_NO">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="SAP Work process no."/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="WP_PID" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_WP_PID">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="SAP Work Process Identification"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="WP_SERVER" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_AS_NAME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Application Server Name"/>
+     <ITEM LANG="E" TEXT="Wokr Process information"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -78,13 +89,14 @@
     </TEXTS>
     <SOURCE>`
   DATA subrc    TYPE sy-subrc.
+  DATA _jobinfo TYPE tbtcm.
 
   CALL FUNCTION &apos;TH_GET_ACTIVE_SERVER&apos;
     EXPORTING
       tabname        = space
       local_tabname  = space
     IMPORTING
-      server         = wp_server
+      server         = workprocess-server
     EXCEPTIONS
       no_server_list = 1
       no_server      = 2
@@ -94,12 +106,21 @@
   CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
     IMPORTING
       subrc    = subrc
-      wp_no    = wp_no
-      wp_pid   = wp_pid
-      wp_index = wp_index.
+      wp_no    = workprocess-no
+      wp_pid   = workprocess-pid
+      wp_index = workprocess-index.
 
   process_id = generate_new_process_id( ).
-  GET TIME STAMP FIELD times-start.</SOURCE>
+  GET TIME STAMP FIELD times-start.
+  status = ygpl_mt_status=&gt;in_progress.
+
+  IF NOT sy-batch IS INITIAL.
+* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
+    CALL &apos;GetRuntimeInfo&apos;
+      ID &apos;JOB&apos; FIELD _jobinfo.
+    ASSERT sy-subrc = 0.
+    batch_info = _jobinfo.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GENERATE_NEW_PROCESS_ID" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -119,6 +140,80 @@
 *     EV_GUID_22       =
 *     EV_GUID_32       = RUN_ID</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="LOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Lock record exclusive"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="LOCK_WITH_SHARE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Lock record &amp; sharing"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="READ" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Read procesus definition from DB"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA _data TYPE ygplmt_process.
+
+  lock_with_share( ).
+
+  SELECT SINGLE * INTO _data
+    FROM ygplmt_process
+    WHERE process_id = me-&gt;process_id.
+
+  ASSERT sy-subrc = 0.
+
+  status = _data-status.
+  workprocess-server = _data-wp_server.
+  workprocess-index = _data-wp_index.
+  workprocess-no = _data-wp_no.
+  workprocess-pid = _data-wp_pid.
+
+  IF NOT f_is_final IS INITIAL.   unlock_with_share( ).   ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="REFRESH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Refresh run informations"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  read( ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="SAVE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Save Processus definition"/>
@@ -133,16 +228,128 @@
     <SOURCE>`
   DATA _process TYPE ygplmt_process.
 
+  lock_exclusive( ).
+* Lock release at commit.
   _process-process_id = process_id.
-  _process-status = ygpl_mt_status=&gt;in_progress.
-*  _process-STATUS = ???
-  _process-WP_SERVER = WP_SERVER.
-  _process-WP_INDEX = WP_INDEX.
-  _process-WP_NO = WP_NO.
-  _process-WP_PID = WP_PID.
+  _process-status = status.
+  _process-wp_server = workprocess-server.
+  _process-wp_index = workprocess-index.
+  _process-wp_no = workprocess-no.
+  _process-wp_pid = workprocess-pid.
   _process-timestamp = times-start.
   MODIFY ygplmt_process FROM _process.
   ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlock record (with exclusive option)"/>
+    </TEXTS>
+    <SOURCE>`
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+          process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UNLOCK_WITH_SHARE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlock record (lock with sharing option)"/>
+    </TEXTS>
+    <SOURCE>`
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+          process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Locking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock mode (E, S, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA _key TYPE string.
+  DATA user TYPE sy-uname.
+
+  ygpl_mt_lock_managment=&gt;get_process_clearance( process_id ).
+
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_PROCESS&apos;
+    EXPORTING
+      mode_ygplmt_process = lock_mode
+      mandt               = sy-mandt
+      process_id          = process_id
+      x_process_id        = abap_true
+      _scope              = &apos;2&apos;
+      _wait               = abap_true
+      _collect            = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock        = 1
+      system_failure      = 2
+      OTHERS              = 3.
+  IF sy-subrc = 1.
+    user = sy-msgv1.
+    _key = process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                  object_name = &apos;MT Process Data&apos;(tds)
+                   object_key = _key
+                         user = user.
+*  else if sy-subrc &lt;&gt; 0.
+  ELSE.
+    ASSERT sy-subrc = 0.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlocking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock mode (E, S, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;DEQUEUE_EYGPLMT_PROCESS&apos;
+    EXPORTING
+      mode_ygplmt_process = lock_mode
+      mandt               = sy-mandt
+      process_id          = process_id
+      x_process_id        = abap_true
+      _scope              = &apos;2&apos;
+      _synchron           = &apos; &apos;
+      _collect            = &apos; &apos;.
+
+  ygpl_mt_lock_managment=&gt;release_process_clearance( process_id ).</SOURCE>
    </ITEM>
   </METHODS>
   <TYPES>

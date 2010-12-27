@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CCAFE00B2EF73DC594AC2D3F6074AAE1" CODE_SIGNATURE="06960EFF13DA06B59900F7280E6823C3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B1CAA1D33B99ABC15C849677214AE928" CODE_SIGNATURE="5EED9AD237D3828F161BAF06D6C09B64" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
+ </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -20,12 +23,17 @@
      <ITEM LANG="E" TEXT="Constructor in factory mode"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object has changed"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_RUN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
     </TEXTS>
@@ -50,7 +58,7 @@
      <ITEM LANG="E" TEXT="Object store engine"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="WEIGHT_FN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_FN">
+   <ITEM CMPNAME="WEIGHT_FN" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_FN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Weight Fieldname in object data table"/>
     </TEXTS>
@@ -103,32 +111,16 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Add thread manually"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="JOBID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job ID"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job name"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  o_job_monitoring-&gt;add_thread( jobname = jobname
-                               jobcount = jobid ).</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
      <ITEM LANG="E" TEXT="For existing Run"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID"/>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Id"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <SOURCE>`
   DATA length TYPE i.
@@ -144,17 +136,22 @@
   ELSE.
 *    from_factory = abap_false.
     me-&gt;process_id = run_id.
-    infos = read_run( ).
+    read( ).
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="READ_RUN" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Récupération des information d&apos;un bloc"/>
+     <ITEM LANG="E" TEXT="Locking"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RUN_DATA" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_RUN">
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Run&apos;s information"/>
+       <ITEM LANG="E" TEXT="Lock mode (S, E, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run ID"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -166,141 +163,116 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
+  DATA _key TYPE string.
+  DATA user TYPE sy-uname.
+
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_RUNS&apos;
+    EXPORTING
+      mode_ygplmt_runs = lock_mode
+      mandt            = sy-mandt
+      run_id           = process_id
+      x_run_id         = abap_true
+      _scope           = &apos;2&apos;
+      _wait            = abap_true
+      _collect         = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock     = 1
+      system_failure   = 2
+      OTHERS           = 3.
+  IF sy-subrc = 1.
+    user = sy-msgv1.
+    _key = process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                  object_name = &apos;MT Process Data&apos;(tds)
+                   object_key = _key
+                         user = user.
+*  else if sy-subrc &lt;&gt; 0.
+  ELSE.
+    ASSERT sy-subrc = 0.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlocking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock mode (S, E, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;DEQUEUE_EYGPLMT_RUNS&apos;
+    EXPORTING
+      mode_ygplmt_runs = lock_mode
+      mandt            = sy-mandt
+      run_id           = process_id
+      x_run_id         = abap_true
+      _scope           = &apos;2&apos;
+      _synchron        = &apos; &apos;
+      _collect         = &apos; &apos;.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_EXCLUSIVE">
+    <SOURCE>`
+  super-&gt;lock_exclusive( ).
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_WITH_SHARE">
+    <SOURCE>`
+  super-&gt;lock_with_share( ).
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="READ">
+    <SOURCE>`
   DATA _run TYPE ygplmt_runs.
 
-*  IF NOT lock IS INITIAL.
-*    CALL METHOD _lock
-*      EXPORTING
-*        run_id       = run_id
-*        cat          = ygpl_mt_categori=&gt;run_info
-*      EXCEPTIONS
-*        foreign_lock = 1
-*        sys_failure  = 2
-*        OTHERS       = 3.
-*    IF sy-subrc &lt;&gt; 0.
-*      RAISE failed.
-*    ENDIF.
-*  ENDIF.
+* Do the lock
+  SUPER-&gt;READ( ).
 
-*  IF _run-run_id &lt;&gt; run_id.
   SELECT SINGLE * INTO _run
     FROM ygplmt_runs
     WHERE run_id = process_id.
   ASSERT sy-subrc = 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE not_found.
-*  ENDIF.
-*  ENDIF.
 
-*  IF NOT lock IS INITIAL.
-*    CALL METHOD _unlock( run_id = run_id
-*      cat = ygpl_mt_categori=&gt;run_info ).
-*  ENDIF.
+  unlock_with_share( ).
+
   times-start = _run-timestamp.
-  MOVE-CORRESPONDING _run TO run_data.</SOURCE>
+  MOVE-CORRESPONDING _run TO infos.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="REFRESH" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Refresh run informations"/>
-    </TEXTS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
-  infos = read_run( ).</SOURCE>
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+          process_id = me-&gt;process_id ).
+  super-&gt;unlock_exclusive( ) .</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Màj Nombre de bloc"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="BLOC_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Bloc count"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_WITH_SHARE">
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-  UPDATE ygplmt_runs SET blocs = bloc_count
-    WHERE run_id = process_id.</SOURCE>
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+          process_id = me-&gt;process_id ).
+  super-&gt;unlock_with_share( ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the bloc size value"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Requested size of bloc counted in weight unit if provided"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  infos-bloc_size = bloc_size.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the thread count value"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="THREAD_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Number of thread to launch"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  CHECK o_job_monitoring IS BOUND.
-  IF o_job_monitoring-&gt;threads = 0.
-    infos-threads = thread_count.
-  ELSE.
-* To do
-  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="START_THREADS" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Start threads automaticly"/>
-    </TEXTS>
-    <SOURCE>`
-  o_job_monitoring-&gt;start_threads( infos-threads ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Wait Thread progressing"/>
-    </TEXTS>
-    <SOURCE>`
-  o_job_monitoring-&gt;wait_progress( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_ADD_OBJECTS" EXPOSURE="1" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Add Objects to work list"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X"/>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
-    <SOURCE>`
-  DATA _bs      TYPE td_bloc_size.
-  DATA _count   TYPE i.
-
-* Check Objects
-  DESCRIBE TABLE objects LINES _count.
-  CHECK _count &gt;= 1.
-
-* Check Bloc_Size
-  IF infos-bloc_size &lt; 1.   infos-bloc_size = 1.    ENDIF.
-
-  o_objects-&gt;add_objects( objects = objects
-                        bloc_size = infos-bloc_size
-                        weight_fn = me-&gt;weight_fn
-                     dependencies = dependencies ).</SOURCE>
-   </ITEM>
-  </METHODS>
+  </REDEFINITIONS>
  </RAW>
 </ZL_OBJECT>

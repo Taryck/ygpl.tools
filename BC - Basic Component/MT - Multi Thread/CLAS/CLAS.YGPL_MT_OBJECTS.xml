@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="34FCD90D8FFC3BB62C769D7B30917189" CODE_SIGNATURE="FA823B9691B8D492A7F04EDB28744AF9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="44F6D7973A45F62EC4AB9FFB90E1610D" CODE_SIGNATURE="CAA595C69F8357D6800F66FC46CDCAB2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -12,8 +12,10 @@
    <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_ID"/>
    <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
    <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_FN"/>
+   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_MEMORY_SIZE"/>
    <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_NUM_KEY"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
@@ -62,6 +64,11 @@
    <ITEM CMPNAME="ESTIMATED_END_TIME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_TIME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Extimated time after all objects processed to end program"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="F_SEMAPHORE" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Semaphore is set"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="GLOBAL_STATUS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_STATUS_LIST">
@@ -449,8 +456,19 @@
   LOOP AT current_blocs ASSIGNING &lt;wa_b&gt;.
     UPDATE ygplmt_objects SET status = ygpl_mt_status=&gt;done
       WHERE bloc_id = &lt;wa_b&gt;-bloc_id.
+    IF sy-subrc &lt;&gt; 0.
+      CLEAR &lt;wa_b&gt;.
+    ENDIF.
     ASSERT sy-subrc = 0.
   ENDLOOP.
+
+  COMMIT WORK AND WAIT.
+
+  DELETE current_blocs WHERE table_line IS INITIAL.
+  LOOP AT current_blocs ASSIGNING &lt;wa_b&gt;.
+    unlock_bloc( &lt;wa_b&gt;-bloc_id ).
+  ENDLOOP.
+
   CLEAR current_blocs.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1">
@@ -1178,7 +1196,9 @@
   DATA t_size     TYPE td_memory_size.
   DATA _run       TYPE ts_run.
   DATA _blocs     TYPE STANDARD TABLE OF ygplmt_objects.
-  DATA _bloc      like LINE OF current_blocs.
+  DATA _bloc      LIKE LINE OF current_blocs.
+  DATA o_mycx     TYPE REF TO ygpl_mt_cx.
+  DATA o_cx       TYPE REF TO cx_root.
 
   FIELD-SYMBOLS:
     &lt;fs&gt; LIKE objects,
@@ -1189,96 +1209,84 @@
   CREATE DATA tab_ref LIKE objects.
   ASSIGN tab_ref-&gt;* TO &lt;fs&gt;.
 
-*  CALL METHOD ygpl_mt_locks=&gt;lock
-*    EXPORTING
-*      run_id = o_run-&gt;process_id
-*      cat    = ygpl_mt_categori=&gt;data_bloc.
-*  CALL METHOD _lock
-*    EXPORTING
-*      run_id       = run_id
-*      cat          = ygpl_mt_categori=&gt;data_bloc
-*    EXCEPTIONS
-*      foreign_lock = 1
-*      sys_failure  = 2
-*      OTHERS       = 3.
-*  IF sy-subrc = 1.
-*    RAISE foreign_lock.
-*  ELSEIF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
+* Get global Lock on object processing.
+  get_semaphore( ).
 
+  TRY.
 * Determine Maxrow
-  o_run-&gt;refresh( ).
+      o_run-&gt;refresh( ).
 
-*  CALL METHOD _get_run
-*    IMPORTING
-*      run_data  = _run
-*    EXCEPTIONS
-*      not_found = 1
-*      OTHERS    = 2.
-*  IF sy-subrc &lt;&gt; 0.
-*    CALL METHOD _unlock( run_id = run_id
-*      cat = ygpl_mt_categori=&gt;data_bloc ).
-*    RAISE failed.
-*  ENDIF.
-
-  maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate ) DIV o_run-&gt;infos-threads + 1.
-  IF maxrow &lt; 1. maxrow = 1. ENDIF.
+      maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate ) DIV o_run-&gt;infos-threads + 1.
+      IF maxrow &lt; 1. maxrow = 1. ENDIF.
 
 * Get data : Big ones first
-  SELECT * INTO TABLE _blocs
-    FROM ygplmt_objects UP TO maxrow ROWS
-    WHERE run_id = o_run-&gt;process_id
-      AND status = ygpl_mt_status=&gt;to_do
-      AND bloc_size &gt; bloc_size.
-
-  IF NOT bloc_size IS INITIAL.
-* When no more big ones
-    DESCRIBE TABLE _blocs LINES rows.
-    SUBTRACT rows FROM maxrow.
-    IF maxrow &gt; 0.
-      SELECT * APPENDING TABLE _blocs
+      SELECT * INTO TABLE _blocs
         FROM ygplmt_objects UP TO maxrow ROWS
         WHERE run_id = o_run-&gt;process_id
           AND status = ygpl_mt_status=&gt;to_do
-          AND bloc_size &lt;= bloc_size.
-      CLEAR bloc_size.
-    ENDIF.
-  ENDIF.
+          AND bloc_size &gt; bloc_size.
 
-  IF NOT _blocs IS INITIAL.
-    SORT _blocs BY mem_size DESCENDING.
-    LOOP AT _blocs ASSIGNING &lt;wa&gt;.
-* Memory limits
-      IF maximum_memory &gt; 0.
-        t_size = mem_size + &lt;wa&gt;-mem_size.
-        CHECK t_size &gt; maximum_memory AND mem_size &gt; 0.
-        ADD &lt;wa&gt;-mem_size TO mem_size.
-      ENDIF.
-
-      decode_data( EXPORTING buffer = &lt;wa&gt;-obj_data
-                    CHANGING    any = &lt;fs&gt; ).
-
-      APPEND LINES OF &lt;fs&gt; TO objects.
-      IF sy-subrc = 0.
-        _bloc-bloc_id = &lt;wa&gt;-bloc_id.
-        APPEND _bloc TO current_blocs.
-        IF sy-subrc = 0.
-          UPDATE ygplmt_objects SET status = ygpl_mt_status=&gt;in_progress
-            WHERE bloc_id = &lt;wa&gt;-bloc_id.
+      IF NOT bloc_size IS INITIAL.
+* When no more big ones
+        DESCRIBE TABLE _blocs LINES rows.
+        SUBTRACT rows FROM maxrow.
+        IF maxrow &gt; 0.
+          SELECT * APPENDING TABLE _blocs
+            FROM ygplmt_objects UP TO maxrow ROWS
+            WHERE run_id = o_run-&gt;process_id
+              AND status = ygpl_mt_status=&gt;to_do
+              AND bloc_size &lt;= bloc_size.
+          CLEAR bloc_size.
         ENDIF.
       ENDIF.
-    ENDLOOP.
-  ENDIF.
 
-  DESCRIBE TABLE objects LINES maxrow.
-  ADD maxrow TO total_objects.
-  processed_objects = maxrow.
-*  CLEAR msg_objects.
+      IF NOT _blocs IS INITIAL.
+        SORT _blocs BY mem_size DESCENDING.
+        LOOP AT _blocs ASSIGNING &lt;wa&gt;.
+* Memory limits
+          IF maximum_memory &gt; 0.
+            t_size = mem_size + &lt;wa&gt;-mem_size.
+            CHECK t_size &gt; maximum_memory AND mem_size &gt; 0.
+            ADD &lt;wa&gt;-mem_size TO mem_size.
+          ENDIF.
 
-*  COMMIT WORK AND WAIT.
-*  CALL METHOD _unlock( run_id = run_id
-*    cat = ygpl_mt_categori=&gt;data_bloc ).</SOURCE>
+          decode_data( EXPORTING buffer = &lt;wa&gt;-obj_data
+                        CHANGING    any = &lt;fs&gt; ).
+
+          APPEND LINES OF &lt;fs&gt; TO objects.
+          CHECK sy-subrc = 0.
+
+          _bloc-bloc_id = &lt;wa&gt;-bloc_id.
+          TRY.
+              lock_bloc( _bloc-bloc_id ).
+            CATCH ygpl_mt_cx INTO o_cx.
+* Inconsitancy
+              CONTINUE.
+          ENDTRY.
+
+          APPEND _bloc TO current_blocs.
+          ASSERT sy-subrc = 0.
+
+          UPDATE ygplmt_objects SET status = ygpl_mt_status=&gt;in_progress
+            WHERE bloc_id = _bloc-bloc_id.
+          IF sy-subrc &lt;&gt; 0.
+            DELETE current_blocs WHERE bloc_id = _bloc-bloc_id.
+            unlock_bloc( _bloc-bloc_id ).
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+
+      DESCRIBE TABLE objects LINES maxrow.
+      ADD maxrow TO total_objects.
+      processed_objects = maxrow.
+
+      COMMIT WORK AND WAIT.
+    CATCH cx_root INTO o_cx.
+      RELEASE_SEMAPHORE( ).
+      RAISE EXCEPTION o_cx.
+  ENDTRY.
+* Release global Lock on object processing.
+  RELEASE_SEMAPHORE( )..</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1371,6 +1379,21 @@
   ENDIF.
 
   size = &lt;weight&gt;.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_SEMAPHORE" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Semaphore"/>
+    </TEXTS>
+    <SOURCE>`
+
+  IF NOT f_semaphore IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;semaphore_already_defined
+               object_name = &apos;Object Semaphore&apos;(tos).
+  ENDIF.
+* Get global Lock on object processing.
+  ygpl_mt_lock_managment=&gt;get_objects_semaphore( o_run-&gt;process_id ).
+  f_semaphore = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_SIZE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1514,12 +1537,78 @@
 *    RAISE failed.
 *  ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="LOCK_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Locking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object Bloc ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA _key TYPE string.
+  DATA user TYPE sy-uname.
+
+*  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_OBJECTS&apos;
+    EXPORTING
+      mode_ygplmt_objects = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
+      mandt               = sy-mandt
+      bloc_id             = bloc_id
+      x_bloc_id           = abap_true
+      _scope              = &apos;1&apos;
+      _wait               = abap_true
+      _collect            = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock        = 1
+      system_failure      = 2
+      OTHERS              = 3.
+  IF sy-subrc = 1.
+    user = sy-msgv1.
+    _key = bloc_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                  object_name = &apos;Object bloc&apos;(tob)
+                   object_key = _key
+                         user = user.
+*  else if sy-subrc &lt;&gt; 0.
+  ELSE.
+    ASSERT sy-subrc = 0.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="REFRESH_STARTTIME" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Reset the strart date and time"/>
     </TEXTS>
     <SOURCE>`
   GET TIME STAMP FIELD times-start.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="RELEASE_SEMAPHORE" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Release Semaphore if set"/>
+    </TEXTS>
+    <SOURCE>`
+
+  CHECK f_semaphore IS NOT INITIAL.
+*  IF f_semaphore IS INITIAL.
+*    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+*          EXPORTING textid = ygpl_mt_cx_locks=&gt;semaphore_not_set
+*               object_name = &apos;Object Semaphore&apos;(tos).
+*  ENDIF.
+* Get global Lock on object processing.
+  ygpl_mt_lock_managment=&gt;release_objects_semaphore( o_run-&gt;process_id ).
+  CLEAR f_semaphore.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_BLOCS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1715,7 +1804,41 @@
     RAISE failed.
   ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="UNLOCK_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlocking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object Bloc ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CALL FUNCTION &apos;DEQUEUE_EYGPLMT_OBJECTS&apos;
+    EXPORTING
+      MODE_YGPLMT_OBJECTS       = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
+      MANDT                     = SY-MANDT
+      BLOC_ID                   = bloc_id
+      X_BLOC_ID                 = abap_true
+      _SCOPE                    = &apos;1&apos;
+      _SYNCHRON                 = &apos; &apos;
+      _COLLECT                  = &apos; &apos;.</SOURCE>
+   </ITEM>
   </METHODS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="TOB">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Object bloc" LENGTH="30 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="TOS">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Object Semaphore" LENGTH="30 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
   <TYPES>
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" TYPTYPE="1" TYPE="YGPLMT_OBJECTS-OBJ_DATA"/>
    <ITEM CMPNAME="TD_PROGRESS" STATE="1" TYPTYPE="4">td_progress TYPE p LENGTH 3 DECIMALS 3

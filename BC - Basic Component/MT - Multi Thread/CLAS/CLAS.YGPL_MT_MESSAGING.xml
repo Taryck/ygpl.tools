@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6884AA038615B2F81404F3ED5BCEC7D6" CODE_SIGNATURE="68FCCD66F4D5E497C0A105B3C5E5F5BA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F66E6625F545C5DFE98EF6675DB2F401" CODE_SIGNATURE="1FE091C6ECD806292AF0582CEB0289D4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
@@ -38,6 +38,11 @@
      <ITEM LANG="E" TEXT="Object confirmation informations"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="F_SEMAPHORE" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Semaphore is set"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="MSG_IN_BACKGROUND" EXPOSURE="2" STATE="1" ATTVALUE="&apos;X&apos;" TYPTYPE="1" TYPE="TD_BOOLEAN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Envoi message progression en arrière plan Oui &apos;X&apos; ou &apos;N&apos;"/>
@@ -65,7 +70,7 @@
      <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CAT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+     <ITEM SCONAME="CATEGORY" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
       <TEXTS>
        <ITEM LANG="E" TEXT="Message Category"/>
       </TEXTS>
@@ -217,20 +222,20 @@
 * Date : 2008 December                                               *
 **********************************************************************
 
-  CALL METHOD _lock
-    EXPORTING
-      run_id       = process_id
-    EXCEPTIONS
-      foreign_lock = 1
-      sys_failure  = 2
-      OTHERS       = 3.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE failed.
-  ENDIF.
+*  CALL METHOD _lock
+*    EXPORTING
+*      run_id       = process_id
+*    EXCEPTIONS
+*      foreign_lock = 1
+*      sys_failure  = 2
+*      OTHERS       = 3.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
 
   DELETE FROM ygplmt_messages WHERE process_id = process_id.
 
-  CALL METHOD _unlock( run_id = process_id ).</SOURCE>
+*  CALL METHOD _unlock( run_id = process_id ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ENCODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -242,6 +247,28 @@
     </PARAMETERS>
     <SOURCE>`
   EXPORT msg = any TO DATA BUFFER result COMPRESSION ON.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_SEMAPHORE" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Semaphore"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+
+  IF NOT f_semaphore IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;semaphore_already_defined
+               object_name = &apos;Message Semaphore&apos;(tms).
+  ENDIF.
+* Get global Lock on object processing.
+  ygpl_mt_lock_managment=&gt;get_messages_semaphore( process_id ).
+  f_semaphore = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_MESSAGES" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -262,38 +289,57 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-  DATA: it_msg TYPE tt_msgs.
-  DATA: it_sys_msg TYPE tt_msgs.
+  DATA it_msg       TYPE STANDARD TABLE OF ygplmt_messages.
+  DATA it_tmp_msg   TYPE STANDARD TABLE OF ygplmt_messages.
+*  data it_arch_msg  TYPE STANDARD TABLE OF ygplmt_msgs_arch.
+  DATA s_msg_arch   TYPE ygplmt_msgs_arch.
+  DATA it_messages  TYPE tt_msgs.
+  DATA s_msg        LIKE LINE OF it_messages.
+  DATA it_sys_msgs  TYPE tt_msgs.
+  DATA o_cx         TYPE REF TO cx_root.
+  FIELD-SYMBOLS &lt;m&gt; like LINE OF it_msg.
 
-  SELECT mandt msg_id category msg_data INTO TABLE it_msg
-    FROM ygplmt_messages
-    WHERE process_id = process_id.
-  IF it_msg IS INITIAL.
-    RETURN.
-  ENDIF.
+* Get global Lock on object processing.
+  get_semaphore( ).
+  TRY.
 
-  message_readed = abap_true.
+      SELECT * INTO TABLE it_msg
+        FROM ygplmt_messages
+        WHERE process_id = process_id.
+      IF NOT it_msg IS INITIAL.
+        message_readed = abap_true.
+        it_tmp_msg = it_msg.
+        DELETE it_tmp_msg WHERE NOT arch IS INITIAL.
+        LOOP AT it_tmp_msg ASSIGNING &lt;m&gt;.
+          CLEAR s_msg_arch.   s_msg_arch-key = &lt;m&gt;-key.   s_msg_arch-data = &lt;m&gt;-data.
+          INSERT ygplmt_msgs_arch FROM s_msg_arch.
+        ENDLOOP.
+        FREE it_tmp_msg.
 
-  it_sys_msg = it_msg.
-  DELETE it_sys_msg WHERE NOT categ IN ygpl_mt_categories=&gt;r_sys_categories.
-  DELETE it_msg WHERE categ IN ygpl_mt_categories=&gt;r_sys_categories.
+        DELETE ygplmt_messages FROM TABLE it_msg.
+        COMMIT WORK AND WAIT.
+        release_semaphore( ).
 
-  SORT it_sys_msg BY categ.
-  SORT it_msg BY categ.
+        SORT it_msg BY timestamp category.
+        LOOP AT it_msg ASSIGNING &lt;m&gt;.
+          CLEAR s_msg.   MOVE-CORRESPONDING &lt;m&gt; TO s_msg.
+          APPEND s_msg TO it_messages.
+        ENDLOOP.
 
-  IF NOT it_sys_msg IS INITIAL.
-    handle_system_messages( it_sys_msg ).
-  ENDIF.
+        it_sys_msgs = it_messages.
+        DELETE it_sys_msgs WHERE NOT category IN ygpl_mt_categories=&gt;r_sys_categories.
+        DELETE it_messages WHERE category IN ygpl_mt_categories=&gt;r_sys_categories.
 
-  IF NOT it_msg IS INITIAL.
-    handle_specific_messages( it_msg ).
-  ENDIF.
-** Security delete
-*  DELETE ygplmt_messages FROM TABLE it_msg.</SOURCE>
+        IF NOT it_sys_msgs IS INITIAL.    handle_system_messages( it_sys_msgs ).         ENDIF.
+
+        IF NOT it_messages IS INITIAL.    handle_specific_messages( it_messages ).       ENDIF.
+      ENDIF.
+    CATCH cx_root INTO o_cx.
+      release_semaphore( ).
+      RAISE EXCEPTION o_cx.
+  ENDTRY.
+* Release global Lock on object processing.
+  release_semaphore( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_OBJECT_CONFIRMATION" STATE="1">
     <TEXTS>
@@ -342,10 +388,6 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   FIELD-SYMBOLS:
 *    &lt;data&gt; TYPE ANY,
 *    &lt;dt&gt; LIKE LINE OF msg_cat_types,
@@ -398,8 +440,8 @@
 * Call external event handler
     RAISE EVENT handle_specific_message
       EXPORTING
-        cat     = &lt;msg&gt;-categ
-        rawdata = &lt;msg&gt;-msg_data.
+        category = &lt;msg&gt;-category
+        rawdata  = &lt;msg&gt;-msg_data.
   ENDLOOP.
 
   DELETE ygplmt_messages FROM TABLE messages.
@@ -434,37 +476,49 @@
   DATA f_obj_conf TYPE td_boolean.
 
   LOOP AT messages ASSIGNING &lt;msg&gt;.
-    CASE &lt;msg&gt;-categ.
+    CASE &lt;msg&gt;-category.
       WHEN sys_categories-obj_conf.
         f_obj_conf = abap_true.
         handle_object_confirmation( &lt;msg&gt;-msg_data ).
       WHEN OTHERS.
-* Un expected messages
+* Unexpected messages type
     ENDCASE.
   ENDLOOP.
 
-  RAISE EVENT objects_confirmed
-    EXPORTING
-      object_count = confirmed_objects-count
-      status       = confirmed_objects-t_status.
-  CLEAR confirmed_objects.
+  IF f_obj_conf = abap_true.
+    RAISE EVENT objects_confirmed
+      EXPORTING
+        object_count = confirmed_objects-count
+        status       = confirmed_objects-t_status.
+    CLEAR confirmed_objects.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="RELEASE_SEMAPHORE" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Release Semaphore if set"/>
+    </TEXTS>
+    <SOURCE>`
 
-  DELETE ygplmt_messages FROM TABLE messages.
-  ASSERT sy-subrc = 0.
-*  IF sy-subrc &lt;&gt; 0.
-**    ROLLBACK WORK.
-**    CALL METHOD _unlock( run_id = run_id
-**      cat = ygpl_mt_categori=&gt;run_info ).
-**    RAISE failed.
+  CHECK f_semaphore IS NOT INITIAL.
+*  IF f_semaphore IS INITIAL.
+*    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+*          EXPORTING textid = ygpl_mt_cx_locks=&gt;semaphore_not_set
+*               object_name = &apos;Message Semaphore&apos;(tms).
 *  ENDIF.
-*
-*  COMMIT WORK AND WAIT.</SOURCE>
+* Get global Lock on object processing.
+  ygpl_mt_lock_managment=&gt;release_messages_semaphore( process_id ).
+  CLEAR f_semaphore.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_MESSAGE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Send message to DB"/>
     </TEXTS>
     <PARAMETERS>
+     <ITEM SCONAME="ARCHIVE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Archive message after reception"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
       <TEXTS>
        <ITEM LANG="E" TEXT="Message category"/>
@@ -492,9 +546,11 @@
 
   CHECK NOT o_categories-&gt;is_valid_category( category ) IS INITIAL.
 
-  _msg-msg_id = _generate_msg_id( ).
+  _msg-message_id = _generate_msg_id( ).
   _msg-process_id = process_id.
   _msg-category = category.
+  _msg-username = sy-uname.
+  _msg-arch = archive.
 
   _msg-msg_data = encode_data( message ).
 
@@ -526,23 +582,23 @@
 * Date : 2008 December                                               *
 **********************************************************************
 
-  CALL METHOD _lock
-    EXPORTING
-      run_id       = run_id
-    EXCEPTIONS
-      foreign_lock = 1
-      sys_failure  = 2
-      OTHERS       = 3.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE failed.
-  ENDIF.
+*  CALL METHOD _lock
+*    EXPORTING
+*      run_id       = run_id
+*    EXCEPTIONS
+*      foreign_lock = 1
+*      sys_failure  = 2
+*      OTHERS       = 3.
+*  IF sy-subrc &lt;&gt; 0.
+*    RAISE failed.
+*  ENDIF.
 
 *  IF _run-run_id &lt;&gt; run_id.
   DELETE FROM ygplmt_messages WHERE process_id = run_id.
 
-  COMMIT WORK AND WAIT.
-
-  CALL METHOD _unlock( run_id = run_id ).</SOURCE>
+*  COMMIT WORK AND WAIT.
+*
+*  CALL METHOD _unlock( run_id = run_id ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GENERATE_MSG_ID" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -567,93 +623,6 @@
 *     EV_GUID_22       =
       EV_GUID_32       = MSG_ID.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Lock a catégorie (private)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="FOREIGN_LOCK" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Objet déjà bloqué"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="SYS_FAILURE" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Erreur interne du serveur enqueue"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-  CALL FUNCTION &apos;ENQUEUE_EYGPL_RUN&apos;
-    EXPORTING
-      mode_ygpl_run_info       = &apos;X&apos;
-      run_id                   = run_id
-      categ                    = cat
-*   X_RUN_ID                 = &apos; &apos;
-*   X_CATEG                  = &apos; &apos;
-      _scope                   = &apos;2&apos;
-      _wait                    = &apos;X&apos;
-      _collect                 = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock             = 1
-      system_failure           = 2
-      OTHERS                   = 3.
-  IF sy-subrc = 1.
-    RAISE foreign_lock.
-  ELSEIF sy-subrc &lt;&gt; 0.
-    RAISE sys_failure.
-  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Unlock run categorie (private)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CAT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Catégorie de donnée supplémentaire"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-  CALL FUNCTION &apos;DEQUEUE_EYGPL_RUN&apos;
-    EXPORTING
-      MODE_YGPL_RUN_INFO       = &apos;X&apos;
-      RUN_ID                   = run_id
-      CATEG                    = cat
-*      X_RUN_ID                 = &apos; &apos;
-*      X_CATEG                  = &apos; &apos;
-      _SCOPE                   = &apos;3&apos;
-      _SYNCHRON                = &apos; &apos;
-      _COLLECT                 = &apos; &apos;.</SOURCE>
-   </ITEM>
   </METHODS>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
@@ -661,7 +630,7 @@
   <TYPES>
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" TYPTYPE="1" TYPE="YGPLMT_MESSAGES-MSG_DATA"/>
    <ITEM CMPNAME="TD_MSGDATA" STATE="1" TYPTYPE="1" TYPE="YGPLMT_MESSAGES-MSG_DATA"/>
-   <ITEM CMPNAME="TD_MSGKEY" STATE="1" TYPTYPE="1" TYPE="YGPLMT_MESSAGES-MSG_ID">
+   <ITEM CMPNAME="TD_MSGKEY" STATE="1" TYPTYPE="1" TYPE="YGPLMT_MESSAGES-MESSAGE_ID">
     <TEXTS>
      <ITEM LANG="E" TEXT="ID de message"/>
     </TEXTS>
@@ -671,27 +640,17 @@
      <ITEM LANG="E" TEXT="Categories for this run type"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_MSG" STATE="1" TYPTYPE="4">
-    BEGIN OF ts_msg,
+   <ITEM CMPNAME="TS_MSG" STATE="1" TYPTYPE="4">BEGIN OF ts_msg.
 * Adding Table Key for delete
-      mandt    TYPE ygplmt_messages-mandt,
-      msg_id   TYPE	ygplmt_messages-msg_id,
-* End of key
-      categ	   TYPE ygplmt_messages-category,
-      msg_data TYPE	ygplmt_messages-msg_data,
-    END OF ts_msg
-`
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Message à traiter"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TT_MSGS" STATE="1" TYPTYPE="4">
-    tt_msgs TYPE STANDARD TABLE OF ts_msg
-`
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Liste de message à traiter"/>
-    </TEXTS>
-   </ITEM>
+      include type ygpl_mt_messages_key.
+  types:
+      timestamp   type ygplmt_messages-timestamp,
+      category    type ygplmt_messages-category,
+      msg_data    type ygplmt_messages-msg_data,
+    end of ts_msg
+`</ITEM>
+   <ITEM CMPNAME="TT_MSGS" STATE="1" TYPTYPE="4">tt_msgs TYPE STANDARD TABLE OF ts_msg
+`</ITEM>
   </TYPES>
  </RAW>
 </ZL_OBJECT>

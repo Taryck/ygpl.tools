@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="67560DCAEDAEFBD8B478DE157CAA776F" CODE_SIGNATURE="520CC952C691E09AA56F3CFE53E26106" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="D7F08B8D94A6622DA56588BA38061AAC" CODE_SIGNATURE="FC25771E96E6E7DC119549E6A85C490B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
  </DEPENDENCIES>
@@ -11,13 +11,15 @@
     <ITEM LANG="E" TEXT="MT : Task process"/>
    </TEXTS>
   </A0_MAINDATA>
-  <ALIASES>
-   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
-  </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="BLOC_SIZE" STATE="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Minimal bloc size"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object has changed"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
@@ -101,7 +103,6 @@
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-     <ITEM SCONAME="WAIT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PARVALUE="&apos;X&apos;" PAROPTIONL="X"/>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -111,14 +112,113 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   o_objects-&gt;get_batch( importing objects = objects ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Locking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock mode (E, S, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Task ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA _key TYPE string.
+  DATA user TYPE sy-uname.
+
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_TASKS&apos;
+    EXPORTING
+      MODE_YGPLMT_TASKS       = lock_mode
+      MANDT                   = SY-MANDT
+      TASK_ID                 = process_id
+      X_TASK_ID               = abap_true
+      _SCOPE                  = &apos;2&apos;
+      _WAIT                   = abap_true
+      _COLLECT                = &apos; &apos;
+    EXCEPTIONS
+      FOREIGN_LOCK            = 1
+      SYSTEM_FAILURE          = 2
+      OTHERS                  = 3.
+  IF sy-subrc = 1.
+    user = sy-msgv1.
+    _key = process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                  object_name = &apos;MT Process Data&apos;(tds)
+                   object_key = _key
+                         user = user.
+*  else if sy-subrc &lt;&gt; 0.
+  ELSE.
+    ASSERT sy-subrc = 0.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unlocking"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LOCK_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock mode (E, S, X)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Task ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  CALL FUNCTION &apos;DEQUEUE_EYGPLMT_TASKS&apos;
+    EXPORTING
+      mode_ygplmt_tasks = lock_mode
+      mandt             = sy-mandt
+      task_id           = process_id
+      x_task_id         = abap_true
+      _scope            = &apos;2&apos;
+      _synchron         = &apos; &apos;
+      _collect          = &apos; &apos;.</SOURCE>
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_EXCLUSIVE">
+    <SOURCE>`
+  super-&gt;lock_exclusive( ).
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_WITH_SHARE">
+    <SOURCE>`
+  super-&gt;lock_with_share( ).
+  _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+        process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="SAVE">
     <SOURCE>`
   DATA _task TYPE ygplmt_tasks.
@@ -129,6 +229,18 @@
   _task-status = ygpl_mt_status=&gt;in_progress.
   MODIFY ygplmt_tasks FROM _task.
   ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_EXCLUSIVE">
+    <SOURCE>`
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
+          process_id = me-&gt;process_id ).
+  super-&gt;unlock_exclusive( ) .</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_WITH_SHARE">
+    <SOURCE>`
+  _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
+          process_id = me-&gt;process_id ).
+  super-&gt;unlock_with_share( ).</SOURCE>
    </ITEM>
   </REDEFINITIONS>
   <TYPES>

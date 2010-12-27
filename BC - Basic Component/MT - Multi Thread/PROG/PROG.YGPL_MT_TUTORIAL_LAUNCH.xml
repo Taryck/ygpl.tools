@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="10D6B2AF9BEFBA7E86347C4BBBBE728B" CODE_SIGNATURE="B1E70460EF17A35E425E801D57E6A41F" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="A03CFF9339BA606640D853424895F829" CODE_SIGNATURE="0140379A5CF998504950211B78B6DDAD" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="F" FIXPT="X" UCCHECK="X"/>
@@ -15,12 +15,12 @@
 REPORT  ygpl_mt_tutorial_launch.
 PARAMETERS :
   clr_all TYPE oax AS CHECKBOX DEFAULT &apos; &apos;,
-  thread TYPE ygpl_mt_template=&gt;t_threads DEFAULT 2 OBLIGATORY,
-  bloc_s TYPE ygpl_mt_template=&gt;t_bloc_size DEFAULT 10 OBLIGATORY,
-  wait_m TYPE ygpl_mt_template=&gt;t_time DEFAULT 30,
-  prog_m TYPE ygpl_mt_template=&gt;t_progress DEFAULT 1,
-  mem_size TYPE ygpl_mt_template=&gt;t_mem_size DEFAULT 0,
-  wait_t TYPE i DEFAULT 1,
+  thread TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 2 OBLIGATORY,
+  bloc_s TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 10 OBLIGATORY,
+*  wait_m TYPE YGPL_MT_MY_RUN=&gt;TD_WAITTIME DEFAULT 30,
+*  prog_m TYPE YGPL_MT_MY_RUN=&gt;TD_COUNT DEFAULT 1,
+  mem_size TYPE ygpl_mt_my_run=&gt;td_memory_size DEFAULT 0,
+  wait_t TYPE ygpl_mt_my_run=&gt;td_waittime DEFAULT 1,
   obj_c TYPE i DEFAULT 50 OBLIGATORY,
   immed TYPE oax AS CHECKBOX DEFAULT &apos;X&apos;.
 
@@ -39,27 +39,25 @@ TYPES:
   tt_data TYPE STANDARD TABLE OF ts_data WITH NON-UNIQUE KEY msg .
 DATA:
   it_data TYPE tt_data,
-  my_run TYPE REF TO ygpl_mt_template,
-*  progression TYPE string,
+  my_run  TYPE REF TO ygpl_mt_my_run,
   is_finished TYPE oax,
-*  id TYPE ygpl_mt_template=&gt;t_run,
-  _jobname TYPE tbtcjob-jobname,
+  _jobname  TYPE tbtcjob-jobname,
   _jobcount TYPE tbtcjob-jobcount,
   it_ctrl TYPE tt_ctrl,
-  it_dep TYPE ygpl_mt_template=&gt;tt_dependencies,
+  it_dep TYPE ygpl_mt_my_run=&gt;tt_dependencies,
   1st_c TYPE c,
   line TYPE i,
   c_line TYPE i,
   w_dep LIKE LINE OF it_dep,
-  it_objects TYPE ygpl_mt_template=&gt;tt_data,
+  it_objects TYPE ygpl_mt_my_run=&gt;tt_data,
   int TYPE i,
   w_obj LIKE LINE OF it_objects,
   w_lang LIKE LINE OF w_obj-lang.
 
 FIELD-SYMBOLS:
   &lt;wa&gt; LIKE LINE OF it_data,
-  &lt;msg&gt; LIKE LINE OF it_ctrl,
-  &lt;st&gt; LIKE LINE OF my_run-&gt;my_status.
+  &lt;msg&gt; LIKE LINE OF it_ctrl.
+*  &lt;st&gt; LIKE LINE OF my_run-&gt;my_status.
 
 *----------------------------------------------------------------------*
 *       CLASS Handler DEFINITION
@@ -68,7 +66,7 @@ FIELD-SYMBOLS:
 *----------------------------------------------------------------------*
 CLASS handler DEFINITION.
   PUBLIC SECTION.
-    METHODS: submit FOR EVENT submit_thread OF ygpl_mt_template
+    METHODS: submit FOR EVENT submit_thread OF ygpl_mt_my_run
                     IMPORTING
                       thread_number
                       jobname
@@ -84,7 +82,7 @@ CLASS handler IMPLEMENTATION.
 
   METHOD submit.
     SUBMIT ygpl_mt_tutorial
-      WITH run_id = my_run-&gt;run_id
+      WITH run_id = my_run-&gt;process_id
       WITH wait_t = wait_t
       WITH obj_c = obj_c
       WITH mem_size = mem_size
@@ -105,16 +103,20 @@ DATA:
   my_handler TYPE REF TO handler.
 
 START-OF-SELECTION.
-  IF NOT clr_all IS INITIAL.
-    CALL METHOD ygpl_mt_template=&gt;delete_all.
-  ENDIF.
+*  IF NOT clr_all IS INITIAL.
+*    CALL METHOD YGPL_MT_MY_RUN=&gt;delete_all.
+*  ENDIF.
 
-  CREATE OBJECT my_run.
+  CREATE OBJECT my_run
+    EXPORTING
+      thread_count = thread
+      max_memory   = mem_size
+      bloc_size    = bloc_s.
   CREATE OBJECT my_handler.
 
   SET HANDLER my_handler-&gt;submit FOR my_run.
 
-  MESSAGE i002(ygpl_mt_rootclass) WITH my_run-&gt;run_id.
+  MESSAGE i002(ygpl_mt_rootclass) WITH my_run-&gt;process_id.
 
 * Clear Controle table
   DELETE FROM ygpl_t100t.
@@ -161,28 +163,14 @@ START-OF-SELECTION.
   ENDLOOP.
 
 * Prepare MT
-  CALL METHOD my_run-&gt;load_run
+  CALL METHOD my_run-&gt;add_objects
     EXPORTING
-      threads      = thread
       OBJECTS      = it_objects
-      bloc_size    = bloc_s
-      dependencies = it_dep
-    EXCEPTIONS
-      failed       = 1
-      OTHERS       = 2.
-  IF sy-subrc &lt;&gt; 0.
-    MESSAGE e069(/bdl/d-) WITH &apos;INITIALIZATION&apos;(e01).
-  ENDIF.
+      dependencies = it_dep.
 
   IF NOT immed IS INITIAL.
 * Launch threads
-    CALL METHOD my_run-&gt;start_threads
-      EXCEPTIONS
-        failed        = 1
-        submit_thread = 2
-        OTHERS        = 3.
-    IF sy-subrc &lt;&gt; 0.
-    ENDIF.
+    my_run-&gt;start_threads( ) .
   ELSE.
     CLEAR bloc_s.
     DO thread TIMES.
@@ -214,17 +202,10 @@ START-OF-SELECTION.
       CALL METHOD my_run-&gt;add_thread
         EXPORTING
           jobname          = _jobname
-          jobcount         = _jobcount
-        EXCEPTIONS
-          job_doesnt_exist = 1
-          failed           = 2
-          OTHERS           = 3.
-      IF sy-subrc &lt;&gt; 0.
-        MESSAGE e069(/bdl/d-) WITH &apos;ADD_THREAD&apos;(e06).
-      ENDIF.
+          jobid            = _jobcount.
 
       SUBMIT ygpl_mt_tutorial
-        WITH run_id = my_run-&gt;run_id
+        WITH run_id = my_run-&gt;process_id
         WITH wait_t = wait_t
         WITH obj_c = obj_c
         WITH mem_size = mem_size
@@ -290,29 +271,12 @@ START-OF-SELECTION.
 
 * Watching Threads.
   DO.
-    CALL METHOD my_run-&gt;wait_progress
-      EXPORTING
-        mini_wait     = wait_m
-        mini_progress = prog_m
-      IMPORTING
-*        progress      = progression
-        finish        = is_finished
-      EXCEPTIONS
-        failed        = 2
-        OTHERS        = 3.
-    IF sy-subrc &lt;&gt; 0.
-      MESSAGE e069(/bdl/d-) WITH &apos;WAIT PROGRESS&apos;(e05).
-    ENDIF.
-    IF NOT is_finished IS INITIAL.
-      EXIT.
-    ENDIF.
-*    MESSAGE i000(0k) WITH progression.
-*  MESSAGE i111(hrbas00_service).
+    CALL METHOD my_run-&gt;wait_progress( ).
   ENDDO.
 
-  LOOP AT my_run-&gt;my_status ASSIGNING &lt;st&gt;.
-    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
-  ENDLOOP.
+*  LOOP AT my_run-&gt;my_status ASSIGNING &lt;st&gt;.
+*    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
+*  ENDLOOP.
 
 * Clear Controle table
   SELECT t~arbgb c~arbgb
@@ -327,57 +291,5 @@ START-OF-SELECTION.
       WRITE:/ &lt;msg&gt;-msg.
     ENDLOOP.
   ENDIF.</SOURCE>
-  <TEXTSPOOL>
-   <ITEM ID="R">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="MT tutorial (test obj *_MT_TEMPLATE) - Lanceur" LENGTH="46 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="BLOC_S">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Taille des blocs" LENGTH="24 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="CLR_ALL">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Purge tout les RUN" LENGTH="26 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="IMMED">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Lancer les Thread" LENGTH="25 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="MEM_SIZE">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Taille limite batch en octets" LENGTH="37 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="OBJ_C">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Nb d&apos;objet par temps d&apos;attente" LENGTH="38 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="PROG_M">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Min. Progression entre 2 msgs" LENGTH="37 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="THREAD">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Nombre de Thread" LENGTH="24 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="WAIT_M">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Attente mini entre 2 messages" LENGTH="37 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="WAIT_T">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Temps d&apos;attente en S pour nb O" LENGTH="38 "/>
-    </TEXTS>
-   </ITEM>
-  </TEXTSPOOL>
  </RAW>
 </ZL_OBJECT>

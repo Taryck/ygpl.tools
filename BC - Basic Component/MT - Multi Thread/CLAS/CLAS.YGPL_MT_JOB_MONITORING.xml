@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="FF2FA18BF8369E9A62787B7E2DE24F6B" CODE_SIGNATURE="F2D6BC879B5E6BB3B822674AF08D9D1B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="DA6F8FCDDA8969A051EF64F58A61851B" CODE_SIGNATURE="2AFF4AAE979D893EF9D5DBEF39F4DAFB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -203,7 +203,8 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  DATA: _job LIKE LINE OF thread_launched.
+  DATA _job       LIKE LINE OF thread_launched.
+  DATA job_info   TYPE ts_job_info.
 
   _job-jobcount = jobcount.
   _job-jobname = jobname.
@@ -211,7 +212,12 @@
   CALL METHOD get_thread
     EXPORTING
       jobname  = _job-jobname
-      jobcount = _job-jobcount.
+      jobcount = _job-jobcount
+    IMPORTING
+      job_info = job_info.
+
+  _job-priority = job_info-jobclass.
+  IF job_info-reaxserver IS INITIAL.    _job-as_name = job_info-execserver.   ELSE.   _job-as_name = job_info-reaxserver.   ENDIF.
 
   DESCRIBE TABLE thread_launched LINES _job-num.
   ADD 1 TO _job-num.
@@ -405,7 +411,7 @@
 *     WORKDAY_COUNT_DIRECTION           = 0
 *     RECIPIENT_OBJ                     =
       targetserver                      = ls_srvname
-    dont_release                      = abap_true
+      dont_release                      = abap_true
 *     TARGETGROUP                       = &apos; &apos;
 *     DIRECT_START                      =
 *   IMPORTING
@@ -443,7 +449,7 @@
        <ITEM LANG="E" TEXT="Summary of jobs for a group"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="PRIORITY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PRIORITY" PARVALUE="&apos;C&apos;">
+     <ITEM SCONAME="PRIORITY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PRIORITY" PARVALUE="&apos;C&apos;" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Job classification"/>
       </TEXTS>
@@ -465,6 +471,20 @@
     <SOURCE>`
   _GET_AS_LOAD( changing as_list = all_as_list ).
   result = all_as_list.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_JOB_LIST" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get job list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_JOBLIST">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="List of job"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  result = thread_launched.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_NEXT_AS_ROUNDROBIN" STATE="1">
     <TEXTS>
@@ -1057,13 +1077,14 @@
      <ITEM LANG="E" TEXT="MT : Job monitoring"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_JOBLIST" STATE="1" TYPTYPE="4">
+   <ITEM CMPNAME="TS_JOBLIST" EXPOSURE="2" STATE="1" TYPTYPE="4">
     BEGIN OF ts_joblist,
-      Num       type TD_THREAD_COUNT,
-      jobname   TYPE td_jobname,
-      jobcount  TYPE td_jobid,
-      AS_name   type td_as_name,
-    END OF ts_joblist
+        num       TYPE td_thread_count,
+        jobname   TYPE td_jobname,
+        jobcount  TYPE td_jobid,
+        as_name   TYPE td_as_name,
+        priority  TYPE td_priority,
+      END OF ts_joblist
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Job IDs"/>
@@ -1079,8 +1100,8 @@
      <ITEM LANG="E" TEXT="Description of step values (BI-API)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_JOBLIST" STATE="1" TYPTYPE="4">
-    tt_joblist TYPE STANDARD TABLE OF ts_joblist
+   <ITEM CMPNAME="TT_JOBLIST" EXPOSURE="2" STATE="1" TYPTYPE="4">
+    tt_joblist TYPE STANDARD TABLE OF ts_joblist WITH KEY num
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="List of job"/>

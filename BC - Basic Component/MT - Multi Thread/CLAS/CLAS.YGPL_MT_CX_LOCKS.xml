@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4FF5E851A5F9B64D46C467D149ADFEA0" CODE_SIGNATURE="8E945037EC4050033D16AF04AE7560F9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_CATEGORY" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="796076ECB09EE5A79250039ED39EE982" CODE_SIGNATURE="ACF9E88FBB2A2D8386E987B754C08762" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_LOCKS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
  </DEPENDENCIES>
@@ -8,7 +8,7 @@
   <A0_MAINDATA VERSION="1" LANGU="E" CATEGORY="40" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" VARCL="X" UNICODE="X" RSTAT="S" MSG_ID="YGPL_MT_CX">
    <INHERITANCE REFCLSNAME="YGPL_MT_CX" STATE="1"/>
    <TEXTS>
-    <ITEM LANG="E" TEXT="MultyThread : Categories exception class">U1&amp;FUNCTIONALITY&amp;
+    <ITEM LANG="E" TEXT="MultyThread : Lock exception class">U1&amp;FUNCTIONALITY&amp;
 ASZAPLink framework root exception class. All Exception classes raised
   from the framework inherit from this class. Have a look to each method
   for more details.
@@ -31,59 +31,73 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
   <ALIASES>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="CATEGORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_CATEGORY"/>
-   <ITEM CMPNAME="CATEGORY_DO_NOT_EXISTS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_DO_NOT_EXISTS,
+   <ITEM CMPNAME="FOREIGN_LOCK" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of FOREIGN_LOCK,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;001&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
-      attr2 type scx_attrname value &apos;CATEGORY_TABLE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
+      msgno type symsgno value &apos;009&apos;,
+      attr1 type scx_attrname value &apos;OBJECT_NAME&apos;,
+      attr2 type scx_attrname value &apos;OBJECT_KEY&apos;,
+      attr3 type scx_attrname value &apos;USER&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of CATEGORY_DO_NOT_EXISTS
+    end of FOREIGN_LOCK
 `</ITEM>
-   <ITEM CMPNAME="CATEGORY_NOT_DEFINE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_NOT_DEFINE,
+   <ITEM CMPNAME="INVALID_LOCK_MODE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INVALID_LOCK_MODE,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;006&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      msgno type symsgno value &apos;008&apos;,
+      attr1 type scx_attrname value &apos;LOCK_MODE&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of CATEGORY_NOT_DEFINE
+    end of INVALID_LOCK_MODE
 `</ITEM>
-   <ITEM CMPNAME="CATEGORY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPL_MT_CATEGORY&apos;" TYPTYPE="1" TYPE="TABNAME16">
+   <ITEM CMPNAME="LOCK_MODE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_LOCK_MODE">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Name of the category list"/>
+     <ITEM LANG="E" TEXT="Lock Mode"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="DATA_TYPE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DATA_TYPE"/>
-   <ITEM CMPNAME="INCORRECT_DATA_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INCORRECT_DATA_TYPE,
+   <ITEM CMPNAME="OBJECT_KEY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object lock key"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="OBJECT_NAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="CHAR80">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SEMAPHORE_ALREADY_DEFINED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SEMAPHORE_ALREADY_DEFINED,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;002&apos;,
-      attr1 type scx_attrname value &apos;DATA_TYPE&apos;,
-      attr2 type scx_attrname value &apos;CX_NAME&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of INCORRECT_DATA_TYPE
-`</ITEM>
-   <ITEM CMPNAME="SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SYSTEM_CATEGORY,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;000&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      msgno type symsgno value &apos;010&apos;,
+      attr1 type scx_attrname value &apos;OBJECT_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of SYSTEM_CATEGORY
+    end of SEMAPHORE_ALREADY_DEFINED
 `</ITEM>
-   <ITEM CMPNAME="YGPL_MT_CX_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_CATEGORY,
+   <ITEM CMPNAME="SEMAPHORE_NOT_SET" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SEMAPHORE_NOT_SET,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;011&apos;,
+      attr1 type scx_attrname value &apos;OBJECT_NAME&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of SEMAPHORE_NOT_SET
+`</ITEM>
+   <ITEM CMPNAME="USER" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="SYUNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="YGPL_MT_CX_LOCKS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_LOCKS,
       msgid type symsgid value &apos;ZAPLINK&apos;,
       msgno type symsgno value &apos;105&apos;,
       attr1 type scx_attrname value &apos;CX_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of YGPL_MT_CX_CATEGORY</ITEM>
+    end of YGPL_MT_CX_LOCKS</ITEM>
   </ATTRIBUTS>
   <DEFERRED>
    <INTERFACES>
