@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2B084D96AF2CA8C4D3D23B951C435851" CODE_SIGNATURE="F5A7FA0544F88859052D20596EE8A59A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9512D33049A133593AED0C2049EA7B4B" CODE_SIGNATURE="14837CFC65FA073E587259B9C970CA39" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -34,9 +34,11 @@
    </ITEM>
    <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF sys_categories,
-      data_bloc   TYPE td_category VALUE &apos;_D&apos;,              &quot;#EC NOTEXT
+*      data_bloc   TYPE td_category VALUE &apos;_D&apos;,              &quot;#EC NOTEXT
       run_info    TYPE td_category VALUE &apos;_I&apos;,              &quot;#EC NOTEXT
       obj_conf    TYPE td_category VALUE &apos;_O&apos;,              &quot;#EC NOTEXT
+      task_def    TYPE td_category VALUE &apos;_P&apos;,              &quot;#EC NOTEXT
+      condition   TYPE td_category VALUE &apos;_C&apos;,              &quot;#EC NOTEXT
     END OF sys_categories
 `
     <TEXTS>
@@ -275,16 +277,29 @@
      <ITEM LANG="E" TEXT="Relation structure Bloc &lt;=&gt; Object"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_PROCESS" EXPOSURE="2" STATE="1" EDITORDER="40 " TYPTYPE="4">
-    BEGIN OF ts_process ,
-      process_id TYPE td_process_id,
-    END OF ts_process
+   <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" STATE="1" EDITORDER="43 " TYPTYPE="4">
+    BEGIN OF ts_process_definition,
+      process_id    TYPE  td_process_id,
+      batch_info    TYPE  ts_batch_info,
+      workprocess   TYPE  ts_wp_info,
+*  TYPES:
+*    BEGIN OF ts_process ,
+*      process_id TYPE td_process_id,
+*    END OF ts_process .
+*  TYPES:
+*    tt_process_list TYPE STANDARD TABLE OF ts_process WITH KEY process_id .
+    END OF ts_process_definition
 `
     <TEXTS>
-     <ITEM LANG="E" TEXT="Process Key"/>
+     <ITEM LANG="E" TEXT="Definition of a process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" EDITORDER="41 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" STATE="1" EDITORDER="50 " TYPTYPE="4">BEGIN OF ts_progression,
+      processed_objects   TYPE td_count,
+      global_status       TYPE tt_status_list,
+    END OF ts_progression
+`</ITEM>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" EDITORDER="40 " TYPTYPE="4">
     BEGIN OF ts_run,
       run_id    TYPE  ygplmt_runs-run_id.
   INCLUDE TYPE ygpl_mt_run_info.
@@ -295,7 +310,12 @@
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_STATUS_INFO" EXPOSURE="2" STATE="1" EDITORDER="42 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_RUNNING_CONDITIONS" EXPOSURE="2" STATE="1" EDITORDER="51 " TYPTYPE="4">BEGIN OF ts_running_conditions,
+      stop                TYPE td_boolean,
+      max_memory          TYPE td_memory_size,
+    END OF ts_running_conditions
+`</ITEM>
+   <ITEM CMPNAME="TS_STATUS_INFO" EXPOSURE="2" STATE="1" EDITORDER="41 " TYPTYPE="4">
     BEGIN OF ts_status_info,
       status  TYPE td_status,
       count   TYPE td_count,
@@ -305,9 +325,9 @@
      <ITEM LANG="E" TEXT="Object count for a status"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" STATE="1" EDITORDER="43 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" STATE="1" EDITORDER="42 " TYPTYPE="4">
     BEGIN OF ts_wp_info,
-      server TYPE td_as_name,
+      server  TYPE td_as_name,
       pid     TYPE td_wp_pid,
       index   TYPE td_wp_index,
       no      TYPE td_wp_no,
@@ -317,21 +337,21 @@
      <ITEM LANG="E" TEXT="WorkProcess Information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_AS" EXPOSURE="2" STATE="1" EDITORDER="44 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_AS" EXPOSURE="2" STATE="1" EDITORDER="45 " TYPTYPE="4">
     tt_as TYPE STANDARD TABLE OF ts_as WITH KEY name
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="List of Application Server with load"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" STATE="1" EDITORDER="45 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" STATE="1" EDITORDER="46 " TYPTYPE="4">
     tt_blocs_nfo TYPE SORTED TABLE OF ts_bloc_nfo WITH UNIQUE KEY id
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of bloc information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" STATE="1" EDITORDER="46 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" STATE="1" EDITORDER="47 " TYPTYPE="4">
     tt_dependencies TYPE SORTED TABLE OF ts_dependency WITH UNIQUE KEY obj1 obj2
 `
     <TEXTS>
@@ -345,15 +365,15 @@
      <ITEM LANG="E" TEXT="Set of object ID"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" STATE="1" EDITORDER="47 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" STATE="1" EDITORDER="48 " TYPTYPE="4">
     tt_lines_nfo TYPE SORTED TABLE OF ts_line_nfo WITH UNIQUE KEY KEY
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Relation list Bloc &lt;=&gt; Object"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" STATE="1" EDITORDER="48 " TYPTYPE="4">
-    tt_process_list TYPE STANDARD TABLE OF ts_process WITH KEY process_id
+   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" STATE="1" EDITORDER="44 " TYPTYPE="4">
+    tt_process_list TYPE STANDARD TABLE OF ts_process_definition
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of process"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D2AD9C8D64ECB8D9E73189AC5AEB8F42" CODE_SIGNATURE="095D08D2F8CB8AA849D5277AFB261C76" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="338B71B03F8B717FEBE0A0D627AE47A0" CODE_SIGNATURE="0D0A05BF530DA875047B74058F730B7F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
@@ -19,7 +19,9 @@
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_RAWDATA"/>
    <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TR_CATEGORIES"/>
+   <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_PROCESS_DEFINITION"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TS_RUNNING_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUNNING_CONDITIONS"/>
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
@@ -65,7 +67,19 @@
    </CLASSES>
   </DEFERRED>
   <EVENTS>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="NEW_RUNNING_CONDITIONS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="New runnning conditions recieved"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TS_RUNNING_CONDITIONS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="New running conditions"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="NEW_SPECIFIC_MESSAGE" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
     </TEXTS>
@@ -95,6 +109,18 @@
      <ITEM SCONAME="STATUS" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TT_STATUS_LIST">
       <TEXTS>
        <ITEM LANG="E" TEXT="Detailed status count"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="TASK_DEFINITION_RECIEVED" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="New task definition recieved"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="TASK_DEFINITION" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TS_PROCESS_DEFINITION">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="New task definition"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -438,7 +464,7 @@
 *    ENDTRY.
 
 * Call external event handler
-    RAISE EVENT handle_specific_message
+    RAISE EVENT new_specific_message
       EXPORTING
         category = &lt;msg&gt;-category
         rawdata  = &lt;msg&gt;-msg_data.
@@ -472,14 +498,24 @@
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
 **********************************************************************
-  FIELD-SYMBOLS: &lt;msg&gt; LIKE LINE OF messages.
+  FIELD-SYMBOLS &lt;msg&gt; LIKE LINE OF messages.
   DATA f_obj_conf TYPE td_boolean.
+  DATA s_task TYPE ts_process_definition.
+  DATA s_cond TYPE ts_running_conditions.
 
   LOOP AT messages ASSIGNING &lt;msg&gt;.
     CASE &lt;msg&gt;-category.
       WHEN sys_categories-obj_conf.
         f_obj_conf = abap_true.
         handle_object_confirmation( &lt;msg&gt;-msg_data ).
+      WHEN sys_categories-task_def.
+        decode_data( EXPORTING buffer = &lt;msg&gt;-msg_data
+                      CHANGING    any = s_task ).
+        RAISE EVENT task_definition_recieved EXPORTING task_definition = s_task.
+      WHEN sys_categories-condition.
+        decode_data( EXPORTING buffer = &lt;msg&gt;-msg_data
+                      CHANGING    any = s_cond ).
+        RAISE EVENT new_running_conditions EXPORTING conditions = s_cond.
       WHEN OTHERS.
 * Unexpected messages type
     ENDCASE.

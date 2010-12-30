@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AD431259CC4E9D7A07DBB56FB113EEB4" CODE_SIGNATURE="D5F2F1D4A76C99367389BC2147DCFE65" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="715B3838877E3CAF351E6460721E7187" CODE_SIGNATURE="1BFAA806B857C5B8FCC0301F946D84F7" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="F" FIXPT="X" UCCHECK="X"/>
   <SOURCE>`
-*&amp;---------------------------------------------------------------------*
-*&amp; Report  YGPL_MT_TUTORIAL
-*&amp;---------------------------------------------------------------------*
+*---------------------------------------------------------------------*
+* Report  YGPL_MT_TUTORIAL
+*---------------------------------------------------------------------*
 **********************************************************************
 * Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
 * Date : 2008 December                                               *
@@ -14,55 +14,21 @@
 
 REPORT  ygpl_mt_tutorial.
 PARAMETERS :
-  run_id    TYPE ygpl_mt_my_task=&gt;td_process_id OBLIGATORY,
-  mem_size  TYPE ygpl_mt_my_task=&gt;td_memory_size DEFAULT 0,
-  wait_t    TYPE ygpl_mt_my_task=&gt;td_waittime DEFAULT 1,
-  obj_c     TYPE ygpl_mt_my_task=&gt;td_count DEFAULT 100 OBLIGATORY.
+  run_id    TYPE ygpl_mt_my_task=&gt;td_process_id OBLIGATORY.
 
 DATA:
-  _ctrl       TYPE ygpl_t100t,
-  _status     TYPE ygpl_mt_my_task=&gt;td_status,
-  _mini       TYPE p, &quot; bseg-wrbtr,
-  _amount     TYPE p, &quot; bseg-wrbtr,
-  my_task      TYPE REF TO ygpl_mt_my_task,
-  _time       TYPE ygpl_mt_my_task=&gt;td_waittime,
-  _count      TYPE i,
-  it_objects  TYPE ygpl_mt_my_task=&gt;tt_data.
+  my_task       TYPE REF TO ygpl_mt_my_task,
+  s_progress    TYPE ygpl_mt_my_run=&gt;ts_progression,
+  it_objects    TYPE ygpl_mt_my_task=&gt;tt_data.
+
 FIELD-SYMBOLS:
-*  &lt;st&gt; LIKE LINE OF my_task-&gt;my_status,
-  &lt;obj&gt; LIKE LINE OF it_objects,
-  &lt;lang&gt; LIKE LINE OF &lt;obj&gt;-lang.
+  &lt;st&gt;    LIKE LINE OF s_progress-global_status.
 
 START-OF-SELECTION.
 
   CREATE OBJECT my_task
     EXPORTING
       run_id = run_id.
-
-  IF wait_t &lt; 2.
-    _time = wait_t.
-  ELSE.
-    _mini = ( wait_t + 1 ) DIV 2.
-    _amount = wait_t * 3 / 2.
-* Random do not works
-*    CALL FUNCTION &apos;RANDOM_P&apos;
-*      EXPORTING
-*        rnd_min   = _mini
-*        rnd_max   = _amount
-*      IMPORTING
-*        rnd_value = _amount.
-    _time = _amount + 1.
-  ENDIF.
-
-*  CALL METHOD my_task-&gt;send_param
-*    EXPORTING
-*      wait_time = _time
-*    EXCEPTIONS
-*      failed    = 1
-*      OTHERS    = 2.
-*  IF sy-subrc &lt;&gt; 0.
-**   Ignore errors
-*  ENDIF.
 
   DO.
 * Get data
@@ -73,41 +39,7 @@ START-OF-SELECTION.
     ENDIF.
 
 * Process Data
-    LOOP AT it_objects ASSIGNING &lt;obj&gt;.
-      ADD 1 TO _count.
-
-      _ctrl-arbgb = &lt;obj&gt;-msg.
-      READ TABLE &lt;obj&gt;-lang WITH TABLE KEY langu = &apos;E&apos; ASSIGNING &lt;lang&gt;.
-      IF sy-subrc = 0.
-        _ctrl-stext = &lt;lang&gt;-text.
-      ELSE.
-        CLEAR _ctrl-stext.
-      ENDIF.
-      INSERT into ygpl_t100t values _ctrl.
-      IF sy-subrc = 0.
-        _status = ygpl_mt_my_status=&gt;ok.
-      ELSE.
-        FORMAT COLOR COL_NEGATIVE ON.
-        WRITE:/ _ctrl-arbgb, _ctrl-stext.
-        FORMAT COLOR COL_NEGATIVE OFF.
-        _status = ygpl_mt_my_status=&gt;ko.
-      ENDIF.
-
-      CALL METHOD my_task-&gt;confirm_objects
-        EXPORTING
-          status = _status
-          count  = 1.
-
-      IF _count &gt;= obj_c.
-        CLEAR _count.
-        WRITE:/ _ctrl-arbgb, _ctrl-stext.
-        CALL METHOD my_task-&gt;confirm_objects
-          EXPORTING
-            status = ygpl_mt_my_status=&gt;error  &quot; error wanted
-            count  = 1.
-        WAIT UP TO _time SECONDS.
-      ENDIF.
-    ENDLOOP.
+    my_task-&gt;process_my_objects( it_objects ).
 
     FREE it_objects.
 
@@ -118,10 +50,34 @@ START-OF-SELECTION.
 
 END-OF-SELECTION.
 
-*  WRITE:/ &apos;Total of object processed by this thread : &apos;(i02), my_task-&gt;total_objects.
+  s_progress = my_task-&gt;get_progression( ).
+  WRITE:/ &apos;Total of object processed by this thread : &apos;(i02), s_progress-processed_objects.
 
-*  LOOP AT my_task-&gt;my_status ASSIGNING &lt;st&gt;.
-*    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
-*  ENDLOOP.</SOURCE>
+  LOOP AT s_progress-global_status ASSIGNING &lt;st&gt;.
+    WRITE:/ &lt;st&gt;-status, &lt;st&gt;-count.
+  ENDLOOP.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="MT tutorial (test obj *_MT_TEMPLATE) - Traitement" LENGTH="49 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="OBJ_C">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Nb d&apos;objet par temps d&apos;attente" LENGTH="38 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="RUN_ID">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="        Parent Run ID" LENGTH="21 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="WAIT_T">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="        Temps d&apos;attente en S pour nb O" LENGTH="38 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
  </RAW>
 </ZL_OBJECT>

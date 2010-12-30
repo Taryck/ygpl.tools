@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="EFF72A92DC1C98C53C3085477E627342" CODE_SIGNATURE="B69FF0D4B49B21ACA9BA59B0CFE976EB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8DFC8D734CF48B744925EA7E09709356" CODE_SIGNATURE="224F3055E3AB9B29B494E63848BE2011" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -11,6 +11,7 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPL_MT_OBJECTS_EVENTS" REFCMPNAME="OBJECTS_CONFIRMED"/>
    <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYS_CATEGORIES"/>
    <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_ID"/>
    <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
@@ -155,14 +156,8 @@
     <ITEM TYPEGROUP="YGPL_MT_RUN" TPUTYPE="1" EXPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
-  <EVENTS>
-   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Event to handle objects status update (count raised)"/>
-    </TEXTS>
-   </ITEM>
-  </EVENTS>
   <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_MT_OBJECTS_EVENTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
@@ -427,7 +422,7 @@
     <SOURCE>`
   DATA tk LIKE LINE OF r_weight_type_kind.
 
-  ASSERT batch_rate &gt; 0 AND batch_rate &lt; 1.
+  ASSERT batch_rate &gt; 0 AND batch_rate &lt; 100.
 * Génerate Weight Typekind
   tk-sign = &apos;I&apos;. tk-option = &apos;EQ&apos;.
   tk-low = cl_abap_typedescr=&gt;typekind_num.     APPEND tk TO r_weight_type_kind.
@@ -1224,7 +1219,7 @@
 * Determine Maxrow
       o_run-&gt;refresh( ).
 
-      maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate ) DIV o_run-&gt;infos-threads + 1.
+      maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate / 100 ) DIV o_run-&gt;infos-threads + 1.
       IF maxrow &lt; 1. maxrow = 1. ENDIF.
 
 * Get data : Big ones first
@@ -1295,6 +1290,20 @@
   ENDTRY.
 * Release global Lock on object processing.
   RELEASE_SEMAPHORE( )..</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_CONFIRMED_OBJECT_COUNT" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get number of object confirmed"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Number of object confirmed so far for this batch"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  result = confirmed_objects.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1861,7 +1870,7 @@
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_PARENT">
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_ITF_RUN">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Run Process"/>
     </TEXTS>

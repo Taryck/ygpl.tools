@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C3CD2C233F3EBDA05623AB4E9319FAC4" CODE_SIGNATURE="4F9FD61DD1D50975D661A74EB0C2A235" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9DAEF1D60DE6FE55A5B7B214FF2ACD46" CODE_SIGNATURE="A6BED2D0FB0EFB736972E72EA3929907" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_TASK"/>
+ </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -9,9 +12,24 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="MY_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_CATEGORIES"/>
    <ITEM CMPNAME="TD_WAITTIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TD_WAITTIME"/>
+   <ITEM CMPNAME="TS_MY_PROCESS_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_PROCESS_INFO"/>
+   <ITEM CMPNAME="TS_MY_RUN_PARAMETERS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_RUN_PARAMETERS"/>
    <ITEM CMPNAME="TT_DATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TT_DATA"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="RUN_PARAMETERS" STATE="1" TYPTYPE="1" TYPE="TS_MY_RUN_PARAMETERS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run parameters"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WAIT_TIME" STATE="1" TYPTYPE="1" TYPE="TD_WAITTIME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Task wait time"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
@@ -29,6 +47,49 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="COMPUTE_WAIT_TIME" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Compute real task wait time based on run wait time"/>
+    </TEXTS>
+    <SOURCE>`
+  data _mini         TYPE p.
+  data _amount       TYPE p.
+
+  IF RUN_PARAMETERS-wait_time &lt; 2.
+    wait_time = RUN_PARAMETERS-wait_time.
+  ELSE.
+    _mini = ( RUN_PARAMETERS-wait_time + 1 ) DIV 2.
+    _amount = RUN_PARAMETERS-wait_time * 3 / 2.
+* Random do not works
+*    CALL FUNCTION &apos;RANDOM_P&apos;
+*      EXPORTING
+*        rnd_min   = _mini
+*        rnd_max   = _amount
+*      IMPORTING
+*        rnd_value = _amount.
+    wait_time = _amount + 1.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA s_paramaters  TYPE ts_my_process_info.
+
+  super-&gt;constructor( run_id ).
+  run_parameters = get_parameters( ).
+  compute_wait_time( ).
+  s_paramaters-wait_time = wait_time.
+  send_parameters( s_paramaters ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get a batch of MY objects"/>
@@ -46,6 +107,115 @@
     <SOURCE>`
   _get_batch( importing objects = objects ).</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_PARAMETERS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get run parameters"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_MY_RUN_PARAMETERS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run parameters"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  _get_information( EXPORTING category = my_categories-task_param
+                     CHANGING     info = result ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="PROCESS_MY_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Process object set"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="T_OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DATA"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA _count        TYPE i.
+  DATA _ctrl         TYPE ygpl_t100t.
+  DATA _status       TYPE td_status.
+  FIELD-SYMBOLS:
+    &lt;obj&gt;   LIKE LINE OF t_objects,
+    &lt;lang&gt;  LIKE LINE OF &lt;obj&gt;-lang.
+
+  LOOP AT t_objects ASSIGNING &lt;obj&gt;.
+    ADD 1 TO _count.
+
+    _ctrl-arbgb = &lt;obj&gt;-msg.
+    READ TABLE &lt;obj&gt;-lang WITH TABLE KEY langu = &apos;E&apos; ASSIGNING &lt;lang&gt;.
+    IF sy-subrc = 0.
+      _ctrl-stext = &lt;lang&gt;-text.
+    ELSE.
+      CLEAR _ctrl-stext.
+    ENDIF.
+    INSERT into ygpl_t100t values _ctrl.
+    IF sy-subrc = 0.
+      _status = ygpl_mt_my_status=&gt;ok.
+    ELSE.
+      FORMAT COLOR COL_NEGATIVE ON.
+      WRITE:/ _ctrl-arbgb, _ctrl-stext.
+      FORMAT COLOR COL_NEGATIVE OFF.
+      _status = ygpl_mt_my_status=&gt;ko.
+    ENDIF.
+
+    confirm_objects( _status ).
+
+    IF _count &gt;= run_parameters-obj_count.
+      CLEAR _count.
+      WRITE:/ _ctrl-arbgb, _ctrl-stext.
+      confirm_objects( ygpl_mt_my_status=&gt;error ). &quot; error wanted
+      WAIT UP TO wait_time SECONDS.
+    ENDIF.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SEND_PARAMETERS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Send task specfic parameters"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PARAMETERS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_MY_PROCESS_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process information"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  data s_param TYPE TS_MY_PROCESS_INFO.
+  _send_task_definition( ).
+  s_param = parameters.
+  s_param-process_id = me-&gt;process_id.
+  _send_message( ARCHIVE = abap_true
+                category = my_categories-task_param
+                 message = s_param ).</SOURCE>
+   </ITEM>
   </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_TASK" MTDNAME="PROCESS_BATCH">
+    <SOURCE>`
+  DATA t_objects TYPE tt_data.
+  t_objects = objects.
+  process_my_objects( t_objects ).</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
  </RAW>
 </ZL_OBJECT>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="463368C027B18180BA4C6604DCAD2F56" CODE_SIGNATURE="874B3B1805CA585EDCEFD37D25D7F7A3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E4E925C60E35ED1E88231945F90F9F81" CODE_SIGNATURE="05C48305B4F10DD4AD1B25DA297F0AE6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -9,7 +9,10 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="MY_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_CATEGORIES"/>
    <ITEM CMPNAME="TD_WAITTIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TD_WAITTIME"/>
+   <ITEM CMPNAME="TS_MY_PROCESS_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_PROCESS_INFO"/>
+   <ITEM CMPNAME="TS_MY_RUN_PARAMETERS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_RUN_PARAMETERS"/>
    <ITEM CMPNAME="TT_DATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TT_DATA"/>
   </ALIASES>
   <INTERFACES>
@@ -75,6 +78,68 @@
                         max_memory = max_memory
                          bloc_size = bloc_size
                         categories = o_category ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle specific messages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="RAWDATA" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA s_param TYPE ts_my_process_info.
+  DATA s_task  TYPE ts_process_definition.
+  CASE category.
+    WHEN my_categories-task_param.
+      conv_raw2data( EXPORTING rawdata = rawdata
+                      CHANGING    data = s_param ).
+      s_task = get_task_informations( s_param-process_id ).
+      WRITE:/ &apos;New process&apos;, s_param-process_id, s_task-workprocess-server, s_task-batch_info-jobname, s_task-batch_info-jobcount, s_task-batch_info-jobclass.
+    when others.
+* Unexcepted case
+  ENDCASE.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_PARAMETERS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define my run parameters"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PARAMETERS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_MY_RUN_PARAMETERS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Parameters of this run"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  _set_information( category = my_categories-task_param
+                        info = parameters ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SUBMIT_NEW_THREAD" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_RUN" REFCMPNAME="SUBMIT_THREAD">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create new thread"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="JOBNAME" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+    </PARAMETERS>
+    <SOURCE>`
+  SUBMIT ygpl_mt_tutorial
+    WITH run_id = process_id
+*    WITH wait_t = wait_t
+*    WITH obj_c = obj_c
+*    WITH mem_size = mem_size
+    VIA JOB jobname NUMBER jobcount
+    AND RETURN.
+  ASSERT sy-subrc &lt;&gt; 0.</SOURCE>
    </ITEM>
   </METHODS>
  </RAW>
