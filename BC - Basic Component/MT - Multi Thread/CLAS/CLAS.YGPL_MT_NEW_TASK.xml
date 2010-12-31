@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="77E2A6AB515FC6114CE6C1C41F8FA253" CODE_SIGNATURE="897EEB1952C14A7C3F0E005C2CEC3D45" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_NEW_TASK" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : New task"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA task_id TYPE td_process_id.
+
+  super-&gt;constructor( task_id ).    &quot; Create new one
+  set_run( run_id ).
+  CREATE OBJECT o_objects
+    EXPORTING
+      o_run = o_run.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

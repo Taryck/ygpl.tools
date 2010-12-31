@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9DAEF1D60DE6FE55A5B7B214FF2ACD46" CODE_SIGNATURE="A6BED2D0FB0EFB736972E72EA3929907" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="1D9D28C3DF53F619D669839669C0496C" CODE_SIGNATURE="02FFFE676DFF9E00F5B6FD6E2FAFFC0D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_TASK"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_NEW_TASK"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
-   <INHERITANCE REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
+   <INHERITANCE REFCLSNAME="YGPL_MT_NEW_TASK" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT Tutorial - My Task"/>
    </TEXTS>
@@ -70,7 +70,7 @@
     wait_time = _amount + 1.
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
@@ -81,10 +81,22 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
-  DATA s_paramaters  TYPE ts_my_process_info.
+  DATA s_paramaters   TYPE ts_my_process_info.
+  DATA o_category     TYPE REF TO ygpl_mt_my_categories.
 
+* Construct
   super-&gt;constructor( run_id ).
+  CREATE OBJECT o_category.     &quot; My categories
+  set_category( o_category ).
+* Initialize
   run_parameters = get_parameters( ).
   compute_wait_time( ).
   s_paramaters-wait_time = wait_time.
@@ -210,7 +222,7 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_TASK" MTDNAME="PROCESS_BATCH">
+   <ITEM REFCLSNAME="YGPL_MT_NEW_TASK" MTDNAME="PROCESS_BATCH">
     <SOURCE>`
   DATA t_objects TYPE tt_data.
   t_objects = objects.

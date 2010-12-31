@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8DFC8D734CF48B744925EA7E09709356" CODE_SIGNATURE="224F3055E3AB9B29B494E63848BE2011" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="830D66F63C136E60D39301CBE44E78D7" CODE_SIGNATURE="6882D5500937D27E33AEF9A7F97FFF80" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -103,11 +103,6 @@
    <ITEM CMPNAME="MSG_MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;60&apos;" TYPTYPE="1" TYPE="TD_TIME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Minimum time to send new message"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
@@ -220,10 +215,7 @@
     INSERT ygplmt_objects FROM _bloc.
     ADD 1 TO total_blocs_count.
   ENDIF.
-  ASSERT sy-subrc &lt;&gt; 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.</SOURCE>
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -330,29 +322,19 @@
   DATA _obj LIKE LINE OF &lt;bloc&gt;-objs.
 
   READ TABLE m_bloc WITH TABLE KEY id = bloc ASSIGNING &lt;bloc&gt;.
-  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-  ENDIF.
+  ASSERT sy-subrc = 0.
 
   ADD size TO &lt;bloc&gt;-size.
   _obj-id = obj.
   APPEND _obj TO &lt;bloc&gt;-objs.
-  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-  ENDIF.
+  ASSERT sy-subrc = 0.
 
   CALL METHOD set_relation_object_bloc
     EXPORTING
       obj       = obj
       bloc      = bloc
-    changing
-      obj2blocs = obj2blocs.
-*    EXCEPTIONS
-*      failed    = 1
-*      others    = 2.
-  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-  ENDIF.</SOURCE>
+    CHANGING
+      obj2blocs = obj2blocs.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_WEIGHT_FN" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -510,16 +492,6 @@
        <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="O_MESSAGING" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message communication between process"/>
-      </TEXTS>
-     </ITEM>
      <ITEM SCONAME="O_RUN" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_RUN">
       <TEXTS>
        <ITEM LANG="E" TEXT="MT : Run Process"/>
@@ -527,23 +499,22 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
+  ASSERT o_run IS BOUND.
   me-&gt;o_run = o_run.
-  ASSERT me-&gt;o_run IS BOUND.
-  IF o_messaging IS BOUND.
-    me-&gt;o_messaging = o_messaging.
-    SET HANDLER handle_objects_confirmation FOR o_messaging.
-    me-&gt;o_categories = o_messaging-&gt;o_categories.
-  ELSE.
-    IF o_categories IS BOUND.
-      me-&gt;o_categories = o_categories.
-    ELSE.
-      CREATE OBJECT me-&gt;o_categories.
-    ENDIF.
-    CREATE OBJECT me-&gt;o_messaging
-      EXPORTING
-        process_id   = o_run-&gt;process_id
-        o_categories = me-&gt;o_categories.
-  ENDIF.
+*  IF o_messaging IS BOUND.
+*    me-&gt;o_messaging = o_messaging.
+**    me-&gt;o_categories = o_messaging-&gt;o_categories.
+*  ELSE.
+**    IF o_categories IS BOUND.
+**      me-&gt;o_categories = o_categories.
+**    ELSE.
+**      CREATE OBJECT me-&gt;o_categories.
+**    ENDIF.
+*  ENDIF.
+  CREATE OBJECT me-&gt;o_messaging
+    EXPORTING
+      o_process = o_run.
+  SET HANDLER handle_objects_confirmation FOR o_messaging.
 
   set_maximum_memory( maximum_memory ).
   me-&gt;estimated_end_time = estimated_end_time.
@@ -791,9 +762,7 @@
   IF size &lt; 1. _wa-size = 1. ELSE. _wa-size = size. ENDIF.
   _obj-id = obj. APPEND _obj TO _wa-objs.
   INSERT _wa INTO TABLE m_bloc.
-  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-  ENDIF.
+  ASSERT sy-subrc = 0.
 
   bloc = _wa-id.
 
@@ -802,13 +771,7 @@
       obj       = obj
       bloc      = bloc
     CHANGING
-      obj2blocs = obj2blocs.
-*    EXCEPTIONS
-*      failed    = 1
-*      OTHERS    = 2.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.</SOURCE>
+      obj2blocs = obj2blocs.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CREATE_WITH_DEPENDENCIES" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -894,12 +857,6 @@
         CHANGING
           m_bloc    = it_mini_blocs
           obj2blocs = it_obj2blocs.
-*        EXCEPTIONS
-*          failed    = 1
-*          OTHERS    = 2.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
     ENDIF.
     IF obj2_bloc IS INITIAL.
 * Affect µbloc obj1 to obj2
@@ -914,12 +871,6 @@
         CHANGING
           m_bloc    = it_mini_blocs
           obj2blocs = it_obj2blocs.
-*        EXCEPTIONS
-*          failed    = 1
-*          OTHERS    = 2.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
     ELSE.
 * Join µbloc obj1 &amp; Obj2
       CALL METHOD join_2_micro_blocs
@@ -929,12 +880,6 @@
         CHANGING
           m_bloc    = it_mini_blocs
           obj2blocs = it_obj2blocs.
-*        EXCEPTIONS
-*          failed    = 1
-*          OTHERS    = 2.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
     ENDIF.
   ENDLOOP.
 
@@ -945,12 +890,6 @@
       bloc_size = bloc_size
     CHANGING
       m_bloc    = it_mini_blocs.
-*    EXCEPTIONS
-*      failed    = 1
-*      OTHERS    = 2.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
 
   CALL METHOD send_blocs
     EXPORTING
@@ -958,13 +897,7 @@
       blocs     = it_mini_blocs
       weight_fn = weight_fn
     IMPORTING
-      done_obj  = done_obj.
-*    EXCEPTIONS
-*      failed    = 1
-*      OTHERS    = 2.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.</SOURCE>
+      done_obj  = done_obj.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DECODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -1165,9 +1098,9 @@
 
   CALL FUNCTION &apos;GUID_CREATE&apos;
     IMPORTING
-*     EV_GUID_16       =
+      EV_GUID_16       = BLOC_ID.
 *     EV_GUID_22       =
-      EV_GUID_32       = BLOC_ID.</SOURCE>
+*     EV_GUID_32       = BLOC_ID.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1531,28 +1464,16 @@
     &lt;b2&gt; LIKE LINE OF m_bloc.
 
   READ TABLE m_bloc WITH TABLE KEY id = bloc1 ASSIGNING &lt;b1&gt;.
-  ASSERT sy-subrc &lt;&gt; 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
+  ASSERT sy-subrc = 0.
   READ TABLE m_bloc WITH TABLE KEY id = bloc2 ASSIGNING &lt;b2&gt;.
-  ASSERT sy-subrc &lt;&gt; 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
+  ASSERT sy-subrc = 0.
 
   ADD &lt;b2&gt;-size TO &lt;b1&gt;-size.
   APPEND LINES OF &lt;b2&gt;-objs TO &lt;b1&gt;-objs.
-  ASSERT sy-subrc &lt;&gt; 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
+  ASSERT sy-subrc = 0.
 
   DELETE TABLE m_bloc WITH TABLE KEY id = bloc2.
-  ASSERT sy-subrc &lt;&gt; 0.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.</SOURCE>
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="LOCK_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1686,10 +1607,7 @@
   LOOP AT blocs ASSIGNING &lt;b&gt;.
     LOOP AT &lt;b&gt;-objs ASSIGNING &lt;id&gt;.
       READ TABLE objects INDEX &lt;id&gt;-id ASSIGNING &lt;obj&gt;.
-      ASSERT sy-subrc &lt;&gt; 0.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
+      ASSERT sy-subrc = 0.
 * Weight determine
       weight = 1.
       IF NOT fn IS INITIAL.
@@ -1701,27 +1619,15 @@
       ADD weight TO b_weight.
 
       APPEND &lt;obj&gt; TO &lt;objects&gt;.
-      ASSERT sy-subrc &lt;&gt; 0.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
+      ASSERT sy-subrc = 0.
       obj_id-key = &lt;id&gt;-id.
       INSERT obj_id INTO TABLE done_obj.
-      ASSERT sy-subrc &lt;&gt; 0.
-*      IF sy-subrc &lt;&gt; 0.
-*        RAISE failed.
-*      ENDIF.
+      ASSERT sy-subrc = 0.
     ENDLOOP.
     CALL METHOD add_bloc
       EXPORTING
         OBJECTS   = &lt;objects&gt;
         bloc_size = b_weight.
-*      EXCEPTIONS
-*        failed    = 1
-*        OTHERS    = 2.
-*    IF sy-subrc &lt;&gt; 0.
-*      RAISE failed.
-*    ENDIF.
     REFRESH &lt;objects&gt;.
     CLEAR: b_weight.
   ENDLOOP.</SOURCE>
@@ -1779,7 +1685,7 @@
     <SOURCE>`
   me-&gt;maximum_memory = maximum_memory.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_RELATION_OBJECT_BLOC" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="SET_RELATION_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Set Object&apos;s Bloc"/>
     </TEXTS>
@@ -1801,9 +1707,9 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="FAILED" LANGU="E">
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="action a échouée"/>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
      </ITEM>
     </EXCEPTIONS>
@@ -1817,9 +1723,7 @@
   wa-key = obj.
   wa-val = bloc.
   INSERT wa INTO TABLE obj2blocs.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE failed.
-  ENDIF.</SOURCE>
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1860,17 +1764,12 @@
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLMT_OBJECTS-OBJ_DATA"/>
    <ITEM CMPNAME="TD_PROGRESS" STATE="1" EDITORDER="2 " TYPTYPE="4">td_progress TYPE p LENGTH 3 DECIMALS 3
 `</ITEM>
-   <ITEM CMPNAME="TO_CATEGORIES" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_CATEGORIES">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_ITF_RUN">
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_PARENT">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Run Process"/>
     </TEXTS>

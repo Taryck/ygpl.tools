@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="CF33DF7483094F686CF04A9CD186EA26" CODE_SIGNATURE="F8F51419F6B050F31103F7951E1A10D1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS_4MT" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSABSTRCT="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Run/Task Categories"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <TYPES>
+   <ITEM CMPNAME="TO_CATEGORIES" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_INFORMATIONS" EXPOSURE="1" STATE="1" EDITORDER="4 " TYPTYPE="3" TYPE="YGPL_MT_INFORMATIONS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Information communication between process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_JOB_MONITORING" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_JOB_MONITORING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="MT : Job monitoring"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_OBJECTS" EXPOSURE="1" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_OBJECTS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object store engine"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

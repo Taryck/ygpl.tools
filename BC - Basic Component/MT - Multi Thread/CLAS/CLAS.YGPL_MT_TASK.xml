@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2C03B4C89BACDA15E4C483B8ACDEC76D" CODE_SIGNATURE="E4066D9FB72B79E67B719758E7301CD3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="D1A91F75CF5574CAE853DFE045CC1551" CODE_SIGNATURE="1C2A4513FF2DCF73D6160E9319436637" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
-   <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
+   <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS_4MT" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT : Task process"/>
    </TEXTS>
@@ -32,14 +32,14 @@
      <ITEM LANG="E" TEXT="Stop has been requested"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="IS_NEW" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Constructor in factory mode"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Categories for this run type"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_INFORMATIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_INFORMATIONS">
@@ -89,42 +89,60 @@
      <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT" PARVALUE="1"/>
+     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT" PARVALUE="1" PAROPTIONL="X"/>
      <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
     </PARAMETERS>
     <SOURCE>`
   o_objects-&gt;confirm_objects( status = status
                                count = count ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+     <ITEM LANG="E" TEXT="Create existing Task"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+     <ITEM SCONAME="TASK_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Run Process ID"/>
+       <ITEM LANG="E" TEXT="Task Process ID"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
-  CALL METHOD super-&gt;constructor.
-  CREATE OBJECT o_run
-    EXPORTING
-      run_id = run_id.
-  bloc_size = o_run-&gt;infos-bloc_size.
+  DATA length TYPE i.
+
+  length = XSTRLEN( task_id ).
+  ASSERT task_id IS INITIAL OR length = 16.
+
+  super-&gt;constructor( ).
+
   CREATE OBJECT o_categories.
   CREATE OBJECT o_informations
     EXPORTING
-      process_id   = process_id
-      o_categories = o_categories.
+      o_process = me.
   CREATE OBJECT o_messaging
     EXPORTING
-      process_id   = process_id
-      o_categories = o_categories.
-  CREATE OBJECT o_objects
-    EXPORTING
-      o_run = o_run.</SOURCE>
+      o_process = me.
+
+  IF task_id IS INITIAL.
+* Do not have any run yet
+    is_new = abap_true.
+    f_has_changed = abap_true.
+  ELSE.
+    is_new = abap_false.
+    me-&gt;process_id = task_id.
+    read( ).
+    o_run-&gt;set_category( o_categories ).
+    CREATE OBJECT o_objects
+      EXPORTING
+        o_run = o_run.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_PROGRESSION" EXPOSURE="2" STATE="1">
     <TEXTS>
@@ -199,8 +217,31 @@
     </PARAMETERS>
     <SOURCE>`
   CHECK o_categories IS BOUND.
-  IF o_messaging IS BOUND.        o_messaging-&gt;set_category( o_categories ).          ENDIF.
-  IF o_informations IS BOUND.     o_informations-&gt;set_category( o_categories ).       ENDIF.</SOURCE>
+  me-&gt;o_categories = o_categories.
+  CHECK o_run IS BOUND.
+  o_run-&gt;set_category( o_categories ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_RUN" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set new Run if new task"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CHECK is_new = abap_true.
+  _set_run( run_id ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_BATCH" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -364,6 +405,31 @@
     f_definition_sended = abap_true.
   ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="_SET_RUN" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set new Run"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CREATE OBJECT o_run
+    EXPORTING
+      run_id = run_id.
+  bloc_size = o_run-&gt;infos-bloc_size.
+  o_run-&gt;set_category( o_categories ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlocking"/>
@@ -402,26 +468,42 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="AUTOSAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="AUTOSAVE">
     <SOURCE>`
   super-&gt;autosave( ).
   CHECK NOT f_has_changed IS INITIAL.
   save( ).
   CLEAR f_has_changed.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_EXCLUSIVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="LOCK_WITH_SHARE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_WITH_SHARE">
     <SOURCE>`
   super-&gt;lock_with_share( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="SAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="READ">
+    <SOURCE>`
+  DATA _task TYPE ygplmt_tasks.
+
+  super-&gt;read( ).
+
+  SELECT SINGLE * INTO _task
+    FROM ygplmt_tasks
+    WHERE task_id = process_id.
+  ASSERT sy-subrc = 0.
+
+  unlock_with_share( ).
+
+  times-start = _task-timestamp.
+  _set_run( _task-run_id ).</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SAVE">
     <SOURCE>`
   DATA _task TYPE ygplmt_tasks.
 
@@ -429,16 +511,17 @@
 
   _task-task_id = process_id.
   _task-status = ygpl_mt_status=&gt;in_progress.
+  _task-run_id = o_run-&gt;process_id.
   MODIFY ygplmt_tasks FROM _task.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_EXCLUSIVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
           process_id = me-&gt;process_id ).
   super-&gt;unlock_exclusive( ) .</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS" MTDNAME="UNLOCK_WITH_SHARE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_WITH_SHARE">
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
           process_id = me-&gt;process_id ).

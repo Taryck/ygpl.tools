@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="78CD625CF2A7B6FA2E2C7E8FB560CD96" CODE_SIGNATURE="C675B63FC59672CEB5CEDC59DA1F860A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F91D59DAEE53CA8E4B0CBDB5FE78DBC0" CODE_SIGNATURE="D5FA1F29D618E83E6D4F03B60BCEED6B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -54,7 +54,7 @@
        <ITEM LANG="E" TEXT="Category"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="DATA_TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DATA_TYPE">
+     <ITEM SCONAME="DATA_TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DATA_TYPE" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Category data type"/>
       </TEXTS>
@@ -88,11 +88,15 @@
                   category = category.
   ENDIF.
 
-  wa-ok = is_data_type_ok( data_type ).
-  IF wa-ok = abap_false.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
-                 data_type = data_type.
+  IF data_type IS INITIAL.
+    wa-ok = abap_true.
+  ELSE.
+    wa-ok = is_data_type_ok( data_type ).
+    IF wa-ok = abap_false.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_category
+            EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
+                   data_type = data_type.
+    ENDIF.
   ENDIF.
 
   READ TABLE my_keys WITH TABLE KEY cat = category ASSIGNING &lt;wa&gt;.

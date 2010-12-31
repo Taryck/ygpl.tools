@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0006AE38F837E706CB52366323E5ED84" CODE_SIGNATURE="46F7A5921A90D88A051D76C79A7858E9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="1D903B176F1A0E5487CA7A87647F9A6A" CODE_SIGNATURE="01539B0DB510C163E6E7118198F36928" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -432,7 +432,8 @@
     o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;JOB_CLOSE&apos;
                                           subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
-  ENDIF.</SOURCE>
+  ENDIF.
+  CLEAR current_job.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
@@ -763,7 +764,7 @@
   IF _jobname IS INITIAL.
     DESCRIBE TABLE thread_launched LINES _count.      ADD 1 TO _count.
     _jobname = _count.    CONDENSE _jobname.
-    MESSAGE i003(ygpl_mt_rootclass) WITH sy-cprog _jobname INTO _jobname.
+    MESSAGE i002(ygpl_mt) WITH sy-cprog _jobname INTO _jobname.
   ENDIF.
 
   CALL FUNCTION &apos;JOB_OPEN&apos;
@@ -949,7 +950,7 @@
   DATA key      TYPE ts_job_key.
   DATA _thread  TYPE td_count.
 
-  DO threads TIMES.
+  DO count TIMES.
     ADD 1 TO _thread.
     key = new_job( ).
 

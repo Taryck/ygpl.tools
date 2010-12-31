@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F9628DC2DE6E936AB4BDAD23346FD7CF" CODE_SIGNATURE="A1F345E5894767B33BC22EE97FC6C959" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="72A57E1A6FD978D645E1CD34968D58A7" CODE_SIGNATURE="208DEA22ABE5ED213DE2A56335BD223B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
@@ -16,6 +16,7 @@
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DB_TABLE_NAME"/>
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_RAWDATA"/>
@@ -24,14 +25,14 @@
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="O_CATEGORIES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+   <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_INFOS&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Categories for this run type"/>
+     <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+   <ITEM CMPNAME="O_PROCESS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_PROCESS">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Process unique ID"/>
+     <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -120,7 +121,7 @@
   lock_exclusive( category ).
 
   DELETE FROM ygplmt_infos
-         WHERE process_id = process_id
+         WHERE process_id = o_process-&gt;process_id
            and   CATEGORY = category.
 * Locks released by the next Commit/Roll back</SOURCE>
    </ITEM>
@@ -129,28 +130,16 @@
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+     <ITEM SCONAME="O_PROCESS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_PROCESS">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Categories for this run type"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Process ID"/>
+       <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-* Check Run_ID
-  ASSERT NOT process_id IS INITIAL.
-  me-&gt;process_id = process_id.
-
-  ASSERT o_categories IS BOUND.
-  me-&gt;o_categories = o_categories.</SOURCE>
+  ASSERT o_process IS BOUND.
+  me-&gt;o_process = o_process.
+  ASSERT me-&gt;o_process-&gt;o_categories IS BOUND.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DECODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -274,18 +263,25 @@
     <SOURCE>`
   DATA data_info  TYPE td_buffer_data.
   DATA o_cx       TYPE REF TO ygpl_mt_cx.
+  DATA my_key     TYPE string.
 
-  CHECK NOT o_categories-&gt;is_valid_category( category ) IS INITIAL.
+  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
 
   lock_with_share( category ).
   TRY.
       SELECT SINGLE info_data
         INTO data_info
         FROM ygplmt_infos
-        WHERE process_id = process_id
+        WHERE process_id = o_process-&gt;process_id
           AND category = category.
       IF sy-subrc &lt;&gt; 0.
+        my_key = o_process-&gt;process_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_database
+              EXPORTING textid = ygpl_mt_cx_database=&gt;not_found
+                     tablename = my_table
+                     key_value = my_key.
       ENDIF.
+
       decode_data( EXPORTING buffer = data_info
                     CHANGING    any = info ).
 
@@ -315,7 +311,7 @@
     </EXCEPTIONS>
     <SOURCE>`
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
-        process_id = me-&gt;process_id
+        process_id = o_process-&gt;process_id
           category = category ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="LOCK_WITH_SHARE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
@@ -338,23 +334,8 @@
     </EXCEPTIONS>
     <SOURCE>`
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
-        process_id = me-&gt;process_id
+        process_id = o_process-&gt;process_id
           category = category ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_CATEGORY" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the category"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Define new Catagories"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  CHECK o_categories IS BOUND.
-  me-&gt;o_categories = o_categories.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_INFORMATION" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -387,13 +368,13 @@
   DATA _info TYPE ygplmt_infos.
   DATA o_cx TYPE REF TO ygpl_mt_cx.
 
-  CHECK NOT o_categories-&gt;is_valid_category( category ) IS INITIAL.
+  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
 
   lock_exclusive( category ).
 * Locks released by the next Commit/Roll back
   TRY.
 
-      _info-process_id = process_id.
+      _info-process_id = o_process-&gt;process_id.
       _info-category = category.
       _info-info_data = encode_data( info ).
       GET TIME STAMP FIELD _info-timestamp.
@@ -418,7 +399,7 @@
     </PARAMETERS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
-          process_id = me-&gt;process_id
+          process_id = o_process-&gt;process_id
             category = category ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_WITH_SHARE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
@@ -434,7 +415,7 @@
     </PARAMETERS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
-          process_id = me-&gt;process_id
+          process_id = o_process-&gt;process_id
             category = category ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
@@ -500,7 +481,8 @@
 *  else if sy-subrc &lt;&gt; 0.
   ELSE.
     ASSERT sy-subrc = 0.
-  ENDIF.</SOURCE>
+  ENDIF.
+  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -552,14 +534,14 @@
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
   </TYPEGROUPS>
   <TYPES>
-   <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" TYPTYPE="1" TYPE="YGPLMT_INFOS-INFO_DATA">
+   <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLMT_INFOS-INFO_DATA">
     <TEXTS>
      <ITEM LANG="E" TEXT="Raw Data for export/import to database"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_CATEGORIES" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_CATEGORIES">
+   <ITEM CMPNAME="TO_PROCESS" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_PROCESS_4MT">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Categories for this run type"/>
+     <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
     </TEXTS>
    </ITEM>
   </TYPES>
