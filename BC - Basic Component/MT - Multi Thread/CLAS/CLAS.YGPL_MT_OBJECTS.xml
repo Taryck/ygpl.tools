@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="830D66F63C136E60D39301CBE44E78D7" CODE_SIGNATURE="6882D5500937D27E33AEF9A7F97FFF80" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="48A718B164B471241277507BD1499282" CODE_SIGNATURE="928906459FCAA89FBEB8FD1A821D7C18" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <TEXTS>
     <ITEM LANG="E" TEXT="Object store engine"/>
    </TEXTS>
@@ -33,7 +33,12 @@
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="BATCH_RATE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;50&apos;" TYPTYPE="4">
+   <ITEM CMPNAME="BATCH_OBJECTS" STATE="1" TYPTYPE="1" TYPE="TD_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Number of objects for the batch"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="BATCH_RATE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;5&apos;" TYPTYPE="4">
     batch_rate TYPE p LENGTH 3 DECIMALS 2
 `
     <TEXTS>
@@ -50,7 +55,7 @@
      <ITEM LANG="E" TEXT="Number of object confirmed"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_MAXI_PROGRESS" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_PROGRESS">
+   <ITEM CMPNAME="CONFIRM_MAXI_PROGRESS" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;5&apos;" TYPTYPE="1" TYPE="TD_PROGRESS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Maximum progress to send new confirmation"/>
     </TEXTS>
@@ -100,7 +105,7 @@
      <ITEM LANG="E" TEXT="Minimum progress to send new message"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MSG_MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;60&apos;" TYPTYPE="1" TYPE="TD_TIME">
+   <ITEM CMPNAME="MSG_MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;15&apos;" TYPTYPE="1" TYPE="TD_TIME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Minimum time to send new message"/>
     </TEXTS>
@@ -117,7 +122,7 @@
    </ITEM>
    <ITEM CMPNAME="PROCESSED_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Number of processed objects"/>
+     <ITEM LANG="E" TEXT="Number of processed objects (by a Task/by all task for run)"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="R_WEIGHT_TYPE_KIND" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TR_TYPE_KIND">
@@ -142,7 +147,7 @@
    </ITEM>
    <ITEM CMPNAME="TOTAL_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Total object count"/>
+     <ITEM LANG="E" TEXT="Total object count for a Run"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -415,10 +420,17 @@
   tk-low = cl_abap_typedescr=&gt;typekind_int2.    APPEND tk TO r_weight_type_kind.
   tk-low = cl_abap_typedescr=&gt;typekind_numeric. APPEND tk TO r_weight_type_kind.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm processing of a batch (n blocs)"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   DATA _correction TYPE i.
   FIELD-SYMBOLS :
@@ -426,13 +438,15 @@
 
   ASSERT current_blocs IS NOT INITIAL.
 
+  display_speed( ).
+
   IF NOT status_to_send IS INITIAL.
     send_object_confirmation( ).
   ENDIF.
 
-  IF processed_objects &lt;&gt; confirmed_objects.
+  IF batch_objects &lt;&gt; confirmed_objects.
 * External error all objects processed haven&apos;t get a status or too much
-    _correction = processed_objects - confirmed_objects. &quot; aurait du etre envoyé - réellement envoyé
+    _correction = batch_objects - confirmed_objects. &quot; aurait du etre envoyé - réellement envoyé
     confirm_objects( status = ygpl_mt_status=&gt;inconsistency
                      count  = _correction ).
     send_object_confirmation( ).
@@ -456,7 +470,7 @@
 
   CLEAR current_blocs.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
     </TEXTS>
@@ -464,6 +478,13 @@
      <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
      <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   DATA statut LIKE LINE OF global_status.
 
@@ -501,20 +522,15 @@
     <SOURCE>`
   ASSERT o_run IS BOUND.
   me-&gt;o_run = o_run.
-*  IF o_messaging IS BOUND.
-*    me-&gt;o_messaging = o_messaging.
-**    me-&gt;o_categories = o_messaging-&gt;o_categories.
-*  ELSE.
-**    IF o_categories IS BOUND.
-**      me-&gt;o_categories = o_categories.
-**    ELSE.
-**      CREATE OBJECT me-&gt;o_categories.
-**    ENDIF.
-*  ENDIF.
-  CREATE OBJECT me-&gt;o_messaging
-    EXPORTING
-      o_process = o_run.
-  SET HANDLER handle_objects_confirmation FOR o_messaging.
+  IF o_run-&gt;o_messaging IS BOUND.
+    me-&gt;o_messaging = o_run-&gt;o_messaging.     &quot; Should be the same messaging engine in order to attach event to the right instance
+    SET HANDLER handle_objects_confirmation FOR me-&gt;o_messaging.
+  ELSE.
+* No confirmation expected Task parent
+    CREATE OBJECT me-&gt;o_messaging
+      EXPORTING
+        o_process = o_run.
+  ENDIF.
 
   set_maximum_memory( maximum_memory ).
   me-&gt;estimated_end_time = estimated_end_time.
@@ -919,75 +935,112 @@
   DATA new_p    TYPE td_progress.
   DATA delta_p  TYPE td_progress.
   DATA _tmp     TYPE timestampl.
-  DATA _delta   TYPE timestampl.
   DATA _now     TYPE timestampl.
   DATA _sec     TYPE td_time.
   DATA duration TYPE sy-uzeit.
   DATA d_str(15) TYPE c.
   DATA end_str(50) TYPE c.
-  DATA duree    TYPE p LENGTH 4 DECIMALS 5.
-  DATA duree_p  TYPE p LENGTH 4 DECIMALS 5.
+  DATA duree    TYPE f.   &quot; p LENGTH 4 DECIMALS 5.
+  DATA duree_p  TYPE f.   &quot; p LENGTH 4 DECIMALS 5.
   DATA tmp_line(10) TYPE c.
   DATA str      TYPE string.
+  DATA l_pc     TYPE p LENGTH 16 DECIMALS 2.
 
+  CHECK total_objects &gt; 0.
   new_p = processed_objects / total_objects * 100.
   delta_p = new_p - last_message-progress.
-  IF delta_p &gt; msg_mini_progress.
-    GET TIME STAMP FIELD _now.
-    _delta = _now - last_message-time.
-    _sec = _delta.
-    IF _sec &gt;= msg_mini_wait.
-      last_message-progress = new_p.
-      last_message-time = _now.
-      WRITE last_message-progress DECIMALS 1 TO tmp_line.
-      CONDENSE tmp_line.
+  CHECK delta_p &gt; msg_mini_progress.
+
+  GET TIME STAMP FIELD _now.
+  _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
+                                  tstmp2 = last_message-time ).
+*  _delta = _now - last_message-time.
+*  _sec = _delta.
+  CHECK _sec &gt;= msg_mini_wait.
+  last_message-progress = new_p.
+  last_message-time = _now.
+  l_pc = last_message-progress.
+  WRITE l_pc DECIMALS 1 TO tmp_line.
+  CONDENSE tmp_line.
 
 * Calcul remaining time
-      IF last_message-progress &gt; 0.
-        TRY.
-            duree = cl_abap_tstmp=&gt;subtract(
-                tstmp1 = _now
-                tstmp2 = times-start
-                ).
-          CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
-            duree = ( _now - times-start ).
-        ENDTRY.
-        duree_p = duree * 100 / last_message-progress.
+  IF last_message-progress &gt; 0.
+    TRY.
+        duree = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
+                                         tstmp2 = times-start ).
+      CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
+        duree = ( _now - times-start ).
+    ENDTRY.
+    duree_p = duree * 100 / last_message-progress.
 
-        _tmp = ( duree_p - duree ). &quot;temps restant
-        IF _tmp &lt; 0. _tmp = 0. ENDIF.
-        _tmp = _tmp + estimated_end_time.
-        duration = _tmp.
-        WRITE duration TO d_str.
+    _tmp = ( duree_p - duree ). &quot;temps restant
+    IF _tmp &lt; 0. _tmp = 0. ENDIF.
+    _tmp = _tmp + estimated_end_time.
+    duration = _tmp.
+    WRITE duration TO d_str.
 
 * End time
-        TRY.
-            _tmp = cl_abap_tstmp=&gt;add(
-                tstmp   = times-start
-                secs    = duree_p
-                ).
-          CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
-            _tmp = times-start + duree_p.
-        ENDTRY.
-        WRITE _tmp TIME ZONE sy-zonlo TO end_str.
-        FIND FIRST OCCURRENCE OF &apos;,&apos; IN end_str MATCH OFFSET pos.
-        IF sy-subrc = 0.
-          end_str = end_str(pos).
-        ENDIF.
-      ENDIF.
+    TRY.
+        _tmp = cl_abap_tstmp=&gt;add(
+            tstmp   = times-start
+            secs    = duree_p
+            ).
+      CATCH cx_parameter_invalid_range cx_parameter_invalid_type.
+        _tmp = times-start + duree_p.
+    ENDTRY.
+    WRITE _tmp TIME ZONE sy-zonlo TO end_str.
+    FIND FIRST OCCURRENCE OF &apos;,&apos; IN end_str MATCH OFFSET pos.
+    IF sy-subrc = 0.
+      end_str = end_str(pos).
+    ENDIF.
+  ENDIF.
 
 * Display progress
-      IF NOT sy-batch IS INITIAL.
-        MESSAGE i000(ygpl_mt_rootclass) WITH tmp_line d_str end_str.
-      ELSE.
-        MESSAGE i001(ygpl_mt_rootclass) WITH tmp_line d_str end_str INTO str.
-        CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;
-          EXPORTING
-            percentage = last_message-progress
-            text       = str.
-      ENDIF.
+  IF NOT sy-batch IS INITIAL.
+* Progress &amp;1 % - end expected within &amp;2 at &amp;3
+    MESSAGE i003 WITH tmp_line d_str end_str.
+  ELSE.
+* End expected within &amp;2 at &amp;3
+    MESSAGE i004 WITH tmp_line d_str end_str INTO str.
+    CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;
+      EXPORTING
+        percentage = last_message-progress
+        text       = str.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DISPLAY_SPEED" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Display speed for batch"/>
+    </TEXTS>
+    <SOURCE>`
+*  DATA blocs    TYPE i.
+  DATA _now     TYPE timestampl.
+  DATA _sec     TYPE td_time.
+  DATA speed    TYPE i.
+  DATA s_blocs  TYPE string.
+  DATA s_objs   TYPE string.
+  DATA s_dura   TYPE string.
+  DATA s_speed  TYPE string.
 
-    ENDIF.
+  CHECK batch_objects &gt; 0.
+  s_objs = batch_objects.   CONDENSE s_objs.
+  GET TIME STAMP FIELD _now.
+  _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
+                                  tstmp2 = times-start ).
+  s_dura = _sec.    CONDENSE s_dura.
+  IF _sec &gt; 0.
+    speed = batch_objects * 3600 / _sec.    &quot; Obj /h
+    s_speed = speed.
+    CONDENSE s_speed.
+  ELSE.
+    s_speed = &apos;N/A&apos;(n_a).
+  ENDIF.
+  s_blocs = LINES( current_blocs ).   CONDENSE s_blocs.
+
+* Display progress
+  IF NOT sy-batch IS INITIAL.
+* Last batch has &amp;1 blocs (&amp;2 objects) and done in &amp;3 secondes - &amp;4 obj/h
+    MESSAGE i007 WITH s_blocs s_objs s_dura s_speed.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ENCODE_DATA" STATE="1" MTDDECLTYP="1">
@@ -1104,7 +1157,7 @@
    </ITEM>
    <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Get a batch (n blocs)"/>
+     <ITEM LANG="E" TEXT="Task : Get a batch (n blocs)"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
@@ -1121,19 +1174,14 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   DATA tab_ref    TYPE REF TO data.
   DATA maxrow     TYPE i.
   DATA rows       TYPE i.
   DATA mem_size   TYPE td_memory_size.
   DATA t_size     TYPE td_memory_size.
-  DATA _run       TYPE ts_run.
   DATA _blocs     TYPE STANDARD TABLE OF ygplmt_objects.
   DATA _bloc      LIKE LINE OF current_blocs.
-  DATA o_mycx     TYPE REF TO ygpl_mt_cx.
+*  DATA o_mycx     TYPE REF TO ygpl_mt_cx.
   DATA o_cx       TYPE REF TO cx_root.
 
   FIELD-SYMBOLS:
@@ -1212,17 +1260,17 @@
         ENDLOOP.
       ENDIF.
 
-      DESCRIBE TABLE objects LINES maxrow.
-      ADD maxrow TO total_objects.
-      processed_objects = maxrow.
+      batch_objects = LINES( objects ).   CLEAR confirmed_objects.
+      ADD batch_objects TO processed_objects.
 
       COMMIT WORK AND WAIT.
     CATCH cx_root INTO o_cx.
-      RELEASE_SEMAPHORE( ).
+      release_semaphore( ).
       RAISE EXCEPTION o_cx.
   ENDTRY.
 * Release global Lock on object processing.
-  RELEASE_SEMAPHORE( )..</SOURCE>
+  release_semaphore( ).
+  refresh_start_time( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_CONFIRMED_OBJECT_COUNT" EXPOSURE="2" STATE="1">
     <TEXTS>
@@ -1330,10 +1378,17 @@
 
   size = &lt;weight&gt;.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_SEMAPHORE" STATE="1">
+   <ITEM CMPNAME="GET_SEMAPHORE" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get Semaphore"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
 
   IF NOT f_semaphore IS INITIAL.
@@ -1525,7 +1580,7 @@
     ASSERT sy-subrc = 0.
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="REFRESH_STARTTIME" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="REFRESH_START_TIME" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Reset the strart date and time"/>
     </TEXTS>
@@ -1645,27 +1700,42 @@
     </EXCEPTIONS>
     <SOURCE>`
   CHECK status_to_send IS NOT INITIAL.
-
-  o_messaging-&gt;send_message( category = sys_categories-obj_conf
-                             message  = status_to_send ).</SOURCE>
+  o_messaging-&gt;send_system_message( category = sys_categories-obj_conf
+                                    message  = status_to_send ).
+  CLEAR status_to_send.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SEND_PROGRESS" EXPOSURE="1" STATE="1">
+   <ITEM CMPNAME="SEND_PROGRESS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Decide to send object confirmation"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   DATA new_p    TYPE td_progress.
   DATA delta_p  TYPE td_progress.
-  DATA _delta   TYPE timestampl.
+*  DATA _delta   TYPE timestampl.
   DATA _now     TYPE timestampl.
   DATA _sec     TYPE td_time.
+*  DATA o_cx     TYPE REF TO cx_root.
 
-  new_p = confirmed_objects / processed_objects * 100.
+  CHECK batch_objects &gt; 0.
+*  TRY.
+*    CATCH cx_root INTO o_cx.
+*
+*  ENDTRY.
+  new_p = confirmed_objects / batch_objects * 100.
   delta_p = new_p - last_message-progress.
+  GET TIME STAMP FIELD _now.
   IF delta_p &lt; confirm_maxi_progress.
-    GET TIME STAMP FIELD _now.
-    _delta = _now - last_message-time.
-    _sec = _delta.
+    _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
+                                    tstmp2 = last_message-time ).
+*    _delta = _now - last_message-time.
+*    _sec = _delta.
     IF _sec &lt; confirm_mini_wait.
       EXIT.
     ENDIF.
@@ -1725,7 +1795,7 @@
   INSERT wa INTO TABLE obj2blocs.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="UNLOCK_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="UNLOCK_BLOC" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlocking"/>
     </TEXTS>
@@ -1762,8 +1832,11 @@
   </TEXTSPOOL>
   <TYPES>
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLMT_OBJECTS-OBJ_DATA"/>
-   <ITEM CMPNAME="TD_PROGRESS" STATE="1" EDITORDER="2 " TYPTYPE="4">td_progress TYPE p LENGTH 3 DECIMALS 3
-`</ITEM>
+   <ITEM CMPNAME="TD_PROGRESS" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="F">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Progression"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>

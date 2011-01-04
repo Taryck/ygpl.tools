@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="72A57E1A6FD978D645E1CD34968D58A7" CODE_SIGNATURE="208DEA22ABE5ED213DE2A56335BD223B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="FB6F6824A7C34A13A32E80D3C18B1B9F" CODE_SIGNATURE="31ACDA0973C048524C88A44600FE946F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
@@ -20,6 +20,8 @@
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_RAWDATA"/>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIME"/>
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIMESTAMP"/>
    <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TR_CATEGORIES"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
@@ -438,6 +440,11 @@
        <ITEM LANG="E" TEXT="Process ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -454,35 +461,43 @@
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_INFOS&apos;
-    EXPORTING
-      mode_ygplmt_infos = lock_mode
-      mandt             = sy-mandt
-      process_id        = process_id
-      category          = category
-      x_process_id      = abap_true
-      x_category        = abap_true
-      _scope            = &apos;2&apos;
-      _wait             = abap_true
-      _collect          = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock      = 1
-      system_failure    = 2
-      OTHERS            = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = process_id.
-    CONCATENATE _key &apos;-&apos; category INTO _key.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;MT Informations&apos;(lon)
-                   object_key = _key
-                         user = user.
+  ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_INFOS&apos;
+      EXPORTING
+        mode_ygplmt_infos = lock_mode
+        mandt             = sy-mandt
+        process_id        = process_id
+        category          = category
+        x_process_id      = abap_true
+        x_category        = abap_true
+        _scope            = &apos;2&apos;
+        _wait             = abap_true
+        _collect          = &apos; &apos;
+      EXCEPTIONS
+        foreign_lock      = 1
+        system_failure    = 2
+        OTHERS            = 3.
+    IF sy-subrc = 1.
+      IF ygpl_mt_lock_managment=&gt;check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = process_id.
+        CONCATENATE _key &apos;-&apos; category INTO _key.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;MT Informations&apos;(lon)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F91D59DAEE53CA8E4B0CBDB5FE78DBC0" CODE_SIGNATURE="D5FA1F29D618E83E6D4F03B60BCEED6B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A351AD756E47D7FEEA550C2D3E212A05" CODE_SIGNATURE="32FFB06EC10CF8C2CEEC41FF2EFD1FBD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -127,6 +127,8 @@
 *  _cat-low = sys_categories-data_bloc.    APPEND _cat TO r_sys_categories.  &quot; Data : bloc
   _cat-low = sys_categories-run_info.     APPEND _cat TO r_sys_categories.  &quot; Information Run
   _cat-low = sys_categories-obj_conf.     APPEND _cat TO r_sys_categories.  &quot; confirmation d&apos;objet
+  _cat-low = sys_categories-task_def.     APPEND _cat TO r_sys_categories.  &quot; Information Run
+  _cat-low = sys_categories-condition.    APPEND _cat TO r_sys_categories.  &quot; confirmation d&apos;objet
 
   SELECT category
     INTO TABLE all_keys
@@ -183,6 +185,42 @@
     CATCH cx_sy_create_data_error.
       result = abap_false.
   ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="IS_SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Is the category a system category ?"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Category"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Category is valid"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  IF not category IN r_sys_categories.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_category
+          EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
+                  category = category.
+  ENDIF.
+  IF do_exists( category ) IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_category
+          EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
+                  category = category.
+  ENDIF.
+  result = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="IS_VALID_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>

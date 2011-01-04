@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6A9B1510C116C8C168D42246DD0C33A2" CODE_SIGNATURE="76E7F6AA92BD32F3E016540105494AAA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6EB9230BCEE270104CE0DA997A916E01" CODE_SIGNATURE="ACC1C3EFAECB94D2709BC49CA653CD08" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -30,6 +30,11 @@
    <ITEM CMPNAME="F_STOP_REQUESTED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Stop has been requested"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="F_SYSTEM_MESSAGE" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="System Message Allowed"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="IS_NEW" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
@@ -123,15 +128,13 @@
   super-&gt;constructor( ).
 
   CREATE OBJECT o_categories.
-  CREATE OBJECT o_informations
-    EXPORTING
-      o_process = me.
   CREATE OBJECT o_messaging
     EXPORTING
       o_process = me.
 
   IF task_id IS INITIAL.
 * Do not have any run yet
+    status = ygpl_mt_status=&gt;starting.
     is_new = abap_true.
     f_has_changed = abap_true.
   ELSE.
@@ -139,6 +142,9 @@
     me-&gt;process_id = task_id.
     read( ).
     o_run-&gt;set_category( o_categories ).
+    CREATE OBJECT o_informations
+      EXPORTING
+        o_process = o_run.
     CREATE OBJECT o_objects
       EXPORTING
         o_run = o_run.
@@ -258,7 +264,13 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  autosave( ).
+  IF status &lt;&gt; ygpl_mt_status=&gt;in_progress.
+    status = ygpl_mt_status=&gt;in_progress.
+    f_has_changed = abap_true.
+    save( ).
+  ELSE.
+    autosave( ).
+  ENDIF.
   _send_task_definition( ).
   CHECK f_stop_requested IS INITIAL.
   o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
@@ -305,6 +317,11 @@
        <ITEM LANG="E" TEXT="Task ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -319,6 +336,8 @@
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
 
+  ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
+  DO.
   CALL FUNCTION &apos;ENQUEUE_EYGPLMT_TASKS&apos;
     EXPORTING
       MODE_YGPLMT_TASKS       = lock_mode
@@ -333,6 +352,9 @@
       SYSTEM_FAILURE          = 2
       OTHERS                  = 3.
   IF sy-subrc = 1.
+      IF ygpl_mt_lock_managment=&gt;check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
     user = sy-msgv1.
     _key = process_id.
     RAISE EXCEPTION TYPE ygpl_mt_cx_locks
@@ -340,11 +362,14 @@
                   object_name = &apos;MT Process Data&apos;(tds)
                    object_key = _key
                          user = user.
+  ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
   ELSE.
     ASSERT sy-subrc = 0.
   ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_SEND_MESSAGE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -396,13 +421,13 @@
     <SOURCE>`
   DATA s_info TYPE ts_process_definition.
 
-  autosave( ).
   IF f_definition_sended IS INITIAL.
+    autosave( ).
     s_info-process_id = me-&gt;process_id.
     s_info-batch_info = me-&gt;batch_info.
     s_info-workprocess = me-&gt;workprocess.
-    o_messaging-&gt;send_message( category = sys_categories-task_def
-                                message = s_info ).
+    o_messaging-&gt;send_system_message( category = sys_categories-task_def
+                                       message = s_info ).
     f_definition_sended = abap_true.
   ENDIF.</SOURCE>
    </ITEM>
@@ -425,11 +450,22 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  DATA f_no_msg TYPE td_boolean.
+
+  f_no_msg = ygpl_mt_process=&gt;no_message.
+  ygpl_mt_process=&gt;no_message = abap_true.
   CREATE OBJECT o_run
     EXPORTING
       run_id = run_id.
+  ygpl_mt_process=&gt;no_message = f_no_msg.
   bloc_size = o_run-&gt;infos-bloc_size.
-  o_run-&gt;set_category( o_categories ).</SOURCE>
+  o_run-&gt;set_category( o_categories ).
+  CREATE OBJECT o_informations
+    EXPORTING
+      o_process = o_run.
+  CREATE OBJECT o_objects
+    EXPORTING
+      o_run = o_run.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -476,6 +512,10 @@
   save( ).
   CLEAR f_has_changed.</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED" MTDFINAL="X">
+    <SOURCE>`
+  result = f_system_message.</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
@@ -502,7 +542,8 @@
   unlock_with_share( ).
 
   times-start = _task-timestamp.
-  _set_run( _task-run_id ).</SOURCE>
+  _set_run( _task-run_id ).
+  status = _task-status.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SAVE">
     <SOURCE>`
@@ -511,7 +552,7 @@
   super-&gt;save( ).
 
   _task-task_id = process_id.
-  _task-status = ygpl_mt_status=&gt;in_progress.
+  _task-status = status.
   _task-run_id = o_run-&gt;process_id.
   MODIFY ygplmt_tasks FROM _task.
   ASSERT sy-subrc = 0.</SOURCE>

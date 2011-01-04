@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BEE47085A989BCF70BCAE94D3AA09416" CODE_SIGNATURE="533ADD8FDD3C85EF506D8ECD38256F2D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="281E22A7398408D3FDB765F64C3A833A" CODE_SIGNATURE="8FD5AD55F939B5DEFCED6180C608FFB7" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <TEXTS>
     <ITEM LANG="E" TEXT="MT : Job monitoring"/>
    </TEXTS>
@@ -269,7 +269,7 @@
           IMPORTING
             job_info = job_info.
       CATCH ygpl_mt_cx_job_monitoring INTO o_cx.
-        IF o_cx-&gt;IS_EXCEPTION_TEXT( ygpl_mt_cx_job_monitoring=&gt;job_dont_exists ) is not initial.
+        IF o_cx-&gt;is_exception_text( ygpl_mt_cx_job_monitoring=&gt;job_dont_exists ) IS NOT INITIAL.
 *          job_info-status = job_status-aborted.
           job_info-status = job_status-finished.
         ELSE.
@@ -279,14 +279,12 @@
     IF job_info-status = job_status-aborted OR job_info-status = job_status-finished.
       IF job_info-status = job_status-finished.
         IF NOT sy-batch IS INITIAL.
-          MESSAGE i006(ygpl_mt_rootclass) WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
+* Thread #&amp;1 - &amp;2(&amp;3) - Job completed
+          MESSAGE i005 WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
         ENDIF.
       ELSE.
-        IF NOT sy-batch IS INITIAL.
-          MESSAGE i007(ygpl_mt_rootclass) WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
-        ELSE.
-          MESSAGE w007(ygpl_mt_rootclass) WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
-        ENDIF.
+* Thread #&amp;1 - &amp;2(&amp;3) - Job aborded, recovery required
+        MESSAGE i006 WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
       ENDIF.
       RAISE EVENT on_thread_end EXPORTING o_job_monitoring = me
                                              thread_number = &lt;th&gt;-num
@@ -430,7 +428,8 @@
      OTHERS                            = 9.
   IF sy-subrc &gt; 1.
     o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;JOB_CLOSE&apos;
-                                          subrc     = sy-subrc ).
+                                           classname = &apos;YGPL_MT_CX&apos;
+                                           subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
   ENDIF.
   CLEAR current_job.</SOURCE>

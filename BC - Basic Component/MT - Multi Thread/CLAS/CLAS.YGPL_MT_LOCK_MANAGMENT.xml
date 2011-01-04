@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="728D3104C3676867E3133342A0FCDCB1" CODE_SIGNATURE="67ADF2708E73E8B6162FC87F19A43EA0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="3EA6965A249AC87AF37069A878AB360A" CODE_SIGNATURE="B446AE06E4C6ED76499A438687547E24" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -14,7 +14,16 @@
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIME"/>
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIMESTAMP"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="TIMEOUT" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_TIMESTAMP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Tilmestamp of the next timeout"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
   <FRIENDS>
    <ITEM REFCLSNAME="YGPL_MT_INFORMATIONS" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_MESSAGING" STATE="1"/>
@@ -114,6 +123,22 @@
                  lock_mode = lock_mode.
   ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="CHECK_TIMEOUT" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check if timeout is reached"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout reached"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _now TYPE td_timestamp.
+  GET TIME STAMP FIELD _now.
+  IF _now &gt; timeout.      result = abap_true.     ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="GET_INFORMATION_CLEARANCE" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Check if actions on Process information is clear/authorized"/>
@@ -122,6 +147,11 @@
      <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
       <TEXTS>
        <ITEM LANG="E" TEXT="Run ID"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -136,34 +166,42 @@
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
-    EXPORTING
-      mode_ygplmt_locks       = lock_modes-read
-      mandt                   = sy-mandt
-      process_id              = run_id
-      action                  = actions-information
-      x_process_id            = abap_true
-      x_action                = abap_true
-      _scope                  = &apos;2&apos;
-      _wait                   = abap_true
+  set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
+      EXPORTING
+        mode_ygplmt_locks       = lock_modes-read
+        mandt                   = sy-mandt
+        process_id              = run_id
+        action                  = actions-information
+        x_process_id            = abap_true
+        x_action                = abap_true
+        _scope                  = &apos;2&apos;
+        _wait                   = abap_true
 *     _COLLECT                = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock            = 1
-      system_failure          = 2
-      OTHERS                  = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = run_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;MT Information&apos;(tis)
-                   object_key = _key
-                         user = user.
+      EXCEPTIONS
+        foreign_lock            = 1
+        system_failure          = 2
+        OTHERS                  = 3.
+    IF sy-subrc = 1.
+      IF check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = run_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;MT Information&apos;(tis)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_MESSAGES_SEMAPHORE" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -175,6 +213,11 @@
        <ITEM LANG="E" TEXT="Run/Task ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -187,34 +230,41 @@
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
-    EXPORTING
-      mode_ygplmt_locks       = lock_modes-exclusive
-      mandt                   = sy-mandt
-      process_id              = process_id
-      action                  = actions-messaging
-      x_process_id            = abap_true
-      x_action                = abap_true
-      _scope                  = &apos;1&apos;
-      _wait                   = abap_true
+  set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
+      EXPORTING
+        mode_ygplmt_locks       = lock_modes-exclusive
+        mandt                   = sy-mandt
+        process_id              = process_id
+        action                  = actions-messaging
+        x_process_id            = abap_true
+        x_action                = abap_true
+        _scope                  = &apos;1&apos;
+        _wait                   = abap_true
 *     _COLLECT                = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock            = 1
-      system_failure          = 2
-      OTHERS                  = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;Message Semaphore&apos;(tms)
-                   object_key = _key
-                         user = user.
+      EXCEPTIONS
+        foreign_lock            = 1
+        system_failure          = 2
+        OTHERS                  = 3.
+    IF sy-subrc = 1.
+      IF check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = process_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;Message Semaphore&apos;(tms)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_OBJECTS_SEMAPHORE" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -226,6 +276,11 @@
        <ITEM LANG="E" TEXT="Run ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -238,34 +293,41 @@
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
-    EXPORTING
-      mode_ygplmt_locks       = lock_modes-exclusive
-      mandt                   = sy-mandt
-      process_id              = run_id
-      action                  = actions-object
-      x_process_id            = abap_true
-      x_action                = abap_true
-      _scope                  = &apos;1&apos;
-      _wait                   = abap_true
+  set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
+      EXPORTING
+        mode_ygplmt_locks       = lock_modes-exclusive
+        mandt                   = sy-mandt
+        process_id              = run_id
+        action                  = actions-object
+        x_process_id            = abap_true
+        x_action                = abap_true
+        _scope                  = &apos;1&apos;
+        _wait                   = abap_true
 *     _COLLECT                = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock            = 1
-      system_failure          = 2
-      OTHERS                  = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = run_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;Object Semaphore&apos;(tos)
-                   object_key = _key
-                         user = user.
+      EXCEPTIONS
+        foreign_lock            = 1
+        system_failure          = 2
+        OTHERS                  = 3.
+    IF sy-subrc = 1.
+      IF check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = run_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;Object Semaphore&apos;(tos)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_PROCESS_CLEARANCE" EXPOSURE="1" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -277,6 +339,11 @@
        <ITEM LANG="E" TEXT="Run/Task ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -289,34 +356,42 @@
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
-    EXPORTING
-      mode_ygplmt_locks       = lock_modes-read
-      mandt                   = sy-mandt
-      process_id              = process_id
-      action                  = actions-Process_data
-      x_process_id            = abap_true
-      x_action                = abap_true
-      _scope                  = &apos;2&apos;
-      _wait                   = abap_true
+  set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
+      EXPORTING
+        mode_ygplmt_locks       = lock_modes-read
+        mandt                   = sy-mandt
+        process_id              = process_id
+        action                  = actions-process_data
+        x_process_id            = abap_true
+        x_action                = abap_true
+        _scope                  = &apos;2&apos;
+        _wait                   = abap_true
 *     _COLLECT                = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock            = 1
-      system_failure          = 2
-      OTHERS                  = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;MT Process Data&apos;(tds)
-                   object_key = _key
-                         user = user.
+      EXCEPTIONS
+        foreign_lock            = 1
+        system_failure          = 2
+        OTHERS                  = 3.
+    IF sy-subrc = 1.
+      IF check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = process_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;MT Process Data&apos;(tds)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="RELEASE_EXISTENCE_LOCK" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -474,6 +549,22 @@
       SYSTEM_FAILURE          = 2
       OTHERS                  = 3.
   ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_TIMEOUT_TIMESTAMP" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Compute timestamp of the timeout"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Delay in second from now"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  GET TIME STAMP FIELD ygpl_mt_lock_managment=&gt;timeout.
+  ygpl_mt_lock_managment=&gt;timeout =  cl_abap_tstmp=&gt;add( tstmp = ygpl_mt_lock_managment=&gt;timeout
+                                                          secs = timeout ).</SOURCE>
    </ITEM>
   </METHODS>
   <TEXTSPOOL>

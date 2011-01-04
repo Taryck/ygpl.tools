@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="1D9D28C3DF53F619D669839669C0496C" CODE_SIGNATURE="02FFFE676DFF9E00F5B6FD6E2FAFFC0D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9D1B26842EAB7954BEBBF4D4FBEB15A8" CODE_SIGNATURE="02FFFE676DFF9E00F5B6FD6E2FAFFC0D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_NEW_TASK"/>
  </DEPENDENCIES>
@@ -212,11 +212,11 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  data s_param TYPE TS_MY_PROCESS_INFO.
+  DATA s_param TYPE ts_my_process_info.
   _send_task_definition( ).
   s_param = parameters.
   s_param-process_id = me-&gt;process_id.
-  _send_message( ARCHIVE = abap_true
+  _send_message( archive = abap_true
                 category = my_categories-task_param
                  message = s_param ).</SOURCE>
    </ITEM>

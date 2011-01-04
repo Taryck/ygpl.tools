@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D9C6B1AFC742B2F1378A2AB89E6DF52F" CODE_SIGNATURE="689E38CA79A01566376B234099F551CA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E14FFD7C5C1BF99067F80CB114173462" CODE_SIGNATURE="7262F8A5228A91C8560B4304227C2AB9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -49,7 +49,7 @@
      <ITEM LANG="E" TEXT="MT : Job monitoring"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
@@ -163,6 +163,7 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  thread_scheduled( ).
   o_job_monitoring-&gt;add_thread( jobname = jobname
                                jobcount = jobid ).</SOURCE>
    </ITEM>
@@ -198,17 +199,18 @@
     CREATE OBJECT me-&gt;o_categories.
     CREATE OBJECT o_informations
       EXPORTING
-        o_process   = me.
+        o_process = me.
     CREATE OBJECT o_messaging
       EXPORTING
-        o_process   = me.
+        o_process = me.
     CREATE OBJECT o_objects
       EXPORTING
-        o_run       = me.
+        o_run = me.
     SET HANDLER handle_objects_confirmation FOR o_objects.
     SET HANDLER handle_submit_thread FOR o_job_monitoring.
     SET HANDLER handle_before_sleep_mode FOR o_job_monitoring.
     f_has_changed = abap_true.
+    status = ygpl_mt_status=&gt;starting.
     is_new = abap_true.
   ELSE.
     is_new = abap_false.
@@ -275,7 +277,9 @@
 
   UPDATE ygplmt_runs SET obj_left = _left
     WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.</SOURCE>
+  ASSERT sy-subrc = 0.
+
+  COMMIT WORK.    &quot; To release locks</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="NEW_SPECIFIC_MESSAGE">
     <TEXTS>
@@ -424,8 +428,8 @@
 *        EXPORTING
 *          process_id   = &lt;j&gt;-process_id
 *          o_categories = o_categories.
-      o_msg-&gt;send_message( category = sys_categories-condition
-                            message = s_condition ).
+      o_msg-&gt;send_system_message( category = sys_categories-condition
+                                   message = s_condition ).
     ENDLOOP.
   ENDIF.
   me-&gt;max_memory = max_memory.</SOURCE>
@@ -565,7 +569,7 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  autosave( ).
+  thread_scheduled( ).
   o_job_monitoring-&gt;start_threads( infos-threads ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="STOP_TASK" STATE="1" MTDNEWEXC="X">
@@ -599,8 +603,22 @@
 *    EXPORTING
 *      process_id   = process_id
 *      o_categories = o_categories.
-  o_msg-&gt;send_message( category = sys_categories-condition
-                        message = s_condition ).</SOURCE>
+  o_msg-&gt;send_system_message( category = sys_categories-condition
+                               message = s_condition ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="THREAD_SCHEDULED" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="A Thread has been scheduled : Starting =&gt; In progress"/>
+    </TEXTS>
+    <SOURCE>`
+  IF status &lt;&gt; ygpl_mt_status=&gt;in_progress.
+    IF f_has_changed = abap_true.     save( ).      ENDIF.
+    status = ygpl_mt_status=&gt;in_progress.
+    f_has_changed = abap_true.
+    save( ).
+  ELSE.
+    autosave( ).
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -646,7 +664,8 @@
   o_objects-&gt;add_objects( objects = objects
                         bloc_size = infos-bloc_size
                         weight_fn = me-&gt;weight_fn
-                     dependencies = dependencies ).</SOURCE>
+                     dependencies = dependencies ).
+  infos-objects = o_objects-&gt;total_objects.       f_has_changed = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -690,6 +709,11 @@
        <ITEM LANG="E" TEXT="Run ID"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="TIMEOUT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="60">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout value (second)"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -704,32 +728,40 @@
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
 
-  CALL FUNCTION &apos;ENQUEUE_EYGPLMT_RUNS&apos;
-    EXPORTING
-      mode_ygplmt_runs = lock_mode
-      mandt            = sy-mandt
-      run_id           = process_id
-      x_run_id         = abap_true
-      _scope           = &apos;2&apos;
-      _wait            = abap_true
-      _collect         = &apos; &apos;
-    EXCEPTIONS
-      foreign_lock     = 1
-      system_failure   = 2
-      OTHERS           = 3.
-  IF sy-subrc = 1.
-    user = sy-msgv1.
-    _key = process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                  object_name = &apos;MT Process Data&apos;(tds)
-                   object_key = _key
-                         user = user.
+  ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
+  DO.
+    CALL FUNCTION &apos;ENQUEUE_EYGPLMT_RUNS&apos;
+      EXPORTING
+        mode_ygplmt_runs = lock_mode
+        mandt            = sy-mandt
+        run_id           = process_id
+        x_run_id         = abap_true
+        _scope           = &apos;2&apos;
+        _wait            = abap_true
+        _collect         = &apos; &apos;
+      EXCEPTIONS
+        foreign_lock     = 1
+        system_failure   = 2
+        OTHERS           = 3.
+    IF sy-subrc = 1.
+      IF ygpl_mt_lock_managment=&gt;check_timeout( ) IS INITIAL.
+        CONTINUE.
+      ELSE.
+        user = sy-msgv1.
+        _key = process_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
+              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
+                      object_name = &apos;MT Process Data&apos;(tds)
+                       object_key = _key
+                             user = user.
+      ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
-  ELSE.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-  CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.</SOURCE>
+    ELSE.
+      ASSERT sy-subrc = 0.
+    ENDIF.
+    CALL FUNCTION &apos;YGPL_DO_NOTHING&apos; IN UPDATE TASK.
+    EXIT.
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_SEND_MESSAGE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -836,6 +868,13 @@
   save( ).
   CLEAR f_has_changed.</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED" MTDFINAL="X">
+    <SOURCE>`
+*CALL METHOD SUPER-&gt;IS_SYSTEM_MESSAGE_ALLOWED
+*  RECEIVING
+*    RESULT =
+*    .</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
@@ -863,22 +902,35 @@
   unlock_with_share( ).
 
   times-start = _run-timestamp.
-  MOVE-CORRESPONDING _run TO infos.</SOURCE>
+  MOVE-CORRESPONDING _run TO infos.
+  status = _run-status.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SAVE">
     <SOURCE>`
   DATA _run TYPE ygplmt_runs.
 
-*  CHECK from_factory = abap_true.
   super-&gt;save( ).
-
   _run-run_id = process_id.
+  _run-status = status.
   _run-threads = infos-threads.
-  _run-obj_left = o_objects-&gt;total_objects.
+  _run-objects = _run-obj_left = o_objects-&gt;total_objects.
   _run-bloc_size = infos-bloc_size.
   _run-timestamp = times-start.
   _run-blocs = o_objects-&gt;total_blocs_count.
-  MODIFY ygplmt_runs FROM _run.
+  INSERT ygplmt_runs FROM _run.
+  IF sy-subrc &lt;&gt; 0.
+    UPDATE ygplmt_runs
+       SET status = _run-status
+          threads = _run-threads
+        bloc_size = _run-bloc_size
+          objects = _run-objects
+     WHERE run_id = _run-run_id.
+    IF status = ygpl_mt_status=&gt;starting.
+      UPDATE ygplmt_runs
+         SET obj_left = _run-obj_left
+       WHERE run_id = _run-run_id.
+    ENDIF.
+  ENDIF.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">

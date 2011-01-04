@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="46FA44CE1223FD21D1B94D9616CB9EF6" CODE_SIGNATURE="FC3497BADA5246967C6125B59B7A04ED" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="97EC743531EE28451D6C222B71CA502C" CODE_SIGNATURE="126F668058AD199BFF681DDDE34685FF" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
   <SOURCE>`
-*&amp;---------------------------------------------------------------------*
-*&amp; Report  YGPL_MT_TUTORIAL
-*&amp;---------------------------------------------------------------------*
+*---------------------------------------------------------------------*
+* Report  Multi Thread Tutorial
+*---------------------------------------------------------------------*
 **********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
+* Author : Al&apos;oustaz Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008-2010
 **********************************************************************
 
 REPORT  ygpl_mt_tutorial_launch.
@@ -33,8 +33,8 @@ PARAMETERS :
 
 SELECTION-SCREEN BEGIN OF BLOCK load WITH FRAME TITLE text-tlp.
 PARAMETERS :
-  wait_t TYPE ygpl_mt_my_run=&gt;td_waittime DEFAULT 1,
-  obj_c TYPE i DEFAULT 50 OBLIGATORY.
+  wait_t TYPE ygpl_mt_my_run=&gt;td_waittime DEFAULT 3,
+  obj_c TYPE i DEFAULT 5 OBLIGATORY.
 SELECTION-SCREEN END OF BLOCK load.
 
 TYPES:
@@ -76,10 +76,6 @@ START-OF-SELECTION.
   s_param-obj_count = obj_c.
   my_run-&gt;set_parameters( s_param ).
 
-* Clear Controle table
-  DELETE FROM ygpl_t100t.
-  COMMIT WORK AND WAIT.
-
   PERFORM create_worklist.
 
 * Prepare MT
@@ -87,6 +83,10 @@ START-OF-SELECTION.
     EXPORTING
       OBJECTS      = it_objects
       dependencies = it_dep.
+
+* Before starting Clear Controle table
+  DELETE FROM ygpl_t100t.
+  COMMIT WORK AND WAIT.
 
   CASE abap_true.
     WHEN p_gen.
@@ -182,14 +182,14 @@ FORM launch_theards_manually .
 *     SDLSTRTDT                         = NO_DATE
 *     SDLSTRTTM                         = NO_TIME
 *     STARTDATE_RESTRICTION             = BTC_PROCESS_ALWAYS
-        strtimmed                         = abap_true
+      strtimmed                         = abap_false
 *     TARGETSYSTEM                      = &apos; &apos;
 *     START_ON_WORKDAY_NOT_BEFORE       = SY-DATUM
 *     START_ON_WORKDAY_NR               = 0
 *     WORKDAY_COUNT_DIRECTION           = 0
 *     RECIPIENT_OBJ                     =
 *     TARGETSERVER                      = &apos; &apos;
-*     DONT_RELEASE                      = &apos; &apos;
+      dont_release                      = abap_true
 *     TARGETGROUP                       = &apos; &apos;
 *     DIRECT_START                      =
 *   IMPORTING
