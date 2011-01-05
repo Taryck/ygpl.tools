@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BFB3ABEEABDCA9086EBF33A108299141" CODE_SIGNATURE="E2B6C50C1B9F13C6516261731C0A843C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_CATEGORY" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A1FC57C337631A8DC5201088BE48DB63" CODE_SIGNATURE="F9CEBA6A18985EDF1F760216954CDC97" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_STATUS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
  </DEPENDENCIES>
@@ -29,70 +29,73 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="CATEGORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_CATEGORY"/>
-   <ITEM CMPNAME="CATEGORY_DO_NOT_EXISTS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_DO_NOT_EXISTS,
+   <ITEM CMPNAME="NOT_SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_SYSTEM_STATUS,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;001&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
-      attr2 type scx_attrname value &apos;CATEGORY_TABLE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of CATEGORY_DO_NOT_EXISTS
-`</ITEM>
-   <ITEM CMPNAME="CATEGORY_NOT_DEFINE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of CATEGORY_NOT_DEFINE,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;006&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      msgno type symsgno value &apos;015&apos;,
+      attr1 type scx_attrname value &apos;STATUS&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of CATEGORY_NOT_DEFINE
+    end of NOT_SYSTEM_STATUS
 `</ITEM>
-   <ITEM CMPNAME="CATEGORY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_CATEGORY&apos;" TYPTYPE="1" TYPE="TABNAME16">
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Status"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="STATUS_ALREADY_ADDED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of STATUS_ALREADY_ADDED,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;016&apos;,
+      attr1 type scx_attrname value &apos;STATUS&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of STATUS_ALREADY_ADDED
+`</ITEM>
+   <ITEM CMPNAME="STATUS_DO_NOT_EXISTS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of STATUS_DO_NOT_EXISTS,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;014&apos;,
+      attr1 type scx_attrname value &apos;STATUS&apos;,
+      attr2 type scx_attrname value &apos;STATUS_TABLE&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of STATUS_DO_NOT_EXISTS
+`</ITEM>
+   <ITEM CMPNAME="STATUS_NOT_DEFINE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of STATUS_NOT_DEFINE,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;018&apos;,
+      attr1 type scx_attrname value &apos;STATUS&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of STATUS_NOT_DEFINE
+`</ITEM>
+   <ITEM CMPNAME="STATUS_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_STATUS&apos;" TYPTYPE="1" TYPE="TABNAME16">
     <TEXTS>
      <ITEM LANG="E" TEXT="Name of the category list"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="DATA_TYPE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DATA_TYPE"/>
-   <ITEM CMPNAME="INCORRECT_DATA_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INCORRECT_DATA_TYPE,
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SYSTEM_STATUS,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;002&apos;,
-      attr1 type scx_attrname value &apos;DATA_TYPE&apos;,
-      attr2 type scx_attrname value &apos;CX_NAME&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of INCORRECT_DATA_TYPE
-`</ITEM>
-   <ITEM CMPNAME="NOT_SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_SYSTEM_CATEGORY,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;012&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
+      msgno type symsgno value &apos;013&apos;,
+      attr1 type scx_attrname value &apos;STATUS&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of NOT_SYSTEM_CATEGORY
+    end of SYSTEM_STATUS
 `</ITEM>
-   <ITEM CMPNAME="SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of SYSTEM_CATEGORY,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;000&apos;,
-      attr1 type scx_attrname value &apos;CATEGORY&apos;,
-      attr2 type scx_attrname value &apos;&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of SYSTEM_CATEGORY
-`</ITEM>
-   <ITEM CMPNAME="YGPL_MT_CX_CATEGORY" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_CATEGORY,
+   <ITEM CMPNAME="YGPL_MT_CX_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_STATUS,
       msgid type symsgid value &apos;ZAPLINK&apos;,
       msgno type symsgno value &apos;105&apos;,
       attr1 type scx_attrname value &apos;CX_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of YGPL_MT_CX_CATEGORY</ITEM>
+    end of YGPL_MT_CX_STATUS</ITEM>
   </ATTRIBUTS>
   <DEFERRED>
    <INTERFACES>

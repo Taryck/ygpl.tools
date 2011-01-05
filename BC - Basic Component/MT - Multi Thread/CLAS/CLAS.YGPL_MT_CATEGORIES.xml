@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A351AD756E47D7FEEA550C2D3E212A05" CODE_SIGNATURE="32FFB06EC10CF8C2CEEC41FF2EFD1FBD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="0C8FCB0E75AFB449797E8D0311471058" CODE_SIGNATURE="C9AC965A44298B6D36E4A84D3C0C2F31" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
    <TEXTS>
-    <ITEM LANG="E" TEXT="Status des enregistrements MT"/>
+    <ITEM LANG="E" TEXT="MT Categories"/>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYS_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_CATEGORIES"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
@@ -17,11 +17,20 @@
   <ATTRIBUTS>
    <ITEM CMPNAME="ALL_KEYS" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_KEYS">
     <TEXTS>
-     <ITEM LANG="E" TEXT="All Category&apos;s key list"/>
+     <ITEM LANG="E" TEXT="All Categories key list"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MY_KEYS" STATE="1" TYPTYPE="1" TYPE="TT_CATEGORIES"/>
-   <ITEM CMPNAME="R_SYS_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TR_CATEGORIES">
+   <ITEM CMPNAME="MY_KEYS" STATE="1" TYPTYPE="1" TYPE="TT_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User specific categories"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_SYSTEM_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TR_CATEGORIES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="System Categories NameSpace"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SYSTEM_KEYS" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_KEYS">
     <TEXTS>
      <ITEM LANG="E" TEXT="System Categories"/>
     </TEXTS>
@@ -68,16 +77,10 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-  DATA:
-    wa LIKE LINE OF my_keys.
-  FIELD-SYMBOLS:
-    &lt;wa&gt; LIKE LINE OF my_keys.
+  DATA wa LIKE LINE OF my_keys.
+  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
 
-  IF category IN r_sys_categories.
+  IF category IN r_system_categories.
     RAISE EXCEPTION TYPE ygpl_mt_cx_category
           EXPORTING textid = ygpl_mt_cx_category=&gt;system_category
                   category = category.
@@ -117,22 +120,16 @@
      <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
     </TEXTS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-  DATA _cat LIKE LINE OF r_sys_categories.
+  DATA _cat LIKE LINE OF r_system_categories.
 
-  _cat-sign = &apos;I&apos;. _cat-option = &apos;EQ&apos;.
-*  _cat-low = sys_categories-data_bloc.    APPEND _cat TO r_sys_categories.  &quot; Data : bloc
-  _cat-low = sys_categories-run_info.     APPEND _cat TO r_sys_categories.  &quot; Information Run
-  _cat-low = sys_categories-obj_conf.     APPEND _cat TO r_sys_categories.  &quot; confirmation d&apos;objet
-  _cat-low = sys_categories-task_def.     APPEND _cat TO r_sys_categories.  &quot; Information Run
-  _cat-low = sys_categories-condition.    APPEND _cat TO r_sys_categories.  &quot; confirmation d&apos;objet
+  _cat-sign = &apos;I&apos;. _cat-option = &apos;CP&apos;.      _cat-low = &apos;_*&apos;.
+  APPEND _cat TO r_system_categories.  &quot; System Range
 
   SELECT category
     INTO TABLE all_keys
-    FROM ygplmt_category.</SOURCE>
+    FROM ygplmt_category.
+
+  system_keys = all_keys.     DELETE system_keys WHERE key NOT IN r_system_categories.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DO_EXISTS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -151,14 +148,8 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   READ TABLE all_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
-  IF sy-subrc = 0.
-    exists = abap_true.
-  ENDIF.</SOURCE>
+  IF sy-subrc = 0.      exists = abap_true.       ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="IS_DATA_TYPE_OK" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -210,7 +201,9 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  IF not category IN r_sys_categories.
+  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF system_keys.
+
+  IF NOT category IN r_system_categories.
     RAISE EXCEPTION TYPE ygpl_mt_cx_category
           EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
                   category = category.
@@ -220,11 +213,18 @@
           EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
                   category = category.
   ENDIF.
+
+  READ TABLE system_keys TRANSPORTING NO FIELDS WITH TABLE KEY key = category.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_category
+          EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
+                  category = category.
+  ENDIF.
   result = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="IS_VALID_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Is the category valid ?"/>
+     <ITEM LANG="E" TEXT="Is the category a valid user category ?"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
@@ -246,13 +246,9 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
 
-  IF category IN r_sys_categories.
+  IF category IN r_system_categories.
     RAISE EXCEPTION TYPE ygpl_mt_cx_category
           EXPORTING textid = ygpl_mt_cx_category=&gt;system_category
                   category = category.

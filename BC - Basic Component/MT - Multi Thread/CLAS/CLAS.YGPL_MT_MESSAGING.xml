@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F83D74C1A6294767355E330A81859670" CODE_SIGNATURE="9FB0749E8AB62EC1B826EA119E72ED8E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F4E98BEF814E9BC0AB2A6A768C959B70" CODE_SIGNATURE="7B175823516384220CE3B40CBAF79560" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
  </DEPENDENCIES>
@@ -11,7 +11,7 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="SYS_CATEGORIES" EXPOSURE="1" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYS_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_CATEGORIES"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
@@ -342,8 +342,8 @@
   ENDLOOP.
 
   it_sys_msgs = it_messages.
-  DELETE it_sys_msgs WHERE NOT category IN ygpl_mt_categories=&gt;r_sys_categories.
-  DELETE it_messages WHERE category IN ygpl_mt_categories=&gt;r_sys_categories.
+  DELETE it_sys_msgs WHERE NOT category IN ygpl_mt_categories=&gt;r_system_categories.
+  DELETE it_messages WHERE category IN ygpl_mt_categories=&gt;r_system_categories.
 
   IF NOT it_sys_msgs IS INITIAL.    handle_system_messages( it_sys_msgs ).         ENDIF.
 
@@ -487,14 +487,14 @@
 
   LOOP AT messages ASSIGNING &lt;msg&gt;.
     CASE &lt;msg&gt;-category.
-      WHEN sys_categories-obj_conf.
+      WHEN system_categories-obj_conf.
         f_obj_conf = abap_true.
         handle_object_confirmation( &lt;msg&gt;-msg_data ).
-      WHEN sys_categories-task_def.
+      WHEN system_categories-task_def.
         decode_data( EXPORTING buffer = &lt;msg&gt;-msg_data
                       CHANGING    any = s_task ).
         RAISE EVENT task_definition_recieved EXPORTING task_definition = s_task.
-      WHEN sys_categories-condition.
+      WHEN system_categories-condition.
         decode_data( EXPORTING buffer = &lt;msg&gt;-msg_data
                       CHANGING    any = s_cond ).
         RAISE EVENT new_running_conditions EXPORTING conditions = s_cond.

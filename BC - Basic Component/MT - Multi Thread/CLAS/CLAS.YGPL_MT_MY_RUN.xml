@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0C4280152DB524B7961BAAF39F98EA10" CODE_SIGNATURE="EA430C8F6713ECDBEB358D38BE1792AF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9B16B70A77A6623C0812F32DBB0B2AC6" CODE_SIGNATURE="6C62F4F6C6A0C97C43EB451433C6F72E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -70,14 +70,16 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  DATA run_id TYPE td_process_id.
   DATA o_category TYPE REF TO ygpl_mt_my_categories.
+  DATA o_status   TYPE REF TO ygpl_mt_my_status.
 
   CREATE OBJECT o_category.
+  CREATE OBJECT o_status.
   super-&gt;constructor( thread_count = thread_count
                         max_memory = max_memory
                          bloc_size = bloc_size
-                        categories = o_category ).
+                        categories = o_category
+                            status = o_status ).
   SET HANDLER submit_new_thread FOR me.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE">

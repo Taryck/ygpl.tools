@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E14FFD7C5C1BF99067F80CB114173462" CODE_SIGNATURE="7262F8A5228A91C8560B4304227C2AB9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6D956F6638DCAC52DCB7D88D24D987EF" CODE_SIGNATURE="2931D218ACA9532C2E8EB3F9E4E6AA35" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -374,7 +374,7 @@
    </ITEM>
    <ITEM CMPNAME="SET_CATEGORY" EXPOSURE="2" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Change the category"/>
+     <ITEM LANG="E" TEXT="Change the category list"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
@@ -428,11 +428,26 @@
 *        EXPORTING
 *          process_id   = &lt;j&gt;-process_id
 *          o_categories = o_categories.
-      o_msg-&gt;send_system_message( category = sys_categories-condition
+      o_msg-&gt;send_system_message( category = system_categories-condition
                                    message = s_condition ).
     ENDLOOP.
   ENDIF.
   me-&gt;max_memory = max_memory.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Change the status list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_STATUS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="New Status list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK o_status IS BOUND.
+  me-&gt;o_status = o_status.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_TASK_CLASSNAME" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -603,7 +618,7 @@
 *    EXPORTING
 *      process_id   = process_id
 *      o_categories = o_categories.
-  o_msg-&gt;send_system_message( category = sys_categories-condition
+  o_msg-&gt;send_system_message( category = system_categories-condition
                                message = s_condition ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="THREAD_SCHEDULED" STATE="1">

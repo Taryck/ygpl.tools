@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6EB9230BCEE270104CE0DA997A916E01" CODE_SIGNATURE="ACC1C3EFAECB94D2709BC49CA653CD08" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A02D21D65E417E03A5AAE945172756CA" CODE_SIGNATURE="D0FDFE5B369754E44190D85BAB799213" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -212,7 +212,7 @@
    </ITEM>
    <ITEM CMPNAME="SET_CATEGORY" EXPOSURE="2" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Change the category"/>
+     <ITEM LANG="E" TEXT="Change the category list"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
@@ -248,6 +248,23 @@
     <SOURCE>`
   CHECK is_new = abap_true.
   _set_run( run_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Change the status list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_STATUS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="New Status list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK o_status IS BOUND.
+  me-&gt;o_status = o_status.
+  CHECK o_run IS BOUND.
+  o_run-&gt;set_status( o_status ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_BATCH" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -426,7 +443,7 @@
     s_info-process_id = me-&gt;process_id.
     s_info-batch_info = me-&gt;batch_info.
     s_info-workprocess = me-&gt;workprocess.
-    o_messaging-&gt;send_system_message( category = sys_categories-task_def
+    o_messaging-&gt;send_system_message( category = system_categories-task_def
                                        message = s_info ).
     f_definition_sended = abap_true.
   ENDIF.</SOURCE>
@@ -460,6 +477,7 @@
   ygpl_mt_process=&gt;no_message = f_no_msg.
   bloc_size = o_run-&gt;infos-bloc_size.
   o_run-&gt;set_category( o_categories ).
+  o_run-&gt;set_status( o_status ).
   CREATE OBJECT o_informations
     EXPORTING
       o_process = o_run.
