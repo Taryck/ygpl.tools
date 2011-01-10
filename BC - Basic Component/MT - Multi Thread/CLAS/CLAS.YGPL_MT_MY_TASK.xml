@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="47B5127B030EF5885C63445A0BC6ECF9" CODE_SIGNATURE="9A1618B546D1BDED4D994A5D8CEB1DED" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="0B8CD559C090A9D1CEFCDCC486392CDF" CODE_SIGNATURE="BD62E843C674164D2FEB33A4AA073C00" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_NEW_TASK"/>
  </DEPENDENCIES>
@@ -23,6 +23,11 @@
    <ITEM CMPNAME="RUN_PARAMETERS" STATE="1" TYPTYPE="1" TYPE="TS_MY_RUN_PARAMETERS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run parameters"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_OBJECTS" STATE="1" TYPTYPE="1" TYPE="TT_DATA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="My Objects worklist"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="WAIT_TIME" STATE="1" TYPTYPE="1" TYPE="TD_WAITTIME">
@@ -106,13 +111,10 @@
   s_paramaters-wait_time = wait_time.
   send_parameters( s_paramaters ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="DO_JOB" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Get a batch of MY objects"/>
+     <ITEM LANG="E" TEXT="Do worklist"/>
     </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_DATA"/>
-    </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
@@ -121,7 +123,49 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  _get_batch( importing objects = objects ).</SOURCE>
+  DO.
+* Get data
+    _get_batch( CHANGING objects = t_objects ).
+
+    IF t_objects[] IS INITIAL.   EXIT.     ENDIF.
+
+* Process Data
+    process_my_objects(  ).
+
+    FREE t_objects.
+
+* Confirm Data
+    confirm_batch( ).
+
+  ENDDO.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DO_RECOVERY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Do recovery if needed"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DO.
+* Get data
+    _get_objects_to_recover( CHANGING objects = t_objects ).
+
+    IF t_objects[] IS INITIAL.   EXIT.     ENDIF.
+
+* Process Data
+    process_my_objects( abap_true ).
+
+    FREE t_objects.
+
+* Confirm Data
+    confirm_batch( ).
+
+  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_PARAMETERS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -145,12 +189,30 @@
   _get_information( EXPORTING category = my_categories-task_param
                      CHANGING     info = result ).</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_RUN" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get run"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_RUN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run of the task"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  result = o_run.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="PROCESS_MY_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Process object set"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="T_OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DATA"/>
+     <ITEM SCONAME="RECOVERY_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="process worklist in recovery mode"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -168,6 +230,16 @@
     &lt;lang&gt;  LIKE LINE OF &lt;obj&gt;-lang.
 
   LOOP AT t_objects ASSIGNING &lt;obj&gt;.
+    IF recovery_mode IS NOT INITIAL.
+* In recovery mode check for existence first
+      SELECT SINGLE arbgb INTO _ctrl-arbgb
+        FROM ygpl_t100t
+        WHERE arbgb = &lt;obj&gt;-msg.
+      IF sy-subrc = 0.
+        confirm_objects( system_status-object-already_done ).
+        CONTINUE.
+      ENDIF.
+    ENDIF.
     ADD 1 TO _count.
 
     _ctrl-arbgb = &lt;obj&gt;-msg.
@@ -179,12 +251,12 @@
     ENDIF.
     INSERT into ygpl_t100t values _ctrl.
     IF sy-subrc = 0.
-      _status = ygpl_mt_my_status=&gt;ok.
+      _status = my_status-ok.
     ELSE.
       FORMAT COLOR COL_NEGATIVE ON.
       WRITE:/ _ctrl-arbgb, _ctrl-stext.
       FORMAT COLOR COL_NEGATIVE OFF.
-      _status = ygpl_mt_my_status=&gt;ko.
+      _status = my_status-ko.
     ENDIF.
 
     confirm_objects( _status ).
@@ -192,7 +264,7 @@
     IF _count &gt;= run_parameters-obj_count.
       CLEAR _count.
       WRITE:/ _ctrl-arbgb, _ctrl-stext.
-      confirm_objects( ygpl_mt_my_status=&gt;error ). &quot; error wanted
+      confirm_objects( my_status-error ). &quot; error wanted
       WAIT UP TO wait_time SECONDS.
     ENDIF.
   ENDLOOP.</SOURCE>
@@ -226,11 +298,14 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_NEW_TASK" MTDNAME="NEW_BLOC">
+    <SOURCE>`
+  CREATE DATA table TYPE tt_data.</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_NEW_TASK" MTDNAME="PROCESS_BATCH">
     <SOURCE>`
-  DATA t_objects TYPE tt_data.
   t_objects = objects.
-  process_my_objects( t_objects ).</SOURCE>
+  process_my_objects( ).</SOURCE>
    </ITEM>
   </REDEFINITIONS>
  </RAW>

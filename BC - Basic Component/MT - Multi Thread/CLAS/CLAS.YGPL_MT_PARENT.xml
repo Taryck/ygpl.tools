@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6D956F6638DCAC52DCB7D88D24D987EF" CODE_SIGNATURE="2931D218ACA9532C2E8EB3F9E4E6AA35" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B3862BA18D38D0664B6AC23FBA0D8B08" CODE_SIGNATURE="EB7B9B06D4045A6D3318875E8B2A1B91" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -210,7 +210,7 @@
     SET HANDLER handle_submit_thread FOR o_job_monitoring.
     SET HANDLER handle_before_sleep_mode FOR o_job_monitoring.
     f_has_changed = abap_true.
-    status = ygpl_mt_status=&gt;starting.
+    status = system_status-process-started.
     is_new = abap_true.
   ELSE.
     is_new = abap_false.
@@ -470,7 +470,9 @@
     <SOURCE>`
   DATA o_relations  TYPE REF TO cl_oo_class_relations.
   DATA o_task       TYPE REF TO ygpl_mt_task.
-  data o_cx_create  type REF TO cx_sy_create_object_error.
+  DATA o_cx_create  TYPE REF TO cx_sy_create_object_error.
+  DATA t_objects    TYPE REF TO data.
+  FIELD-SYMBOLS &lt;objects&gt; TYPE STANDARD TABLE.
 
   CREATE OBJECT o_relations
     EXPORTING
@@ -502,10 +504,16 @@
           (classname)
         EXPORTING
           run_id      = process_id.
+
+      o_task-&gt;new_bloc( IMPORTING table = t_objects ).
+      ASSERT t_objects IS BOUND.
+      ASSIGN t_objects-&gt;* TO &lt;objects&gt;.
+      ASSERT sy-subrc = 0.
+
     CATCH ygpl_cx.    &quot; functional error =&gt; OK
-    CATCH cx_sy_create_object_error into o_cx_create.    &quot; Type not valid
+    CATCH cx_sy_create_object_error INTO o_cx_create.    &quot; Type not valid
       ASSERT 0 = 1.
-    CATCH CX_SY_DYN_CALL_PARAM_MISSING.                  &quot; Parameters invalid
+    CATCH cx_sy_dyn_call_param_missing.                  &quot; Parameters invalid
       ASSERT 0 = 1.
     CATCH cx_root.    &quot; other errors unexpected
   ENDTRY.
@@ -626,9 +634,9 @@
      <ITEM LANG="E" TEXT="A Thread has been scheduled : Starting =&gt; In progress"/>
     </TEXTS>
     <SOURCE>`
-  IF status &lt;&gt; ygpl_mt_status=&gt;in_progress.
+  IF status &lt;&gt; system_status-process-in_progress.
     IF f_has_changed = abap_true.     save( ).      ENDIF.
-    status = ygpl_mt_status=&gt;in_progress.
+    status = system_status-process-in_progress.
     f_has_changed = abap_true.
     save( ).
   ELSE.
@@ -940,7 +948,7 @@
         bloc_size = _run-bloc_size
           objects = _run-objects
      WHERE run_id = _run-run_id.
-    IF status = ygpl_mt_status=&gt;starting.
+    IF status = system_status-process-started.
       UPDATE ygplmt_runs
          SET obj_left = _run-obj_left
        WHERE run_id = _run-run_id.

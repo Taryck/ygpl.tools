@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A02D21D65E417E03A5AAE945172756CA" CODE_SIGNATURE="D0FDFE5B369754E44190D85BAB799213" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="05722DE0CA3A89A730DD0B7D54240D1F" CODE_SIGNATURE="B4AA2A442CE28A354A10069C9EA36148" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSABSTRCT="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
    <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS_4MT" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT : Task process"/>
@@ -68,6 +68,9 @@
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" STATE="1"/>
+  </FRIENDS>
   <LOCAL>
    <TYPES>`
 *&quot;* use this source file for any type declarations (class
@@ -82,14 +85,42 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="BEFORE_GET" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Action to do before Getting batch or recovery"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  IF status &lt;&gt; system_status-process-in_progress.
+    status = system_status-process-in_progress.
+    f_has_changed = abap_true.
+    save( ).
+  ELSE.
+    autosave( ).
+  ENDIF.
+  _send_task_definition( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm to correct handling of previous batch of objects"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   o_objects-&gt;confirm_batch( ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
     </TEXTS>
@@ -97,6 +128,13 @@
      <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT" PARVALUE="1" PAROPTIONL="X"/>
      <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   o_objects-&gt;confirm_objects( status = status
                                count = count ).</SOURCE>
@@ -134,7 +172,7 @@
 
   IF task_id IS INITIAL.
 * Do not have any run yet
-    status = ygpl_mt_status=&gt;starting.
+    status = system_status-process-started.
     is_new = abap_true.
     f_has_changed = abap_true.
   ELSE.
@@ -178,24 +216,51 @@
   ENDIF.
   IF NOT conditions-stop IS INITIAL.    f_stop_requested = abap_true.     ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="PROCESS_BATCH" EXPOSURE="1" STATE="1">
+   <ITEM CMPNAME="NEW_BLOC" EXPOSURE="1" STATE="1" MTDABSTRCT="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create new bloc standard table (redefined by children)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="TABLE" CMPTYPE="1" PARDECLTYP="1" TYPTYPE="3" TYPE="DATA"/>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="PROCESS_BATCH" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Method to redefine by children to process objects batch"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
    </ITEM>
-   <ITEM CMPNAME="PROCESS_OBJECTS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="PROCESS_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Process objects"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
+  DATA t_objects    TYPE REF TO data.
   FIELD-SYMBOLS &lt;objects&gt; TYPE STANDARD TABLE.
+
+  new_bloc( IMPORTING table = t_objects ).
+  ASSERT t_objects IS BOUND.
+  ASSIGN t_objects-&gt;* TO &lt;objects&gt;.
 
   DO.
 * Get data
-    _get_batch( IMPORTING objects = &lt;objects&gt; ).
+    _get_batch( CHANGING objects = &lt;objects&gt; ).
 
     IF &lt;objects&gt; IS INITIAL.     EXIT.       ENDIF.
 
@@ -271,7 +336,7 @@
      <ITEM LANG="E" TEXT="Get a batch of objects"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
     </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
@@ -281,16 +346,9 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  IF status &lt;&gt; ygpl_mt_status=&gt;in_progress.
-    status = ygpl_mt_status=&gt;in_progress.
-    f_has_changed = abap_true.
-    save( ).
-  ELSE.
-    autosave( ).
-  ENDIF.
-  _send_task_definition( ).
+  before_get( ).
   CHECK f_stop_requested IS INITIAL.
-  o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
+  o_objects-&gt;get_batch( CHANGING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -318,6 +376,25 @@
     <SOURCE>`
   o_informations-&gt;get_information( EXPORTING category = category
                                     CHANGING     info = info ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_GET_OBJECTS_TO_RECOVER" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get object to recover (if recovery is needed)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  before_get( ).
+  CHECK f_stop_requested IS INITIAL.
+  o_objects-&gt;get_objects_to_recover( CHANGING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="1A5387E9E3D9654D7F6A679DA84A59DE" CODE_SIGNATURE="77CD9F6FB2AAB435AB33B7621097825D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4C2A3E7DBD366056A9FA31481A3F1DB0" CODE_SIGNATURE="E53940D651A949AB07EBD5B0B4B2294E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPES" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -19,6 +19,22 @@
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="All possible actions (Lock engine)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
+    BEGIN OF job_status,    &quot; From LBTCHDEF@266
+      running       TYPE tbtco-status VALUE &apos;R&apos;,            &quot;#EC NOTEXT
+      ready         TYPE tbtco-status VALUE &apos;Y&apos;,            &quot;#EC NOTEXT
+      scheduled     TYPE tbtco-status VALUE &apos;P&apos;,            &quot;#EC NOTEXT
+      released      TYPE tbtco-status VALUE &apos;S&apos;,            &quot;#EC NOTEXT
+      aborted       TYPE tbtco-status VALUE &apos;A&apos;,            &quot;#EC NOTEXT
+      finished      TYPE tbtco-status VALUE &apos;F&apos;,            &quot;#EC NOTEXT
+      put_active    TYPE tbtco-status VALUE &apos;Z&apos;,            &quot;#EC NOTEXT
+      unknown_state TYPE tbtco-status VALUE &apos;X&apos;,            &quot;#EC NOTEXT
+    END OF Job_status
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="SAP background Job Status"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
@@ -48,9 +64,10 @@
    <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF system_status,
       BEGIN OF process,
-        started       TYPE td_status VALUE &apos;s&apos;,             &quot;#EC NOTEXT
+        started       TYPE td_status VALUE &apos;l&apos;,             &quot;#EC NOTEXT
         in_progress   TYPE td_status VALUE &apos;i&apos;,             &quot;#EC NOTEXT
-        finished      TYPE td_status VALUE &apos;f&apos;,             &quot;#EC NOTEXT
+        interupted    TYPE td_status VALUE &apos;s&apos;,             &quot;#EC NOTEXT
+        finished      TYPE td_status VALUE &apos;d&apos;,             &quot;#EC NOTEXT
       END OF process,
       BEGIN OF bloc,
         to_do         TYPE td_status VALUE &apos;t&apos;,             &quot;#EC NOTEXT
@@ -59,6 +76,7 @@
       END OF bloc,
       BEGIN OF object,
         inconsistency TYPE td_status VALUE &apos;x&apos;,             &quot;#EC NOTEXT
+        already_done  TYPE td_status VALUE &apos;d&apos;,             &quot;#EC NOTEXT
       END OF object,
     END OF system_status
 `

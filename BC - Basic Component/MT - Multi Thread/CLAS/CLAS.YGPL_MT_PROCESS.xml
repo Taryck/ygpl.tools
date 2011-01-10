@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0C42C45694D3E7BFBBB3577BDF843806" CODE_SIGNATURE="8934FEBF412C6242316E00BDA3A9B167" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="367C9617D453FE7F5743182B087082BA" CODE_SIGNATURE="8267F0F8BDD09B2B380291976C3BD79E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -9,6 +9,7 @@
   </A0_MAINDATA>
   <ALIASES>
    <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="JOB_STATUS"/>
    <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="LOCK_MODES"/>
    <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_CATEGORIES"/>
    <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_STATUS"/>
@@ -112,6 +113,76 @@
   CHECK NOT f_has_changed IS INITIAL.
   save( ).
   CLEAR f_has_changed.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check is stauts is valid (look for interupted process)"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA it_wpinfo    TYPE STANDARD TABLE OF wpinfo.
+  DATA job_status   TYPE tbtcjob-status.
+  FIELD-SYMBOLS &lt;wp&gt; LIKE LINE OF it_wpinfo.
+* FROM TSKHINCL @ 399
+*--------------------------------------------------------------------*/
+* Constants for field wp_istatus in structure wpinfo
+*--------------------------------------------------------------------*/
+  CONSTANTS: th_wp_slot_free  TYPE x VALUE 1,               &quot;#EC *
+             th_wp_wait       TYPE x VALUE 2,               &quot;#EC *
+             th_wp_run        TYPE x VALUE 4,               &quot;#EC *
+             th_wp_hold       TYPE x VALUE 8,               &quot;#EC *
+             th_wp_killed     TYPE x VALUE 16,              &quot;#EC *
+             th_wp_shutdown   TYPE x VALUE 32,              &quot;#EC *
+             th_wp_restricted TYPE x VALUE 64,              &quot;#EC *
+             th_wp_new        TYPE x VALUE 128.             &quot;#EC *
+
+  CHECK status = system_status-process-in_progress.
+  ASSERT workprocess-server IS NOT INITIAL.
+  CALL FUNCTION &apos;TH_WPINFO&apos;       &quot; Status @ 102
+    EXPORTING
+      srvname          = workprocess-server
+*     WITH_CPU         = 0
+    TABLES
+      wplist           = it_wpinfo
+    EXCEPTIONS
+      send_error       = 1
+      OTHERS           = 2.
+  ASSERT sy-subrc = 0.
+
+  READ TABLE it_wpinfo ASSIGNING &lt;wp&gt;
+       WITH KEY    wp_no = workprocess-no
+                  wp_pid = workprocess-pid
+                wp_index = workprocess-index.
+  ASSERT sy-subrc = 0.
+
+  IF &lt;wp&gt;-wp_istatus = th_wp_run OR &lt;wp&gt;-wp_istatus = th_wp_hold.     RETURN.     ENDIF.    &quot; process is dead
+
+  IF batch_info IS INITIAL.
+* Check user/program ?
+  ELSE.
+    CALL FUNCTION &apos;BP_JOB_CHECKSTATE&apos;
+      EXPORTING
+        dialog                             = &apos;N&apos;  &quot;#EC NOTEXT No dialog
+        jobcount                           = batch_info-jobcount
+        jobname                            = batch_info-jobname
+*       START_ASAP                         =
+*       TIME_LIMIT                         =
+      IMPORTING
+*       STATUS_ACCORDING_TO_DB             =
+        actual_status                      = job_status
+      EXCEPTIONS
+        checking_of_job_has_failed         = 1
+        correcting_job_status_failed       = 2
+        invalid_dialog_type                = 3
+        job_does_not_exist                 = 0
+        no_check_privilege_given           = 0
+        ready_switch_too_dangerous         = 6
+        OTHERS                             = 7.
+    ASSERT sy-subrc = 0.
+    IF job_status = me-&gt;job_status-running.   RETURN.    ENDIF.
+  ENDIF.
+
+  f_has_changed = abap_true.
+  status = system_status-process-interupted.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -306,6 +377,13 @@
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlock record (with exclusive option)"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
           process_id = me-&gt;process_id ).</SOURCE>
@@ -314,6 +392,13 @@
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlock record (lock with sharing option)"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
           process_id = me-&gt;process_id ).</SOURCE>

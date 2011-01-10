@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E80DD00CA3F30A0B5087C9089393D0A1" CODE_SIGNATURE="1BFAA806B857C5B8FCC0301F946D84F7" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="D29ECEC88C37A08440DA1C6AAED95D8C" CODE_SIGNATURE="737DE86568A8777B8E5E0BF251DB84ED" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -16,37 +16,20 @@ REPORT  ygpl_mt_tutorial.
 PARAMETERS :
   run_id    TYPE ygpl_mt_my_task=&gt;td_process_id OBLIGATORY.
 
-DATA:
-  my_task       TYPE REF TO ygpl_mt_my_task,
-  s_progress    TYPE ygpl_mt_my_run=&gt;ts_progression,
-  it_objects    TYPE ygpl_mt_my_task=&gt;tt_data.
-
-FIELD-SYMBOLS:
-  &lt;st&gt;    LIKE LINE OF s_progress-global_status.
-
 START-OF-SELECTION.
+  DATA:
+    my_task       TYPE REF TO ygpl_mt_my_task,
+    s_progress    TYPE ygpl_mt_my_run=&gt;ts_progression,
+    it_objects    TYPE ygpl_mt_my_task=&gt;tt_data.
+
+  FIELD-SYMBOLS:
+    &lt;st&gt;    LIKE LINE OF s_progress-global_status.
 
   CREATE OBJECT my_task
     EXPORTING
       run_id = run_id.
 
-  DO.
-* Get data
-    it_objects = my_task-&gt;get_batch( ).
-
-    IF it_objects[] IS INITIAL.
-      EXIT.
-    ENDIF.
-
-* Process Data
-    my_task-&gt;process_my_objects( it_objects ).
-
-    FREE it_objects.
-
-* Confirm Data
-    my_task-&gt;confirm_batch( ).
-
-  ENDDO.
+  my_task-&gt;do_job( ).
 
 END-OF-SELECTION.
 
