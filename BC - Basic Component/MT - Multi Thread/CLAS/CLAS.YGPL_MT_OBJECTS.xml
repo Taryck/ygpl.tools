@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CE8CF9B12157426DE15F1B145CBF4D4C" CODE_SIGNATURE="4383ECE8C162B296A1AA6DA516E57669" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="276FDB6C32A609B45DFA87020A1FAECE" CODE_SIGNATURE="3EABC9EE44275851B84FF8A9024578B2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -448,7 +448,7 @@
   IF batch_objects &lt;&gt; confirmed_objects.
 * External error all objects processed haven&apos;t get a status or too much
     _correction = batch_objects - confirmed_objects. &quot; aurait du etre envoyé - réellement envoyé
-    confirm_objects( status = system_status-object-inconsistency
+    send_correction( status = system_status-object-inconsistency
                      count  = _correction ).
     send_object_confirmation( ).
   ENDIF.
@@ -487,19 +487,9 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA statut LIKE LINE OF global_status.
-
   CHECK o_run-&gt;o_status-&gt;is_valid_status( status ) IS NOT INITIAL.
-
-  statut-status = status.
-  statut-count = count.
-
-  ADD count TO confirmed_objects.
-
-  COLLECT statut INTO global_status.
-  COLLECT statut INTO status_to_send.
-
-  send_progress( ).</SOURCE>
+  send_confirmation( count = count
+                    status = status ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
@@ -1163,7 +1153,7 @@
      <ITEM LANG="E" TEXT="Task : Get a batch (n blocs)"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
       <TEXTS>
        <ITEM LANG="E" TEXT="Generic object list"/>
       </TEXTS>
@@ -1187,7 +1177,7 @@
 
   get_blocs( EXPORTING maxrow  = maxrow
                        status  = system_status-bloc-to_do
-              CHANGING objects = objects ).</SOURCE>
+             IMPORTING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_BLOCS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1199,7 +1189,7 @@
        <ITEM LANG="E" TEXT="Max row to retrieve"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
       <TEXTS>
        <ITEM LANG="E" TEXT="Generic object list"/>
       </TEXTS>
@@ -1339,7 +1329,7 @@
      <ITEM LANG="E" TEXT="Get object to recover (if recovery is needed)"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
       <TEXTS>
        <ITEM LANG="E" TEXT="Generic object list"/>
       </TEXTS>
@@ -1354,7 +1344,7 @@
     </EXCEPTIONS>
     <SOURCE>`
   get_blocs( EXPORTING status  = system_status-bloc-in_progress
-              CHANGING objects = objects ).</SOURCE>
+             IMPORTING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1756,6 +1746,54 @@
     REFRESH &lt;objects&gt;.
     CLEAR: b_weight.
   ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SEND_CONFIRMATION" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Send object confirmation"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA s_status LIKE LINE OF global_status.
+
+  s_status-status = status.
+  s_status-count = count.
+
+  ADD count TO confirmed_objects.
+
+  COLLECT s_status INTO global_status.
+  COLLECT s_status INTO status_to_send.
+
+  send_progress( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SEND_CORRECTION" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Send correction due to inconsistency"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CHECK o_run-&gt;o_status-&gt;is_system_status( status ) IS NOT INITIAL.
+  send_confirmation( count = count
+                    status = status ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_OBJECT_CONFIRMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
