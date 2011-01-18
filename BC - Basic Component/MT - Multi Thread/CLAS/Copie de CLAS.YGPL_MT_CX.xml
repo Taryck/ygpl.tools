@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CFA10BB461164BCC33F47D763B62317E" CODE_SIGNATURE="C054EAF00D73AE537A170A339C455EC3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_DATABASE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="19485DA632BAA62F4B4D5929B6668688" CODE_SIGNATURE="0E720CFC546796D4CC68201A388C5253" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="ZGPL_MT_CX" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_CX"/>
+  <ITEM TYPE="CLAS" NAME="ZGPL_CX"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" CATEGORY="40" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" VARCL="X" UNICODE="X" RSTAT="S" MSG_ID="YGPL_MT_CX">
-   <INHERITANCE REFCLSNAME="YGPL_MT_CX" STATE="1"/>
+   <INHERITANCE REFCLSNAME="YGPL_CX" STATE="1"/>
    <TEXTS>
-    <ITEM LANG="E" TEXT="MultyThread : Categories exception class">U1&amp;FUNCTIONALITY&amp;
+    <ITEM LANG="E" TEXT="MultyThread : Root exception class">U1&amp;FUNCTIONALITY&amp;
 ASZAPLink framework root exception class. All Exception classes raised
   from the framework inherit from this class. Have a look to each method
   for more details.
@@ -29,40 +29,15 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
   application</ITEM>
    </TEXTS>
   </A0_MAINDATA>
-  <ALIASES>
-   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
-   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DATA_TYPE"/>
-   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
-  </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="KEY_VALUE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Value of the key for the record"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="NOT_FOUND" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_FOUND,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;050&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of NOT_FOUND
-`</ITEM>
-   <ITEM CMPNAME="TABLENAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Name of the table"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="YGPL_MT_CX_DATABASE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_DATABASE,
+   <ITEM CMPNAME="ZGPL_MT_CX" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of ZGPL_MT_CX,
       msgid type symsgid value &apos;ZAPLINK&apos;,
       msgno type symsgno value &apos;105&apos;,
       attr1 type scx_attrname value &apos;CX_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of YGPL_MT_CX_DATABASE
-`</ITEM>
+    end of YGPL_MT_CX</ITEM>
   </ATTRIBUTS>
   <DEFERRED>
    <INTERFACES>
@@ -70,11 +45,9 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
    </INTERFACES>
   </DEFERRED>
   <FRIENDS>
+   <ITEM STATE="1"/>
    <ITEM REFCLSNAME="ZAPLINK_CX" STATE="1"/>
   </FRIENDS>
-  <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-  </INTERFACES>
   <LOCAL>
    <TYPES>`
 *&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
@@ -86,7 +59,9 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
 *&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
    <MACROS>`
 *&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
-*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS
+
+INCLUDE zaplink_macros.</MACROS>
   </LOCAL>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>

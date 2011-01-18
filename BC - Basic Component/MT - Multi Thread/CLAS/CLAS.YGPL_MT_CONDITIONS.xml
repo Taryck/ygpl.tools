@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="9E9BC4E985AB811381E40EFF10B34822" CODE_SIGNATURE="EA69286DFB80F8754737C468372DA760" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_MT_CONDITIONS_RUN"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_CONDITIONS_RUN" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="BLOC_SIZE" EXPOSURE="2" REFCLSNAME="YGPLIMT_STARTCONDITIONS" REFCMPNAME="BLOC_SIZE"/>
+   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_STARTCONDITIONS" REFCMPNAME="SET_BLOC_SIZE"/>
+   <ITEM CMPNAME="SET_WEIGHT_FIELDNAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_STARTCONDITIONS" REFCMPNAME="SET_WEIGHT_FIELDNAME"/>
+   <ITEM CMPNAME="WEIGHT_FIELDNAME" EXPOSURE="2" REFCLSNAME="YGPLIMT_STARTCONDITIONS" REFCMPNAME="WEIGHT_FIELDNAME"/>
+  </ALIASES>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIMT_STARTCONDITIONS" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="SET_BLOC_SIZE">
+      <SOURCE>`
+  check bloc_size &gt; 0.
+  bloc_size = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_WEIGHT_FIELDNAME">
+      <SOURCE>`
+  weight_fieldname = value.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  super-&gt;constructor( ).
+  bloc_size = 10.
+*  WEIGHT_FIELDNAME = &apos;&apos;.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="MERGE_WITH">
+    <SOURCE>`
+  DATA i_condition TYPE REF TO ygplimt_startconditions.
+  super-&gt;merge_with( conditions ).
+  TRY.
+      i_condition ?= conditions.
+      bloc_size = i_condition-&gt;bloc_size.
+      weight_fieldname = i_condition-&gt;weight_fieldname.
+    CATCH cx_sy_move_cast_error.
+* Ignore this error
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="YGPLIMT_CONDITIONS~DESERIALIZE">
+    <SOURCE>`
+  DATA o_start  TYPE REF TO ygplimt_startconditions.
+
+  super-&gt;ygplimt_conditions~deserialize( xml ).
+
+  TRY.
+      o_start ?= deserialized_object.
+      set_bloc_size( o_start-&gt;bloc_size ).
+      set_weight_fieldname( o_start-&gt;weight_fieldname ).
+      set_servers( o_start-&gt;servers ).
+    CATCH cx_sy_move_cast_error.
+  ENDTRY.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+ </RAW>
+</ZL_OBJECT>

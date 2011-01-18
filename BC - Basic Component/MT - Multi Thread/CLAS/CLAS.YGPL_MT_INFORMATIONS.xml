@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A9CBF3B16F64C01588EC5E6DAA9E0D2F" CODE_SIGNATURE="25C3362A290A37070442813D369598B0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
- <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_CATEGORIES"/>
- </DEPENDENCIES>
+<ZL_OBJECT CHECKSUM="96670067C9C0E023D9C5955052C8AAC6" CODE_SIGNATURE="DE0965424340523C98AFD83AC3DA476A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -11,19 +8,28 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
-   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
-   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
-   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DATA_TYPE"/>
-   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_DB_TABLE_NAME"/>
-   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
-   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
-   <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_RAWDATA"/>
-   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIME"/>
-   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIMESTAMP"/>
-   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TR_CATEGORIES"/>
-   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
-   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
+   <ITEM CMPNAME="CLEAR_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="CLEAR_INFORMATION"/>
+   <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_ALL"/>
+   <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_PROCESS"/>
+   <ITEM CMPNAME="GET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="GET_INFORMATION"/>
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="HANDLE_SPECIFIC_MESSAGE"/>
+   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="OBJECTS_CONFIRMED"/>
+   <ITEM CMPNAME="O_PROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="O_PROCESS"/>
+   <ITEM CMPNAME="SET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="SET_INFORMATION"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
+   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_LOCK_MODE"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_RAWDATA"/>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIMESTAMP"/>
+   <ITEM CMPNAME="TI_PROCESS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_PROCESS"/>
+   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TR_CATEGORIES"/>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_INFOS&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
@@ -31,19 +37,9 @@
      <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_PROCESS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_PROCESS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
-    </TEXTS>
-   </ITEM>
   </ATTRIBUTS>
-  <DEFERRED>
-   <CLASSES>
-    <ITEM TYPEGROUP="YGPL_MT_CATEGORIES" TPUTYPE="1" EXPLICIT="X"/>
-   </CLASSES>
-  </DEFERRED>
   <EVENTS>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
     </TEXTS>
@@ -60,7 +56,7 @@
      </ITEM>
     </PARAMETERS>
    </ITEM>
-   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="OBJECTS_CONFIRMED_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Event to handle objects status update (count raised)"/>
     </TEXTS>
@@ -79,7 +75,93 @@
    </ITEM>
   </EVENTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPLIMT_INFORMATIONS" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CLEAR_INFORMATION">
+      <SOURCE>`
+  lock_exclusive( category ).
+
+  DELETE FROM ygplmt_infos
+         WHERE process_id = o_process-&gt;process_id
+           and   CATEGORY = category.
+* Locks released by the next Commit/Roll back</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="DELETE_ALL">
+      <SOURCE>`
+* #TO_DO
+*  _lock( process_id = &apos;@&apos;       &quot; All Process
+*          lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
+*           category = &apos;@&apos; ).    &quot; All Categories
+* Locks released by the next Commit/Roll back
+
+  DELETE FROM ygplmt_infos.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="DELETE_PROCESS">
+      <SOURCE>`
+  _lock( process_id = process_id
+          lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
+           category = &apos;@&apos; ).    &quot; All Categories
+* Locks released by the next Commit/Roll back
+
+  DELETE FROM ygplmt_infos WHERE process_id = process_id.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_INFORMATION">
+      <SOURCE>`
+  DATA data_info  TYPE td_buffer_data.
+  DATA o_cx       TYPE REF TO ygpl_mt_cx.
+  DATA my_key     TYPE string.
+
+  CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_valid_category( category ) IS INITIAL.
+
+  lock_with_share( category ).
+  TRY.
+      SELECT SINGLE info_data
+        INTO data_info
+        FROM ygplmt_infos
+        WHERE process_id = o_process-&gt;process_id
+          AND category = category.
+      IF sy-subrc &lt;&gt; 0.
+        my_key = o_process-&gt;process_id.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_database
+              EXPORTING textid = ygpl_mt_cx_database=&gt;not_found
+                     tablename = my_table
+                     key_value = my_key.
+      ENDIF.
+
+      decode_data( EXPORTING buffer = data_info
+                    CHANGING    any = info ).
+
+    CATCH ygpl_mt_cx INTO o_cx.
+      unlock_with_share( category ).
+      RAISE EXCEPTION o_cx.
+  ENDTRY.
+  unlock_with_share( category ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_INFORMATION">
+      <SOURCE>`
+  DATA _info TYPE ygplmt_infos.
+  DATA o_cx TYPE REF TO ygpl_mt_cx.
+
+  CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_valid_category( category ) IS INITIAL.
+
+  lock_exclusive( category ).
+* Locks released by the next Commit/Roll back
+  TRY.
+
+      _info-process_id = o_process-&gt;process_id.
+      _info-category = category.
+      _info-info_data = encode_data( info ).
+      GET TIME STAMP FIELD _info-timestamp.
+      MODIFY ygplmt_infos FROM _info.
+      ASSERT sy-subrc = 0.
+
+    CATCH ygpl_mt_cx INTO o_cx.
+      unlock_exclusive( category ).
+      RAISE EXCEPTION o_cx.
+  ENDTRY.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -95,7 +177,7 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="CLEAR_INFORMATION" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="CLEAR_INFORMATION_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Clear information on DB"/>
     </TEXTS>
@@ -131,7 +213,7 @@
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="O_PROCESS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_PROCESS">
+     <ITEM SCONAME="O_PROCESS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PROCESS">
       <TEXTS>
        <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
       </TEXTS>
@@ -139,8 +221,7 @@
     </PARAMETERS>
     <SOURCE>`
   ASSERT o_process IS BOUND.
-  me-&gt;o_process = o_process.
-  ASSERT me-&gt;o_process-&gt;o_categories IS BOUND.</SOURCE>
+  SET_PROCESS( o_process ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DECODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -157,7 +238,7 @@
     <SOURCE>`
   IMPORT info = any FROM DATA BUFFER buffer.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="DELETE_ALL_OFF" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Delete all messages"/>
     </TEXTS>
@@ -197,7 +278,7 @@
 
   DELETE FROM ygplmt_infos.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="DELETE_PROCESS_OFF" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Delete all message for a process"/>
     </TEXTS>
@@ -238,7 +319,7 @@
     <SOURCE>`
   EXPORT info = any TO DATA BUFFER result COMPRESSION ON.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_INFORMATION" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="GET_INFORMATION_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Read information from DB"/>
     </TEXTS>
@@ -262,35 +343,35 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA data_info  TYPE td_buffer_data.
-  DATA o_cx       TYPE REF TO ygpl_mt_cx.
-  DATA my_key     TYPE string.
-
-  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
-
-  lock_with_share( category ).
-  TRY.
-      SELECT SINGLE info_data
-        INTO data_info
-        FROM ygplmt_infos
-        WHERE process_id = o_process-&gt;process_id
-          AND category = category.
-      IF sy-subrc &lt;&gt; 0.
-        my_key = o_process-&gt;process_id.
-        RAISE EXCEPTION TYPE ygpl_mt_cx_database
-              EXPORTING textid = ygpl_mt_cx_database=&gt;not_found
-                     tablename = my_table
-                     key_value = my_key.
-      ENDIF.
-
-      decode_data( EXPORTING buffer = data_info
-                    CHANGING    any = info ).
-
-    CATCH ygpl_mt_cx INTO o_cx.
-      unlock_with_share( category ).
-      RAISE EXCEPTION o_cx.
-  ENDTRY.
-  unlock_with_share( category ).</SOURCE>
+*  DATA data_info  TYPE td_buffer_data.
+*  DATA o_cx       TYPE REF TO ygpl_mt_cx.
+*  DATA my_key     TYPE string.
+*
+*  CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_valid_category( category ) IS INITIAL.
+*
+*  lock_with_share( category ).
+*  TRY.
+*      SELECT SINGLE info_data
+*        INTO data_info
+*        FROM ygplmt_infos
+*        WHERE process_id = o_process-&gt;process_id
+*          AND category = category.
+*      IF sy-subrc &lt;&gt; 0.
+*        my_key = o_process-&gt;process_id.
+*        RAISE EXCEPTION TYPE ygpl_mt_cx_database
+*              EXPORTING textid = ygpl_mt_cx_database=&gt;not_found
+*                     tablename = my_table
+*                     key_value = my_key.
+*      ENDIF.
+*
+*      decode_data( EXPORTING buffer = data_info
+*                    CHANGING    any = info ).
+*
+*    CATCH ygpl_mt_cx INTO o_cx.
+*      unlock_with_share( category ).
+*      RAISE EXCEPTION o_cx.
+*  ENDTRY.
+*  unlock_with_share( category ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="LOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -338,7 +419,7 @@
         process_id = o_process-&gt;process_id
           category = category ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_INFORMATION" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SET_INFORMATION_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Write information to DB"/>
     </TEXTS>
@@ -362,30 +443,44 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-  DATA _info TYPE ygplmt_infos.
-  DATA o_cx TYPE REF TO ygpl_mt_cx.
-
-  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
-
-  lock_exclusive( category ).
-* Locks released by the next Commit/Roll back
-  TRY.
-
-      _info-process_id = o_process-&gt;process_id.
-      _info-category = category.
-      _info-info_data = encode_data( info ).
-      GET TIME STAMP FIELD _info-timestamp.
-      MODIFY ygplmt_infos FROM _info.
-      ASSERT sy-subrc = 0.
-
-    CATCH ygpl_mt_cx INTO o_cx.
-      unlock_exclusive( category ).
-      RAISE EXCEPTION o_cx.
-  ENDTRY.</SOURCE>
+***********************************************************************
+** Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+** Date : 2008 December                                               *
+***********************************************************************
+*  DATA _info TYPE ygplmt_infos.
+*  DATA o_cx TYPE REF TO ygpl_mt_cx.
+*
+*  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
+*
+*  lock_exclusive( category ).
+** Locks released by the next Commit/Roll back
+*  TRY.
+*
+*      _info-process_id = o_process-&gt;process_id.
+*      _info-category = category.
+*      _info-info_data = encode_data( info ).
+*      GET TIME STAMP FIELD _info-timestamp.
+*      MODIFY ygplmt_infos FROM _info.
+*      ASSERT sy-subrc = 0.
+*
+*    CATCH ygpl_mt_cx INTO o_cx.
+*      unlock_exclusive( category ).
+*      RAISE EXCEPTION o_cx.
+*  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_PROCESS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define Process"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_PROCESS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PROCESS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  me-&gt;o_process = o_process.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1" STATE="1">
     <TEXTS>
@@ -551,11 +646,6 @@
    <ITEM CMPNAME="TD_BUFFER_DATA" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLMT_INFOS-INFO_DATA">
     <TEXTS>
      <ITEM LANG="E" TEXT="Raw Data for export/import to database"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TO_PROCESS" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_PROCESS_4MT">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
     </TEXTS>
    </ITEM>
   </TYPES>

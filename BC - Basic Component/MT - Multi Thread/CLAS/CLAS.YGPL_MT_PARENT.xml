@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="680DAE61FC36699BB9A6035D5EE3C78C" CODE_SIGNATURE="5ED985DAB452F293C88BE6F162A1CB26" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2FA784666B7A94422A1B3A4DD31B28E1" CODE_SIGNATURE="B884906FBBB22A6AB38900764B9D87E5" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -8,75 +8,40 @@
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="1" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS_4MT" STATE="1"/>
    <TEXTS>
-    <ITEM LANG="E" TEXT="MT : Run as master"/>
+    <ITEM LANG="E" TEXT="MT : Run as master of a Task"/>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_FN"/>
-   <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_JOBID"/>
-   <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_JOBNAME"/>
-   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
-   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_PROCESS_LIST"/>
+   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_COUNT"/>
+   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_SIZE"/>
+   <ITEM CMPNAME="SET_MAX_MEMORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_MAX_MEMORY"/>
+   <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_THREAD_COUNT"/>
+   <ITEM CMPNAME="SET_WEIGHT_FN" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_WEIGHT_FN"/>
+   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_FN"/>
+   <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_JOBID"/>
+   <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_JOBNAME"/>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_DEPENDENCIES"/>
+   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_PROCESS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Object has changed"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="INFOS" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TS_RUN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="IS_NEW" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+   <ITEM CMPNAME="O_CONDITIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CONDITIONS">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Constructor in factory mode"/>
+     <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MAX_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_INFORMATIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_INFORMATIONS">
+   <ITEM CMPNAME="O_INFORMATIONS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_INFORMATIONS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Information communication between process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_JOB_MONITORING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_JOB_MONITORING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="MT : Job monitoring"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_MESSAGING" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECTS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Object store engine"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TASK_CLASSNAME" STATE="1" TYPTYPE="1" TYPE="TD_CLASSNAME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Object Type Name"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TASK_LIST" STATE="1" TYPTYPE="1" TYPE="TT_PROCESS_LIST">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="List of all children process (task)"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TASK_ROOT_CLASSNAME" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPL_MT_NEW_TASK&apos;" TYPTYPE="1" TYPE="SEOCLASS-CLSNAME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Task root class name"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="WEIGHT_FN" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_FN">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Weight Fieldname in object data table"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -125,6 +90,89 @@
    <ITEM REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
   </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIMT_PARENT" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="SET_BLOC_COUNT">
+      <SOURCE>`
+  lock_exclusive( ).
+* Lock released with commit.
+  UPDATE ygplmt_runs SET blocs = bloc_count
+    WHERE run_id = process_id.
+  ASSERT sy-subrc = 0.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_BLOC_SIZE">
+      <SOURCE>`
+*  CHECK infos-bloc_size &lt;&gt; bloc_size.
+*  f_has_changed = abap_true.
+*  infos-bloc_size = bloc_size.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_MAX_MEMORY">
+      <SOURCE>`
+*  DATA o_msg    TYPE to_messaging.
+*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
+*  DATA s_condition TYPE ts_running_conditions.
+*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
+*
+*  CHECK me-&gt;max_memory &lt;&gt; max_memory.
+*  o_job_monitoring-&gt;check_active_threads( ).
+*  IF o_job_monitoring-&gt;threads &gt; 0.
+** Task running
+*    it_list = o_job_monitoring-&gt;get_job_list( ).
+*    IF LINES( it_list ) &gt; LINES( task_list ).
+** Lock required
+*      ASSERT 0 = 1.   &quot; #TO_do
+*    ENDIF.
+*    LOOP AT task_list ASSIGNING &lt;j&gt;.
+*      s_condition-max_memory = max_memory.
+** Send message
+** #TO_do
+**      CREATE OBJECT o_msg
+**        EXPORTING
+**          process_id   = &lt;j&gt;-process_id
+**          o_categories = o_categories.
+*      o_msg-&gt;send_system_message( category = system_categories-condition
+*                                   message = s_condition ).
+*    ENDLOOP.
+*  ENDIF.
+*  me-&gt;max_memory = max_memory.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_THREAD_COUNT">
+      <SOURCE>`
+*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
+*  DATA nb_stop  TYPE i.
+*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
+*
+*  CHECK o_job_monitoring IS BOUND.
+*  CHECK infos-threads &lt;&gt; thread_count.
+*  f_has_changed = abap_true.
+*  IF o_job_monitoring-&gt;threads = 0.
+*    infos-threads = thread_count.
+*  ELSE.
+*    nb_stop = infos-threads - thread_count.
+*    IF nb_stop &lt; 0.
+*      ASSERT 0 = 1.   &quot; # To do
+*    ELSE.
+** Task running
+*      it_list = o_job_monitoring-&gt;get_job_list( ).
+*      IF LINES( task_list ) &lt; nb_stop.
+** Lock required
+*        ASSERT 0 = 1.   &quot; # To do
+*      ENDIF.
+** To improve
+*      LOOP AT task_list ASSIGNING &lt;j&gt; TO nb_stop.
+*        stop_task( &lt;j&gt;-process_id ).
+*      ENDLOOP.
+*    ENDIF.
+*  ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_WEIGHT_FN">
+      <SOURCE>`
+*  me-&gt;weight_fn = weight_fn.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
   <LOCAL>
    <TYPES>`
 *&quot;* use this source file for any type declarations (class
@@ -139,39 +187,21 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Add thread manually"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="JOBID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job ID"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job name"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  thread_scheduled( ).
-  o_job_monitoring-&gt;add_thread( jobname = jobname
-                               jobcount = jobid ).</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
+     <ITEM SCONAME="O_INFORMATIONS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_INFORMATIONS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Information communication between process"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="O_MESSAGING" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message communication between process"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
       <TEXTS>
        <ITEM LANG="E" TEXT="Run Id"/>
@@ -187,6 +217,7 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA length TYPE i.
+  DATA o_msg TYPE to_messaging.
 
   super-&gt;constructor( ).
 
@@ -195,142 +226,46 @@
   ASSERT run_id IS INITIAL OR length = 16.
 
   IF run_id IS INITIAL.
-    CREATE OBJECT o_job_monitoring.
-    CREATE OBJECT me-&gt;o_categories.
-    CREATE OBJECT o_informations
-      EXPORTING
-        o_process = me.
-    CREATE OBJECT o_messaging
-      EXPORTING
-        o_process = me.
-    CREATE OBJECT o_objects
-      EXPORTING
-        o_run = me.
-    SET HANDLER handle_objects_confirmation FOR o_objects.
-    SET HANDLER handle_submit_thread FOR o_job_monitoring.
-    SET HANDLER handle_before_sleep_mode FOR o_job_monitoring.
-    f_has_changed = abap_true.
-    status = system_status-process-started.
-    is_new = abap_true.
   ELSE.
-    is_new = abap_false.
     me-&gt;process_id = run_id.
     read( ).
-  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_PROGRESSION" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get run progression"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_PROGRESSION">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Run&apos;s progression"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  result-processed_objects = o_objects-&gt;processed_objects.
-  result-global_status = o_objects-&gt;global_status.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_TASK_INFORMATIONS" EXPOSURE="1" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get task information from ID if exists"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Task&apos;s ID"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_PROCESS_DEFINITION">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Task informations"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  READ TABLE task_list INTO result WITH KEY process_id = process_id.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="HANDLE_BEFORE_SLEEP_MODE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_JOB_MONITORING" REFCMPNAME="BEFORE_SLEEP_MODE">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Handle BEFORE_SLEEP_MODE event of Job Monitoring"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_ME"/>
-    </PARAMETERS>
-    <SOURCE>`
-  IF NOT o_messaging-&gt;handle_messages( ) IS INITIAL.
-    o_job_monitoring-&gt;cancel_next_sleep( ).
-  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="HANDLE_OBJECTS_CONFIRMATION" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_OBJECTS_EVENTS" REFCMPNAME="OBJECTS_CONFIRMED">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
-    </TEXTS>
-    <SOURCE>`
-  DATA _left TYPE i.
+  ENDIF.
 
-  _left = o_objects-&gt;total_objects - o_objects-&gt;processed_objects.
-
-  lock_exclusive( ).
-
-  UPDATE ygplmt_runs SET obj_left = _left
-    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.
-
-  COMMIT WORK.    &quot; To release locks</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="NEW_SPECIFIC_MESSAGE">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Handle new specific message"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY"/>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA"/>
-    </PARAMETERS>
-    <SOURCE>`
-  RAISE EVENT recieving_specific_message
-        EXPORTING category = category
-                   rawdata = rawdata.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="HANDLE_SUBMIT_THREAD" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_JOB_MONITORING" REFCMPNAME="SUBMIT_THREAD">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Handle SUBMIT_THREAD event of Job Monitoring =&gt; Raise event"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBID"/>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME"/>
-     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_ME"/>
-     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
-    </PARAMETERS>
-    <SOURCE>`
-  IF NOT task_classname IS INITIAL.
-    SUBMIT ygpl_mt_generic_task_launcher
-       WITH p_class = task_classname
-       WITH p_runid = process_id
-       VIA JOB jobname NUMBER jobcount
-       AND RETURN.
+  IF o_messaging IS BOUND.
+    set_messaging( o_messaging ).
+    me-&gt;o_messaging-&gt;set_process( me ).
   ELSE.
-    RAISE EVENT submit_thread
-          EXPORTING jobcount = jobcount
-                     jobname = jobname
-               thread_number = thread_number.
+    o_msg ?= ygpl_mt_factories=&gt;get_messaging( me ).
+    set_messaging( o_msg ).
+  ENDIF.
+  IF o_informations IS BOUND.
+    me-&gt;o_informations ?= o_informations.
+    me-&gt;o_informations-&gt;set_process( me ).
+  ELSE.
+    me-&gt;o_informations ?= ygpl_mt_factories=&gt;get_messaging( me ).
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="HANDLE_TASK_DEFINITION" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="TASK_DEFINITION_RECIEVED">
+   <ITEM CMPNAME="READ_CONDTIONS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Handle new task definition"/>
+     <ITEM LANG="E" TEXT="Read Conditions from DB"/>
     </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="TASK_DEFINITION" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_PROCESS_DEFINITION"/>
-    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
-* New task started (&amp;1) on server (&amp;2) with jobname : &amp;3(&amp;4)
-  MESSAGE s001 WITH task_definition-process_id task_definition-workprocess-server task_definition-batch_info-jobname task_definition-batch_info-jobcount.
-  APPEND task_definition TO task_list.</SOURCE>
+  DATA d_cond_ser TYPE td_serialized.
+  Data o_cond     type to_conditions.
+  _get_information( EXPORTING category = system_categories-condition
+                     CHANGING info = d_cond_ser ).
+  o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
+  o_cond-&gt;deserialize( d_cond_ser ).
+  set_conditions( o_cond ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SET_BLOC_COUNT_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Màj Nombre de bloc"/>
     </TEXTS>
@@ -356,7 +291,7 @@
     WHERE run_id = process_id.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="SET_BLOC_SIZE_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Change the bloc size value"/>
     </TEXTS>
@@ -368,26 +303,26 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  CHECK infos-bloc_size &lt;&gt; bloc_size.
-  f_has_changed = abap_true.
-  infos-bloc_size = bloc_size.</SOURCE>
+*  CHECK infos-bloc_size &lt;&gt; bloc_size.
+*  f_has_changed = abap_true.
+*  infos-bloc_size = bloc_size.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_CATEGORY" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Change the category list"/>
+     <ITEM LANG="E" TEXT="Define conditions"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="O_CATEGORIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CONDITIONS">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Define new Catagories"/>
+       <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  CHECK o_categories IS BOUND.
-  me-&gt;o_categories = o_categories.</SOURCE>
+  ASSERT object IS BOUND.
+  ygplimt_parent~conditions = o_conditions = object.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_MAX_MEMORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SET_MAX_MEMORY_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Change the Maximum memory amount"/>
     </TEXTS>
@@ -406,121 +341,50 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA o_msg    TYPE to_messaging.
-  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-  DATA s_condition TYPE ts_running_conditions.
-  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-
-  CHECK me-&gt;max_memory &lt;&gt; max_memory.
-  o_job_monitoring-&gt;check_active_threads( ).
-  IF o_job_monitoring-&gt;threads &gt; 0.
-* Task running
-    it_list = o_job_monitoring-&gt;get_job_list( ).
-    IF LINES( it_list ) &gt; LINES( task_list ).
-* Lock required
-      ASSERT 0 = 1.   &quot; #TO_do
-    ENDIF.
-    LOOP AT task_list ASSIGNING &lt;j&gt;.
-      s_condition-max_memory = max_memory.
-* Send message
-* #TO_do
-*      CREATE OBJECT o_msg
-*        EXPORTING
-*          process_id   = &lt;j&gt;-process_id
-*          o_categories = o_categories.
-      o_msg-&gt;send_system_message( category = system_categories-condition
-                                   message = s_condition ).
-    ENDLOOP.
-  ENDIF.
-  me-&gt;max_memory = max_memory.</SOURCE>
+*  DATA o_msg    TYPE to_messaging.
+*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
+*  DATA s_condition TYPE ts_running_conditions.
+*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
+*
+*  CHECK me-&gt;max_memory &lt;&gt; max_memory.
+*  o_job_monitoring-&gt;check_active_threads( ).
+*  IF o_job_monitoring-&gt;threads &gt; 0.
+** Task running
+*    it_list = o_job_monitoring-&gt;get_job_list( ).
+*    IF LINES( it_list ) &gt; LINES( task_list ).
+** Lock required
+*      ASSERT 0 = 1.   &quot; #TO_do
+*    ENDIF.
+*    LOOP AT task_list ASSIGNING &lt;j&gt;.
+*      s_condition-max_memory = max_memory.
+** Send message
+** #TO_do
+**      CREATE OBJECT o_msg
+**        EXPORTING
+**          process_id   = &lt;j&gt;-process_id
+**          o_categories = o_categories.
+*      o_msg-&gt;send_system_message( category = system_categories-condition
+*                                   message = s_condition ).
+*    ENDLOOP.
+*  ENDIF.
+*  me-&gt;max_memory = max_memory.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_STATUS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="SET_MESSAGING" EXPOSURE="1" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Change the status list"/>
+     <ITEM LANG="E" TEXT="Define Messaging"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="O_STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_STATUS">
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING">
       <TEXTS>
-       <ITEM LANG="E" TEXT="New Status list"/>
+       <ITEM LANG="E" TEXT="Message communication between process"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  CHECK o_status IS BOUND.
-  me-&gt;o_status = o_status.</SOURCE>
+  ASSERT object IS BOUND.
+  ygplimt_parent~messaging = o_messaging = object.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_TASK_CLASSNAME" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Define Task class that will be launched using Generic launch"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CLASSNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CLASSNAME">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Object Type Name"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA o_relations  TYPE REF TO cl_oo_class_relations.
-  DATA o_task       TYPE REF TO ygpl_mt_task.
-  DATA o_cx_create  TYPE REF TO cx_sy_create_object_error.
-  DATA t_objects    TYPE REF TO data.
-  FIELD-SYMBOLS &lt;objects&gt; TYPE STANDARD TABLE.
-
-  CREATE OBJECT o_relations
-    EXPORTING
-      clsname         = task_root_classname
-      w_superclasses  = seox_false
-*      w_subclasses    = seox_true
-      w_references    = seox_false
-      w_redefinitions = seox_false
-      w_eventhandler  = seox_false
-      w_implementings = seox_false
-    EXCEPTIONS
-      is_interface    = 1
-      not_existing    = 2
-      OTHERS          = 3.
-  ASSERT sy-subrc = 0.
-
-  LOOP AT o_relations-&gt;subclasses TRANSPORTING NO FIELDS
-       WHERE version = &apos;1&apos;     &quot; Active
-         AND state &lt;&gt; &apos;0&apos;
-         AND clsname = classname.     &quot; Only modeled
-    EXIT.
-  ENDLOOP.
-
-  ASSERT sy-subrc = 0.
-
-  TRY.
-      CREATE OBJECT o_task
-        TYPE
-          (classname)
-        EXPORTING
-          run_id      = process_id.
-
-      o_task-&gt;new_bloc( IMPORTING table = t_objects ).
-      ASSERT t_objects IS BOUND.
-      ASSIGN t_objects-&gt;* TO &lt;objects&gt;.
-      ASSERT sy-subrc = 0.
-
-    CATCH ygpl_cx.    &quot; functional error =&gt; OK
-    CATCH cx_sy_create_object_error INTO o_cx_create.    &quot; Type not valid
-      ASSERT 0 = 1.
-    CATCH cx_sy_dyn_call_param_missing.                  &quot; Parameters invalid
-      ASSERT 0 = 1.
-    CATCH cx_root.    &quot; other errors unexpected
-  ENDTRY.
-
-  task_classname = classname.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SET_THREAD_COUNT_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Change the thread count value"/>
     </TEXTS>
@@ -539,34 +403,34 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-  DATA nb_stop  TYPE i.
-  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-
-  CHECK o_job_monitoring IS BOUND.
-  CHECK infos-threads &lt;&gt; thread_count.
-  f_has_changed = abap_true.
-  IF o_job_monitoring-&gt;threads = 0.
-    infos-threads = thread_count.
-  ELSE.
-    nb_stop = infos-threads - thread_count.
-    IF nb_stop &lt; 0.
-      ASSERT 0 = 1.   &quot; # To do
-    ELSE.
-* Task running
-      it_list = o_job_monitoring-&gt;get_job_list( ).
-      IF LINES( task_list ) &lt; nb_stop.
-* Lock required
-        ASSERT 0 = 1.   &quot; # To do
-      ENDIF.
-* To improve
-      LOOP AT task_list ASSIGNING &lt;j&gt; TO nb_stop.
-        stop_task( &lt;j&gt;-process_id ).
-      ENDLOOP.
-    ENDIF.
-  ENDIF.</SOURCE>
+*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
+*  DATA nb_stop  TYPE i.
+*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
+*
+*  CHECK o_job_monitoring IS BOUND.
+*  CHECK infos-threads &lt;&gt; thread_count.
+*  f_has_changed = abap_true.
+*  IF o_job_monitoring-&gt;threads = 0.
+*    infos-threads = thread_count.
+*  ELSE.
+*    nb_stop = infos-threads - thread_count.
+*    IF nb_stop &lt; 0.
+*      ASSERT 0 = 1.   &quot; # To do
+*    ELSE.
+** Task running
+*      it_list = o_job_monitoring-&gt;get_job_list( ).
+*      IF LINES( task_list ) &lt; nb_stop.
+** Lock required
+*        ASSERT 0 = 1.   &quot; # To do
+*      ENDIF.
+** To improve
+*      LOOP AT task_list ASSIGNING &lt;j&gt; TO nb_stop.
+*        stop_task( &lt;j&gt;-process_id ).
+*      ENDLOOP.
+*    ENDIF.
+*  ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_WEIGHT_FN" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="SET_WEIGHT_FN_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Change the field name of weight field"/>
     </TEXTS>
@@ -578,117 +442,7 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  me-&gt;weight_fn = weight_fn.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="START_THREADS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Start threads automaticly"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  thread_scheduled( ).
-  o_job_monitoring-&gt;start_threads( infos-threads ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="STOP_TASK" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Stop childen process (task)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Process ID of the Task"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA o_msg        TYPE to_messaging.
-  DATA s_condition  TYPE ts_running_conditions.
-
-  READ TABLE task_list TRANSPORTING NO FIELDS WITH KEY process_id = process_id.
-  ASSERT sy-subrc = 0.
-  s_condition-stop = abap_true.
-* Send stop request message
-* # Todo
-*  CREATE OBJECT o_msg
-*    EXPORTING
-*      process_id   = process_id
-*      o_categories = o_categories.
-  o_msg-&gt;send_system_message( category = system_categories-condition
-                               message = s_condition ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="THREAD_SCHEDULED" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="A Thread has been scheduled : Starting =&gt; In progress"/>
-    </TEXTS>
-    <SOURCE>`
-  IF status &lt;&gt; system_status-process-in_progress.
-    IF f_has_changed = abap_true.     save( ).      ENDIF.
-    status = system_status-process-in_progress.
-    f_has_changed = abap_true.
-    save( ).
-  ELSE.
-    autosave( ).
-  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Wait Thread progressing"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  o_job_monitoring-&gt;wait_progress( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_ADD_OBJECTS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Add Objects to work list"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X"/>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA _bs      TYPE td_bloc_size.
-  DATA _count   TYPE i.
-
-  autosave( ).
-* Check Objects
-  DESCRIBE TABLE objects LINES _count.
-  CHECK _count &gt;= 1.
-
-* Check Bloc_Size
-  IF infos-bloc_size &lt; 1.   infos-bloc_size = 1.    ENDIF.
-
-  o_objects-&gt;add_objects( objects = objects
-                        bloc_size = infos-bloc_size
-                        weight_fn = me-&gt;weight_fn
-                     dependencies = dependencies ).
-  infos-objects = o_objects-&gt;total_objects.       f_has_changed = abap_true.</SOURCE>
+*  me-&gt;weight_fn = weight_fn.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -884,13 +638,6 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="AUTOSAVE">
-    <SOURCE>`
-  super-&gt;autosave( ).
-  CHECK NOT f_has_changed IS INITIAL.
-  save( ).
-  CLEAR f_has_changed.</SOURCE>
-   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED" MTDFINAL="X">
     <SOURCE>`
 *CALL METHOD SUPER-&gt;IS_SYSTEM_MESSAGE_ALLOWED
@@ -922,39 +669,13 @@
     WHERE run_id = process_id.
   ASSERT sy-subrc = 0.
 
+  read_condtions( ).
+
   unlock_with_share( ).
 
   times-start = _run-timestamp.
   MOVE-CORRESPONDING _run TO infos.
   status = _run-status.</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SAVE">
-    <SOURCE>`
-  DATA _run TYPE ygplmt_runs.
-
-  super-&gt;save( ).
-  _run-run_id = process_id.
-  _run-status = status.
-  _run-threads = infos-threads.
-  _run-objects = _run-obj_left = o_objects-&gt;total_objects.
-  _run-bloc_size = infos-bloc_size.
-  _run-timestamp = times-start.
-  _run-blocs = o_objects-&gt;total_blocs_count.
-  INSERT ygplmt_runs FROM _run.
-  IF sy-subrc &lt;&gt; 0.
-    UPDATE ygplmt_runs
-       SET status = _run-status
-          threads = _run-threads
-        bloc_size = _run-bloc_size
-          objects = _run-objects
-     WHERE run_id = _run-run_id.
-    IF status = system_status-process-started.
-      UPDATE ygplmt_runs
-         SET obj_left = _run-obj_left
-       WHERE run_id = _run-run_id.
-    ENDIF.
-  ENDIF.
-  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
@@ -970,9 +691,29 @@
    </ITEM>
   </REDEFINITIONS>
   <TYPES>
-   <ITEM CMPNAME="TD_CLASSNAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="SEOCLSNAME">
+   <ITEM CMPNAME="TD_CLASSNAME" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="SEOCLSNAME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Object Type Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TI_OBJECTS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="TI_OBJECTS_LOADING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object store engine"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_CONDITIONS" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_CONDITIONS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_INFORMATIONS" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="3" TYPE="YGPL_MT_INFORMATIONS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Information communication between process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
   </TYPES>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8214041F51F7557024E1F14CF0C59489" CODE_SIGNATURE="6AFA9849ECB6F6C76C7B0A92F12A85A2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_STATUS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="C16FDE896B56BEF4353B8B33196AB346" CODE_SIGNATURE="C594EC9AE18E8E535BF03C2DA234ED31" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_STATUS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -9,10 +9,11 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_STATUS"/>
-   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
-   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
-   <ITEM CMPNAME="TR_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TR_STATUS"/>
+   <ITEM CMPNAME="R_SYSTEM_STATUS" REFCLSNAME="YGPLIMT_STATUS" REFCMPNAME="R_SYSTEM_STATUS"/>
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_STATUS"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_STATUS"/>
+   <ITEM CMPNAME="TR_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TR_STATUS"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="ALL_KEYS" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_KEYS">
@@ -25,7 +26,7 @@
      <ITEM LANG="E" TEXT="User specific Status"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="R_SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TR_STATUS">
+   <ITEM CMPNAME="R_SYSTEM_STATUS2" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TR_STATUS">
     <TEXTS>
      <ITEM LANG="E" TEXT="System Status NameSpace"/>
     </TEXTS>
@@ -37,7 +38,84 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPLIMT_STATUS" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ADD_SPECIFIC_STATUS">
+      <SOURCE>`
+  DATA wa LIKE LINE OF my_keys.
+  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
+
+  IF key IN r_system_status.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;system_status
+                  status = key.
+  ENDIF.
+  IF do_exists( key ) IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
+                  status = key.
+  ENDIF.
+
+  READ TABLE my_keys WITH TABLE KEY key = key ASSIGNING &lt;wa&gt;.
+  IF sy-subrc = 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;status_already_added
+                  status = key.
+  ELSE. &quot; unexpected but handled
+    wa-key = key.
+    INSERT wa INTO TABLE my_keys.
+    ASSERT sy-subrc = 0.
+  ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="DO_EXISTS">
+      <SOURCE>`
+  READ TABLE all_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
+  IF sy-subrc = 0.      exists = abap_true.       ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="IS_SYSTEM_STATUS">
+      <SOURCE>`
+  IF NOT key IN r_system_status.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;not_system_status
+                    status = key.
+  ENDIF.
+  IF do_exists( key ) IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
+                    status = key.
+  ENDIF.
+
+  READ TABLE system_keys TRANSPORTING NO FIELDS WITH TABLE KEY key = key.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;not_system_status
+                    status = key.
+  ENDIF.
+  result = abap_true.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="IS_VALID_STATUS">
+      <SOURCE>`
+  IF key IN r_system_status.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;system_status
+                    status = key.
+  ENDIF.
+  IF do_exists( key ) IS INITIAL.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
+                    status = key.
+  ENDIF.
+
+  READ TABLE my_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_status
+          EXPORTING textid = ygpl_mt_cx_status=&gt;status_not_define
+                    status = key.
+  ENDIF.
+  result = abap_true.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
   </INTERFACES>
   <LOCAL>
    <TYPES>`

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="276FDB6C32A609B45DFA87020A1FAECE" CODE_SIGNATURE="3EABC9EE44275851B84FF8A9024578B2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8A45BE4B9105D7BFB64317D0A7ED4F75" CODE_SIGNATURE="7A2E05C446B2494F62D62FD066373D03" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -11,27 +11,45 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPL_MT_OBJECTS_EVENTS" REFCMPNAME="OBJECTS_CONFIRMED"/>
-   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_CATEGORIES"/>
-   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="SYSTEM_STATUS"/>
-   <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_ID"/>
-   <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BLOC_SIZE"/>
-   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_BOOLEAN"/>
-   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_CATEGORY"/>
-   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_COUNT"/>
-   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_FN"/>
-   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_LOCK_MODE"/>
-   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_MEMORY_SIZE"/>
-   <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_NUM_KEY"/>
-   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_PROCESS_ID"/>
-   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_STATUS"/>
-   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TD_TIME"/>
-   <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_CHRONO"/>
-   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TS_RUN"/>
-   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_BLOCS_NFO"/>
-   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_DEPENDENCIES"/>
-   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_LINES_NFO"/>
-   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPES" REFCMPNAME="TT_STATUS_LIST"/>
+   <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_LOADING" REFCMPNAME="ADD_OBJECTS"/>
+   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="CONFIRM_BATCH"/>
+   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="CONFIRM_OBJECTS"/>
+   <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_DELETING" REFCMPNAME="DELETE_ALL"/>
+   <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_DELETING" REFCMPNAME="DELETE_PROCESS"/>
+   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="GET_BATCH"/>
+   <ITEM CMPNAME="GET_OBJECTS_TO_RECOVER" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="GET_OBJECTS_TO_RECOVER"/>
+   <ITEM CMPNAME="GLOBAL_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="GLOBAL_STATUS"/>
+   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_OBJECTS_LOADING" REFCMPNAME="OBJECTS_CONFIRMED"/>
+   <ITEM CMPNAME="O_START_CONDITIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_LOADING" REFCMPNAME="CONDITIONS"/>
+   <ITEM CMPNAME="O_TASK_CONDITIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="CONDITIONS"/>
+   <ITEM CMPNAME="PROCESSED_OBJECTS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="PROCESSED_OBJECTS"/>
+   <ITEM CMPNAME="REFRESH_START_TIME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_OBJECTS_LOADING" REFCMPNAME="REFRESH_START_TIME"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_STATUS"/>
+   <ITEM CMPNAME="TD_BLOC_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BLOC_ID"/>
+   <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BLOC_SIZE"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_FN"/>
+   <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_LOCK_MODE"/>
+   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_MEMORY_SIZE"/>
+   <ITEM CMPNAME="TD_NUM_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_NUM_KEY"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_STATUS"/>
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
+   <ITEM CMPNAME="TI_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_FULL_CONDITIONS"/>
+   <ITEM CMPNAME="TI_MESSAGING" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_MESSAGING"/>
+   <ITEM CMPNAME="TI_PARENT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_PARENT"/>
+   <ITEM CMPNAME="TI_TASK_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_TASK_CONDITIONS"/>
+   <ITEM CMPNAME="TOTAL_BLOCS_COUNT" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="TOTAL_BLOCS_COUNT"/>
+   <ITEM CMPNAME="TOTAL_OBJECTS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="TOTAL_OBJECTS"/>
+   <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_CHRONO"/>
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_BLOCS_NFO"/>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_DEPENDENCIES"/>
+   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_LINES_NFO"/>
+   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="BATCH_OBJECTS" STATE="1" TYPTYPE="1" TYPE="TD_COUNT">
@@ -46,24 +64,9 @@
      <ITEM LANG="E" TEXT="Rate of Batch load (0%&lt;R&lt;100%) recommended (25&lt;R&lt;75)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="BLOC_SIZE" STATE="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Minimal bloc size"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="CONFIRMED_OBJECTS" STATE="1" TYPTYPE="1" TYPE="TD_COUNT">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number of object confirmed"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="CONFIRM_MAXI_PROGRESS" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;5&apos;" TYPTYPE="1" TYPE="TD_PROGRESS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Maximum progress to send new confirmation"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="CONFIRM_MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;30&apos;" TYPTYPE="1" TYPE="TD_TIME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Minimum time to send new confirmation"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="CURRENT_BLOCS" STATE="1" TYPTYPE="1" TYPE="TT_BLOCS">
@@ -81,11 +84,6 @@
      <ITEM LANG="E" TEXT="Semaphore is set"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="GLOBAL_STATUS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_STATUS_LIST">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Number of object processed by Status"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="LAST_MESSAGE" STATE="1" TYPTYPE="4">
     BEGIN OF last_message,
       progress TYPE td_progress,
@@ -96,22 +94,12 @@
      <ITEM LANG="E" TEXT="Progresion and time of the last message send/recieved"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MAXIMUM_MEMORY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+   <ITEM CMPNAME="O_CONDITIONS_OFF" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TI_CONDITIONS">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
+     <ITEM LANG="E" TEXT="Starting Conditions"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MSG_MINI_PROGRESS" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_PROGRESS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Minimum progress to send new message"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="MSG_MINI_WAIT" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;15&apos;" TYPTYPE="1" TYPE="TD_TIME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Minimum time to send new message"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+   <ITEM CMPNAME="O_MESSAGING_OFF" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
@@ -121,9 +109,9 @@
      <ITEM LANG="E" TEXT="MT : Run Process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="PROCESSED_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
+   <ITEM CMPNAME="O_TASK_CONDITIONS_OFF" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TI_TASK_CONDITIONS">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Number of processed objects (by a Task/by all task for run)"/>
+     <ITEM LANG="E" TEXT="Run conditions interface"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="R_WEIGHT_TYPE_KIND" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TR_TYPE_KIND">
@@ -136,19 +124,14 @@
      <ITEM LANG="E" TEXT="Status information to send to parent"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TASK_MINI_BLOCSIZE" STATE="1" TYPTYPE="1" TYPE="TD_COUNT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Task mini bloc size"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TIMES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TS_CHRONO">
     <TEXTS>
      <ITEM LANG="E" TEXT="Timestamp"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TOTAL_BLOCS_COUNT" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Number total of blocs"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TOTAL_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_COUNT">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Total object count for a Run"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -158,8 +141,120 @@
    </CLASSES>
   </DEFERRED>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_OBJECTS_EVENTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_MT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CONFIRM_BATCH">
+      <SOURCE>`
+  DATA _correction TYPE i.
+  FIELD-SYMBOLS :
+    &lt;wa_b&gt; LIKE LINE OF current_blocs.
+
+  ASSERT current_blocs IS NOT INITIAL.
+
+  display_speed( ).
+
+  IF NOT status_to_send IS INITIAL.
+    send_object_confirmation( ).
+  ENDIF.
+
+  IF batch_objects &lt;&gt; confirmed_objects.
+* External error all objects processed haven&apos;t get a status or too much
+    _correction = batch_objects - confirmed_objects. &quot; aurait du etre envoyé - réellement envoyé
+    send_correction( status = system_status-object-inconsistency
+                     count  = _correction ).
+    send_object_confirmation( ).
+  ENDIF.
+
+  LOOP AT current_blocs ASSIGNING &lt;wa_b&gt;.
+    UPDATE ygplmt_objects SET status = system_status-bloc-done
+      WHERE bloc_id = &lt;wa_b&gt;-bloc_id.
+    IF sy-subrc &lt;&gt; 0.
+      CLEAR &lt;wa_b&gt;.
+    ENDIF.
+    ASSERT sy-subrc = 0.
+  ENDLOOP.
+
+  COMMIT WORK AND WAIT.
+
+  DELETE current_blocs WHERE table_line IS INITIAL.
+  LOOP AT current_blocs ASSIGNING &lt;wa_b&gt;.
+    unlock_bloc( &lt;wa_b&gt;-bloc_id ).
+  ENDLOOP.
+
+  CLEAR current_blocs.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CONFIRM_OBJECTS">
+      <SOURCE>`
+  CHECK o_run-&gt;conditions-&gt;status-&gt;is_valid_status( status ) IS NOT INITIAL.
+  send_confirmation( count = count
+                    status = status ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_BATCH">
+      <SOURCE>`
+  DATA maxrow     TYPE i.
+
+* Determine Maxrow
+  o_run-&gt;refresh( ).
+
+  maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate / 100 ) DIV o_run-&gt;infos-threads + 1.
+  IF maxrow &lt; 1. maxrow = 1. ENDIF.
+
+  get_blocs( EXPORTING maxrow  = maxrow
+                       status  = system_status-bloc-to_do
+             IMPORTING objects = objects ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_OBJECTS_TO_RECOVER">
+      <SOURCE>`
+  get_blocs( EXPORTING status  = system_status-bloc-in_progress
+             IMPORTING objects = objects ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_OBJECTS_DELETING" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="DELETE_ALL">
+      <SOURCE>`
+*  DELETE FROM ygplmt_OBJECTS.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="DELETE_PROCESS">
+      <SOURCE>`
+  get_semaphore( ). &quot; #TO_DO
+* Locks released by the next Commit/Roll back
+
+  DELETE FROM ygplmt_objects WHERE run_id = process_id.
+  release_semaphore( ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_OBJECTS_LOADING" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ADD_OBJECTS">
+      <SOURCE>`
+  DATA _bs      TYPE td_bloc_size.
+  DATA _count   TYPE i.
+
+* Check Objects
+  DESCRIBE TABLE objects LINES _count.
+  CHECK _count &gt;= 1.
+
+  ADD _count TO total_objects.
+
+* Check Bloc_Size
+  IF o_start_conditions-&gt;bloc_size &lt; 1.   o_start_conditions-&gt;set_bloc_size( 1 ).     ENDIF.
+
+  create_blocs( OBJECTS = OBJECTS
+              bloc_size = o_start_conditions-&gt;bloc_size
+              weight_fn = o_start_conditions-&gt;weight_fieldname
+           dependencies = dependencies ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="REFRESH_START_TIME">
+      <SOURCE>`
+  GET TIME STAMP FIELD times-start.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -223,63 +318,6 @@
   ENDIF.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Generic Run initialisation"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE" PARVALUE="10" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Table des dépendences"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-  DATA _bs      TYPE td_bloc_size.
-  DATA _count   TYPE i.
-
-* Check Objects
-  DESCRIBE TABLE objects LINES _count.
-  CHECK _count &gt;= 1.
-
-  ADD _count TO total_objects.
-
-* Check Bloc_Size
-  IF bloc_size &lt; 1.   _bs = 1.    ELSE.   _bs = bloc_size.    ENDIF.
-
-  CALL METHOD create_blocs
-    EXPORTING
-      OBJECTS      = OBJECTS
-      bloc_size    = _bs
-      weight_fn    = weight_fn
-      dependencies = dependencies.</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="ADD_OBJECTS_2_MICRO_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Add object to micro bloc"/>
@@ -341,6 +379,63 @@
       bloc      = bloc
     CHANGING
       obj2blocs = obj2blocs.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ADD_OBJECTS_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Generic Run initialisation"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BLOC_SIZE" PARVALUE="10" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Taille (en nb d&apos;objet) d&apos;un bloc (unité mini de traitement)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="DEPENDENCIES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DEPENDENCIES" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table des dépendences"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Liste d&apos;objet générique"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Field Name du numérique poids"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+**********************************************************************
+* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
+* Date : 2008 December                                               *
+**********************************************************************
+  DATA _bs      TYPE td_bloc_size.
+  DATA _count   TYPE i.
+
+* Check Objects
+  DESCRIBE TABLE objects LINES _count.
+  CHECK _count &gt;= 1.
+
+  ADD _count TO total_objects.
+
+* Check Bloc_Size
+  IF bloc_size &lt; 1.   _bs = 1.    ELSE.   _bs = bloc_size.    ENDIF.
+
+  CALL METHOD create_blocs
+    EXPORTING
+      OBJECTS      = OBJECTS
+      bloc_size    = _bs
+      weight_fn    = weight_fn
+      dependencies = dependencies.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_WEIGHT_FN" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -421,7 +516,7 @@
   tk-low = cl_abap_typedescr=&gt;typekind_int2.    APPEND tk TO r_weight_type_kind.
   tk-low = cl_abap_typedescr=&gt;typekind_numeric. APPEND tk TO r_weight_type_kind.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="CONFIRM_BATCH_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm processing of a batch (n blocs)"/>
     </TEXTS>
@@ -471,7 +566,7 @@
 
   CLEAR current_blocs.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="CONFIRM_OBJECTS_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
     </TEXTS>
@@ -487,26 +582,16 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  CHECK o_run-&gt;o_status-&gt;is_valid_status( status ) IS NOT INITIAL.
-  send_confirmation( count = count
-                    status = status ).</SOURCE>
+*  CHECK o_run-&gt;o_status-&gt;is_valid_status( status ) IS NOT INITIAL.
+*  send_confirmation( count = count
+*                    status = status ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="ESTIMATED_END_TIME" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME" PARVALUE="5" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Extimated time after all objects processed to end program"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="MAXIMUM_MEMORY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE" PARVALUE="0" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Estimated Memory size of the bloc"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="O_RUN" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_RUN">
+     <ITEM SCONAME="O_RUN" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PARENT">
       <TEXTS>
        <ITEM LANG="E" TEXT="MT : Run Process"/>
       </TEXTS>
@@ -514,19 +599,7 @@
     </PARAMETERS>
     <SOURCE>`
   ASSERT o_run IS BOUND.
-  me-&gt;o_run = o_run.
-  IF o_run-&gt;o_messaging IS BOUND.
-    me-&gt;o_messaging = o_run-&gt;o_messaging.     &quot; Should be the same messaging engine in order to attach event to the right instance
-    SET HANDLER handle_objects_confirmation FOR me-&gt;o_messaging.
-  ELSE.
-* No confirmation expected Task parent
-    CREATE OBJECT me-&gt;o_messaging
-      EXPORTING
-        o_process = o_run.
-  ENDIF.
-
-  set_maximum_memory( maximum_memory ).
-  me-&gt;estimated_end_time = estimated_end_time.
+  set_run( o_run ).
 
   GET TIME STAMP FIELD times-start.
   last_message-time = times-start.</SOURCE>
@@ -942,14 +1015,17 @@
   CHECK total_objects &gt; 0.
   new_p = processed_objects / total_objects * 100.
   delta_p = new_p - last_message-progress.
-  CHECK delta_p &gt; msg_mini_progress.
-
   GET TIME STAMP FIELD _now.
   _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
                                   tstmp2 = last_message-time ).
 *  _delta = _now - last_message-time.
 *  _sec = _delta.
-  CHECK _sec &gt;= msg_mini_wait.
+
+  CHECK delta_p &gt;= o_start_conditions-&gt;global_progression-progress-mini
+     OR _sec &lt;= o_start_conditions-&gt;global_progression-time-maxi.
+  CHECK _sec &gt;= o_start_conditions-&gt;global_progression-time-mini
+     OR delta_p &lt;= o_start_conditions-&gt;global_progression-progress-maxi.
+
   last_message-progress = new_p.
   last_message-time = _now.
   l_pc = last_message-progress.
@@ -1148,7 +1224,7 @@
 *     EV_GUID_22       =
 *     EV_GUID_32       = BLOC_ID.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="GET_BATCH_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Task : Get a batch (n blocs)"/>
     </TEXTS>
@@ -1237,9 +1313,9 @@
         FROM ygplmt_objects UP TO maxrow ROWS
         WHERE run_id = o_run-&gt;process_id
           AND status = status
-          AND bloc_size &gt; bloc_size.
+          AND bloc_size &gt; task_mini_blocsize.
 
-      IF NOT bloc_size IS INITIAL.
+      IF NOT task_mini_blocsize IS INITIAL.
 * When no more big ones
         IF maxrow &lt;&gt; 0.
           rem_rows = maxrow.
@@ -1252,8 +1328,8 @@
             FROM ygplmt_objects UP TO rem_rows ROWS
             WHERE run_id = o_run-&gt;process_id
               AND status = status
-              AND bloc_size &lt;= bloc_size.
-          CLEAR bloc_size.
+              AND bloc_size &lt;= task_mini_blocsize.
+          CLEAR task_mini_blocsize.
         ENDIF.
       ENDIF.
 
@@ -1261,9 +1337,9 @@
         SORT _blocs BY mem_size DESCENDING.
         LOOP AT _blocs ASSIGNING &lt;wa&gt;.
 * Memory limits
-          IF maximum_memory &gt; 0.
+          IF o_task_conditions-&gt;maximum_memory &gt; 0.
             t_size = mem_size + &lt;wa&gt;-mem_size.
-            CHECK t_size &gt; maximum_memory AND mem_size &gt; 0.
+            CHECK t_size &gt; o_task_conditions-&gt;maximum_memory AND mem_size &gt; 0.
             ADD &lt;wa&gt;-mem_size TO mem_size.
           ENDIF.
 
@@ -1324,7 +1400,7 @@
     <SOURCE>`
   result = confirmed_objects.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_OBJECTS_TO_RECOVER" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="GET_OBJECTS_TO_RECOVER_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get object to recover (if recovery is needed)"/>
     </TEXTS>
@@ -1519,8 +1595,8 @@
      <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="OBJECT_COUNT" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
-     <ITEM SCONAME="STATUS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_STATUS_LIST"/>
+     <ITEM SCONAME="OBJECT_COUNT" CMPTYPE="1" MTDTYPE="1"/>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   FIELD-SYMBOLS &lt;line&gt; LIKE LINE OF status.
@@ -1640,7 +1716,7 @@
     ASSERT sy-subrc = 0.
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="REFRESH_START_TIME" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="REFRESH_START_TIME_OFF" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Reset the strart date and time"/>
     </TEXTS>
@@ -1791,7 +1867,7 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  CHECK o_run-&gt;o_status-&gt;is_system_status( status ) IS NOT INITIAL.
+  CHECK o_run-&gt;conditions-&gt;status-&gt;is_system_status( status ) IS NOT INITIAL.
   send_confirmation( count = count
                     status = status ).</SOURCE>
    </ITEM>
@@ -1808,8 +1884,8 @@
     </EXCEPTIONS>
     <SOURCE>`
   CHECK status_to_send IS NOT INITIAL.
-  o_messaging-&gt;send_system_message( category = system_categories-obj_conf
-                                    message  = status_to_send ).
+  o_run-&gt;o_messaging-&gt;send_system_message( category = system_categories-obj_conf
+                                           message  = status_to_send ).
   CLEAR status_to_send.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_PROGRESS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
@@ -1839,29 +1915,17 @@
   new_p = confirmed_objects / batch_objects * 100.
   delta_p = new_p - last_message-progress.
   GET TIME STAMP FIELD _now.
-  IF delta_p &lt; confirm_maxi_progress.
-    _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
-                                    tstmp2 = last_message-time ).
-*    _delta = _now - last_message-time.
-*    _sec = _delta.
-    IF _sec &lt; confirm_mini_wait.
-      EXIT.
-    ENDIF.
-  ENDIF.
+  _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
+                                  tstmp2 = last_message-time ).
+  CHECK delta_p &gt;= o_task_conditions-&gt;progression-progress-mini
+     OR _sec &lt;= o_task_conditions-&gt;progression-time-maxi.
+  CHECK _sec &gt;= o_task_conditions-&gt;progression-time-mini
+     OR delta_p &lt;= o_task_conditions-&gt;progression-progress-maxi.
+
   last_message-progress = new_p.
   last_message-time = _now.
 
   send_object_confirmation( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_MAXIMUM_MEMORY" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Set new maximum memory limit"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="MAXIMUM_MEMORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE"/>
-    </PARAMETERS>
-    <SOURCE>`
-  me-&gt;maximum_memory = maximum_memory.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_RELATION_OBJECT_BLOC" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -1902,6 +1966,31 @@
   wa-val = bloc.
   INSERT wa INTO TABLE obj2blocs.
   ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_RUN" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define Run"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_RUN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PARENT"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA o_real_run TYPE REF TO ygpl_mt_run.
+  TRY.
+      o_real_run ?= o_run.
+    CATCH cx_sy_move_cast_error.
+  ENDTRY.
+  me-&gt;o_run ?= o_run.
+  IF o_real_run IS BOUND.   &quot; it&apos;s a Run not task (parent)
+    SET HANDLER handle_objects_confirmation FOR me-&gt;o_run-&gt;o_messaging ACTIVATION &apos;X&apos;.
+    o_start_conditions ?= me-&gt;o_run-&gt;conditions.
+  ELSE.
+    CLEAR o_start_conditions.
+    SET HANDLER handle_objects_confirmation FOR me-&gt;o_run-&gt;o_messaging ACTIVATION &apos; &apos;.
+  ENDIF.
+  o_task_conditions ?= me-&gt;o_run-&gt;conditions.
+
+  task_mini_blocsize = me-&gt;o_run-&gt;infos-bloc_size.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_BLOC" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -1945,19 +2034,14 @@
      <ITEM LANG="E" TEXT="Progression"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
+   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_RUN" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_PARENT">
+   <ITEM CMPNAME="TO_RUN" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_PARENT">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Run Process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TO_TASK" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="3" TYPE="YGPL_MT_TASK">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="MT : Task process"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TR_TYPE_KIND" STATE="1" EDITORDER="3 " TYPTYPE="4">

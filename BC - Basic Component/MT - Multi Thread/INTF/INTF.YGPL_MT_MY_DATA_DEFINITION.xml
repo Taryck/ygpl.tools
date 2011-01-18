@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="48C62DBAF4C94F8753C06D6039A2B969" CODE_SIGNATURE="04AFA4CB0D8FCD3BF47E852FB7FA1FB4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_DATA_DEFINITION" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E5A8466EB11A140F2C97CF52691915A1" CODE_SIGNATURE="8C997CE12B0E40D6D73DE45CECB492D8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_DATA_DEFINITION" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -10,7 +10,7 @@
   <ATTRIBUTS>
    <ITEM CMPNAME="MY_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF my_categories,
-      task_param    TYPE ygpl_mt_types=&gt;td_category VALUE &apos;PA&apos;, &quot;#EC NOTEXT
+      task_param    TYPE ygpl_mt_typespool=&gt;td_category VALUE &apos;PA&apos;, &quot;#EC NOTEXT
     END OF my_categories
 `
     <TEXTS>
@@ -19,9 +19,9 @@
    </ITEM>
    <ITEM CMPNAME="MY_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF my_status,
-      ok        TYPE ygpl_mt_types=&gt;td_status VALUE &apos;O&apos;,    &quot;#EC NOTEXT
-      ko        TYPE ygpl_mt_types=&gt;td_status VALUE &apos;K&apos;,    &quot;#EC NOTEXT
-      error     TYPE ygpl_mt_types=&gt;td_status VALUE &apos;E&apos;,    &quot;#EC NOTEXT
+      ok        TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;O&apos;, &quot;#EC NOTEXT
+      ko        TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;K&apos;, &quot;#EC NOTEXT
+      error     TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;E&apos;, &quot;#EC NOTEXT
     END OF my_status
 `
     <TEXTS>
@@ -32,6 +32,7 @@
   <DEFERRED>
    <INTERFACES>
     <ITEM TYPEGROUP="YGPL_MT_TYPES" TPUTYPE="2" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_MT_TYPESPOOL" TPUTYPE="2" IMPLICIT="X"/>
    </INTERFACES>
   </DEFERRED>
   <TYPES>
@@ -63,7 +64,7 @@
    </ITEM>
    <ITEM CMPNAME="TS_MY_PROCESS_INFO" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="4">
     BEGIN OF ts_my_process_info,
-      process_id  TYPE ygpl_mt_types=&gt;td_process_id,
+      process_id  TYPE ygpl_mt_typespool=&gt;td_process_id,
       wait_time   TYPE td_waittime,   &quot; for simulating load
     END OF ts_my_process_info
 `
@@ -73,9 +74,9 @@
    </ITEM>
    <ITEM CMPNAME="TS_MY_RUN_PARAMETERS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">
     BEGIN OF ts_my_run_parameters,
-      memory_size  TYPE ygpl_mt_types=&gt;td_memory_size,
+      memory_size  TYPE ygpl_mt_typespool=&gt;td_memory_size,
       wait_time    TYPE td_waittime,
-      obj_count    TYPE ygpl_mt_types=&gt;td_count,
+      obj_count    TYPE ygpl_mt_typespool=&gt;td_count,
     END OF ts_my_run_parameters
 `
     <TEXTS>

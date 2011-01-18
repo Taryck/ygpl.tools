@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="4BC934B352C3D45A27892566CB5F2D95" CODE_SIGNATURE="A1D4B6E81E861637B05242BD8EE72765" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_NEW_RUN" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="MT : Run new"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_CONDITIONS2" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_FULL_CONDITIONS"/>
+   <ITEM CMPNAME="O_OBJECTS2" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECTS_LOADING"/>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORIES" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CATEGORIES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Categories for this run type"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_FULL_CONDITIONS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Starting conditions"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="STATUS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_STATUS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Possible status for this run"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA run_id TYPE td_process_id.
+
+  ASSERT categories IS BOUND.
+  ASSERT status IS BOUND.
+  ASSERT conditions IS BOUND.
+
+  super-&gt;constructor( run_id ).
+
+  me-&gt;set_category( categories ).
+  me-&gt;set_status( status ).
+  me-&gt;set_conditions( conditions ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Change the Conditions"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_FULL_CONDITIONS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Define new conditions"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK o_conditions IS BOUND.
+  me-&gt;o_conditions = o_conditions.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

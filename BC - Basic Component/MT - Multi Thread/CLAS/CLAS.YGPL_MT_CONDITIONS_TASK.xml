@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="F3AD3E0D171FA62F2A469A7A28096CBD" CODE_SIGNATURE="209F1CFD994D6735A0E10DB22480E165" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS_TASK" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Run conditions"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="BATCH_RATE" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="BATCH_RATE"/>
+   <ITEM CMPNAME="CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="CATEGORIES"/>
+   <ITEM CMPNAME="DESERIALIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="DESERIALIZE"/>
+   <ITEM CMPNAME="JOB_PRIORITY" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="JOB_PRIORITY"/>
+   <ITEM CMPNAME="MAXIMUM_MEMORY" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="MAXIMUM_MEMORY"/>
+   <ITEM CMPNAME="PROGRESSION" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="PROGRESSION"/>
+   <ITEM CMPNAME="SERIALIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SERIALIZE"/>
+   <ITEM CMPNAME="SERVERS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SERVERS"/>
+   <ITEM CMPNAME="SET_BATCH_RATE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_BATCH_RATE"/>
+   <ITEM CMPNAME="SET_CATEGORIES" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_CATEGORIES"/>
+   <ITEM CMPNAME="SET_JOB_PRIORITY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_JOB_PRIORITY"/>
+   <ITEM CMPNAME="SET_MAXIMUM_MEMORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_MAXIMUM_MEMORY"/>
+   <ITEM CMPNAME="SET_PROGRESSION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_PROGRESSION"/>
+   <ITEM CMPNAME="SET_SERVERS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_SERVERS"/>
+   <ITEM CMPNAME="SET_STATUS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="SET_STATUS"/>
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" REFCMPNAME="STATUS"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="DESERIALIZED_OBJECT" EXPOSURE="1" STATE="1" TYPTYPE="3" TYPE="OBJECT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="deserialized object"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIMT_JOB_MONI_CONDITIONS" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="SET_JOB_PRIORITY">
+      <SOURCE>`
+  ygplimt_runconditions_4task~set_job_priority( value ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_SERVERS">
+      <SOURCE>`
+  ygplimt_runconditions_4task~set_servers( value ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_RUNCONDITIONS_4TASK" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="SET_BATCH_RATE">
+      <SOURCE>`
+  CHECK value &gt; 0 AND value &lt;= 100.
+  batch_rate = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_CATEGORIES">
+      <SOURCE>`
+  ASSERT value IS BOUND.
+  CHECK value &lt;&gt; categories.
+  categories = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_JOB_PRIORITY">
+      <SOURCE>`
+  CHECK value = &apos;C&apos; OR value = &apos;B&apos; OR value = &apos;A&apos;.
+  ygplimt_runconditions_4task~job_priority = value.
+  ygplimt_job_moni_conditions~job_priority = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_MAXIMUM_MEMORY">
+      <SOURCE>`
+  maximum_memory = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_PROGRESSION">
+      <SOURCE>`
+  CHECK value-progress-maxi &lt;= 100.
+  CHECK value-progress-mini &gt; 0.
+  CHECK value-time-mini &gt; 0.
+  progression = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_SERVERS">
+      <SOURCE>`
+  ygplimt_runconditions_4task~servers = value.
+  ygplimt_job_moni_conditions~servers = value.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_STATUS">
+      <SOURCE>`
+  ASSERT value IS BOUND.
+  CHECK value &lt;&gt; status.
+  status = value.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+
+  maximum_memory = 0.
+*  SERVERS
+  job_priority = &apos;C&apos;.
+  progression-time-mini = 15.
+  progression-progress-mini = 1.
+  progression-progress-maxi = 5.
+  batch_rate = 50.
+  categories = ygpl_mt_factories=&gt;get_categories( ).
+  status = ygpl_mt_factories=&gt;get_status( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="MERGE_WITH" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Merge with other conditions"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="3" TYPE="YGPLIMT_RUNCONDITIONS_4TASK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run conditions"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  maximum_memory = conditions-&gt;maximum_memory.
+  SERVERS = conditions-&gt;SERVERS.
+  job_priority = conditions-&gt;job_priority.
+  progression = conditions-&gt;progression.
+  batch_rate = conditions-&gt;batch_rate.
+  categories = conditions-&gt;categories.
+  status = conditions-&gt;status.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>
