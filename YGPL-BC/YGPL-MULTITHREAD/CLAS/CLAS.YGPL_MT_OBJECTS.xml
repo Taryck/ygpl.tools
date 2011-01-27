@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AED9D5905FED0B18921D047C4147F705" CODE_SIGNATURE="CF493C9D8821D7E74334684DD4168F2C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A81F28BD836B0E3AE94C0E7DCCAC258F" CODE_SIGNATURE="FE8639FCC76DE0B404A37511E7C00132" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -1099,37 +1099,6 @@
       EV_GUID_16       = BLOC_ID.
 *     EV_GUID_22       =
 *     EV_GUID_32       = BLOC_ID.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_BATCH_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Task : Get a batch (n blocs)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Generic object list"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA maxrow     TYPE i.
-
-* Determine Maxrow
-  o_run-&gt;refresh( ).
-
-  maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate / 100 ) DIV o_run-&gt;infos-threads + 1.
-  IF maxrow &lt; 1. maxrow = 1. ENDIF.
-
-  get_blocs( EXPORTING maxrow  = maxrow
-                       status  = system_status-bloc-to_do
-             IMPORTING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_BLOCS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
