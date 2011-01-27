@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8154D2CB0E7AF30175FDB366F754E593" CODE_SIGNATURE="E58F5EB339B0C394EAF72B04AB6A3473" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="37F518D58C4658E39841863BE2EA23CF" CODE_SIGNATURE="E26FE295A94511C68B8E6342DA95B6FD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CATEGORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -8,7 +8,13 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="ADD_SPECIFIC_CATEGORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_CATEGORIES" REFCMPNAME="ADD_SPECIFIC_CATEGORY"/>
+   <ITEM CMPNAME="DESERIALIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_CONDITIONS" REFCMPNAME="DESERIALIZE"/>
+   <ITEM CMPNAME="DO_EXISTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_CATEGORIES" REFCMPNAME="DO_EXISTS"/>
+   <ITEM CMPNAME="IS_VALID_CATEGORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_CATEGORIES" REFCMPNAME="IS_VALID_CATEGORY"/>
+   <ITEM CMPNAME="R_SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_CATEGORIES" REFCMPNAME="R_SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="SERIALIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_CONDITIONS" REFCMPNAME="SERIALIZE"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_CATEGORIES" REFCMPNAME="SYSTEM_CATEGORIES"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DATA_TYPE"/>
@@ -20,14 +26,10 @@
      <ITEM LANG="E" TEXT="All Categories key list"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
    <ITEM CMPNAME="MY_KEYS" STATE="1" TYPTYPE="1" TYPE="TT_CATEGORIES">
     <TEXTS>
      <ITEM LANG="E" TEXT="User specific categories"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="R_SYSTEM_CATEGORIES" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TR_CATEGORIES">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="System Categories NameSpace"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="SYSTEM_KEYS" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_KEYS">
@@ -77,35 +79,17 @@
     IF wa-ok = abap_true. wa-type = data_type. ENDIF.
     INSERT wa INTO TABLE my_keys.
     ASSERT sy-subrc = 0.
+    f_has_changed = abap_true.
   ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CLEAR_SPECIFIC_CATEGORIES">
+      <SOURCE>`
+  CLEAR my_keys.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="DO_EXISTS">
       <SOURCE>`
   READ TABLE all_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
   IF sy-subrc = 0.      exists = abap_true.       ENDIF.</SOURCE>
-     </ITEM>
-     <ITEM MTDNAME="IS_SYSTEM_CATEGORY">
-      <SOURCE>`
-  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF system_keys.
-
-  IF NOT category IN r_system_categories.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
-                  category = category.
-  ENDIF.
-  IF do_exists( category ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
-                  category = category.
-  ENDIF.
-
-  READ TABLE system_keys TRANSPORTING NO FIELDS WITH TABLE KEY key = category.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
-                  category = category.
-  ENDIF.
-  result = abap_true.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="IS_VALID_CATEGORY">
       <SOURCE>`
@@ -137,6 +121,24 @@
      </ITEM>
     </COMPONENTS>
    </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_CONDITIONS" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="DESERIALIZE">
+      <SOURCE>`
+  CHECK NOT xml IS INITIAL.
+  CALL TRANSFORMATION id
+  SOURCE XML xml
+  RESULT data = my_keys.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SERIALIZE">
+      <SOURCE>`
+  CHECK NOT my_keys IS INITIAL.
+  CALL TRANSFORMATION id
+  SOURCE data = my_keys
+  RESULT XML xml.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -152,67 +154,19 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="ADD_SPECIFIC_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="CHANGES_SAVED" EXPOSURE="2" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Add a specific category to the list of possible category"/>
+     <ITEM LANG="E" TEXT="Mark changes as saved"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Category"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="DATA_TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DATA_TYPE" PAROPTIONL="X">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Category data type"/>
+       <ITEM LANG="E" TEXT="Conditions have changed"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
     <SOURCE>`
-  DATA wa LIKE LINE OF my_keys.
-  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
-
-  IF category IN r_system_categories.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;system_category
-                  category = category.
-  ENDIF.
-  IF do_exists( category ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
-                  category = category.
-  ENDIF.
-
-  IF data_type IS INITIAL.
-    wa-ok = abap_true.
-  ELSE.
-    wa-ok = is_data_type_ok( data_type ).
-    IF wa-ok = abap_false.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_category
-            EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
-                   data_type = data_type.
-    ENDIF.
-  ENDIF.
-
-  READ TABLE my_keys WITH TABLE KEY cat = category ASSIGNING &lt;wa&gt;.
-  IF sy-subrc = 0.
-    &lt;wa&gt;-ok = wa-ok.
-    IF &lt;wa&gt;-ok = abap_true.
-      &lt;wa&gt;-type = data_type.
-    ENDIF.
-  ELSE. &quot; unexpected but handled
-    wa-cat = category.
-    IF wa-ok = abap_true. wa-type = data_type. ENDIF.
-    INSERT wa INTO TABLE my_keys.
-    ASSERT sy-subrc = 0.
-  ENDIF.</SOURCE>
+  CLEAR f_has_changed.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
     <TEXTS>
@@ -230,25 +184,19 @@
 
   system_keys = all_keys.     DELETE system_keys WHERE key NOT IN r_system_categories.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="DO_EXISTS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="HAS_CHANGED" EXPOSURE="2" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Check that key exists"/>
+     <ITEM LANG="E" TEXT="Do conditions have been modified"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="EXISTS" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
       <TEXTS>
-       <ITEM LANG="E" TEXT="&apos;X&apos; Exists &apos; &apos; non trouvé"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="KEY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Information / Message category"/>
+       <ITEM LANG="E" TEXT="Conditions have changed"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  READ TABLE all_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
-  IF sy-subrc = 0.      exists = abap_true.       ENDIF.</SOURCE>
+  result = f_has_changed.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="IS_DATA_TYPE_OK" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -276,7 +224,7 @@
       result = abap_false.
   ENDTRY.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="IS_SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="IS_SYSTEM_CATEGORY" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Is the category a system category ?"/>
     </TEXTS>
@@ -317,56 +265,6 @@
   IF sy-subrc &lt;&gt; 0.
     RAISE EXCEPTION TYPE ygpl_mt_cx_category
           EXPORTING textid = ygpl_mt_cx_category=&gt;not_system_category
-                  category = category.
-  ENDIF.
-  result = abap_true.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="IS_VALID_CATEGORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Is the category a valid user category ?"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Category"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Category is valid"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
-
-  IF category IN r_system_categories.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;system_category
-                  category = category.
-  ENDIF.
-  IF do_exists( category ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_do_not_exists
-                  category = category.
-  ENDIF.
-
-  READ TABLE my_keys WITH TABLE KEY cat = category ASSIGNING &lt;wa&gt;.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_not_define
-                  category = category.
-  ENDIF.
-  IF &lt;wa&gt;-ok = abap_false.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_category
-          EXPORTING textid = ygpl_mt_cx_category=&gt;category_not_define
                   category = category.
   ENDIF.
   result = abap_true.</SOURCE>

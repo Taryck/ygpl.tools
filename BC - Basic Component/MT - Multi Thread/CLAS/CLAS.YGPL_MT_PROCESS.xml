@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="64FC5A56F3728CC4D0109FA501AE97DB" CODE_SIGNATURE="7F6E8190352EC9DEBA8CE6062BD0F682" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2160F827BC2D720372EDEEFC2F21423F" CODE_SIGNATURE="C7EE8BDFC72A77AD39B19B0870F8C533" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -8,16 +8,28 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="ACTIONS"/>
-   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="JOB_STATUS"/>
-   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="LOCK_MODES"/>
-   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_CATEGORIES"/>
-   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SYSTEM_STATUS"/>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="AUTOSAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="AUTOSAVE"/>
+   <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="BATCH_INFO"/>
+   <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="CHECK_STATUS"/>
+   <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="CONV_RAW2DATA"/>
+   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="JOB_STATUS"/>
+   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="LOCK_MODES"/>
+   <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="NO_MESSAGE"/>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="PROCESS_ID"/>
+   <ITEM CMPNAME="READ" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="READ"/>
+   <ITEM CMPNAME="REFRESH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="REFRESH"/>
+   <ITEM CMPNAME="SAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="SAVE"/>
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="STATUS"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="SYSTEM_STATUS"/>
    <ITEM CMPNAME="TD_AS_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_AS_NAME"/>
    <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BLOC_SIZE"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_DB_TABLE_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_KEY"/>
+   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_MEMORY_SIZE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
@@ -25,22 +37,15 @@
    <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_STATUS"/>
    <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
    <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIMESTAMP"/>
-   <ITEM CMPNAME="TD_WP_INDEX" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_WP_INDEX"/>
-   <ITEM CMPNAME="TD_WP_NO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_WP_NO"/>
-   <ITEM CMPNAME="TD_WP_PID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_WP_PID"/>
    <ITEM CMPNAME="TS_BATCH_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_BATCH_INFO"/>
    <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_CHRONO"/>
    <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_PROCESS_DEFINITION"/>
    <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_PROGRESSION"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_WP_INFO"/>
+   <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="WORKPROCESS"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_BATCH_INFO">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Batch informations"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="F_HAS_CHANGED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
     <TEXTS>
      <ITEM LANG="E" TEXT="Object has changed"/>
@@ -51,29 +56,19 @@
      <ITEM LANG="E" TEXT="Object is final"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
+   <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
     <TEXTS>
-     <ITEM LANG="E" TEXT="No message send on creation"/>
+     <ITEM LANG="E" TEXT="Table Key value"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+   <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_PROCESS&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="STATUS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_STATUS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Processus Status"/>
+     <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TIMES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TS_CHRONO">
     <TEXTS>
      <ITEM LANG="E" TEXT="Timestamps"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TS_WP_INFO">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Wokr Process information"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -104,11 +99,17 @@
              th_wp_restricted TYPE x VALUE 64,              &quot;#EC *
              th_wp_new        TYPE x VALUE 128.             &quot;#EC *
 
+  DEFINE job_interupted.
+    f_has_changed = abap_true.
+    status = system_status-process-interupted.
+    return.
+  END-OF-DEFINITION.
+
   CHECK status = system_status-process-in_progress.
-  ASSERT workprocess-server IS NOT INITIAL.
+  ASSERT workprocess-wp_server IS NOT INITIAL.
   CALL FUNCTION &apos;TH_WPINFO&apos;       &quot; Status @ 102
     EXPORTING
-      srvname          = workprocess-server
+      srvname          = workprocess-wp_server
 *     WITH_CPU         = 0
     TABLES
       wplist           = it_wpinfo
@@ -118,12 +119,16 @@
   ASSERT sy-subrc = 0.
 
   READ TABLE it_wpinfo ASSIGNING &lt;wp&gt;
-       WITH KEY    wp_no = workprocess-no
-                  wp_pid = workprocess-pid
-                wp_index = workprocess-index.
-  ASSERT sy-subrc = 0.
+       WITH KEY    wp_no = workprocess-wp_no
+                  wp_pid = workprocess-wp_pid
+                wp_index = workprocess-wp_index.
+  IF sy-subrc &lt;&gt; 0.
+    job_interupted.   &quot; process is dead
+  ENDIF.
 
-  IF &lt;wp&gt;-wp_istatus = th_wp_run OR &lt;wp&gt;-wp_istatus = th_wp_hold.     RETURN.     ENDIF.    &quot; process is dead
+  IF &lt;wp&gt;-wp_istatus &lt;&gt; th_wp_run AND &lt;wp&gt;-wp_istatus &lt;&gt; th_wp_hold.
+    job_interupted.   &quot; process is running
+  ENDIF.
 
   IF batch_info IS INITIAL.
 * Check user/program ?
@@ -147,18 +152,21 @@
         ready_switch_too_dangerous         = 6
         OTHERS                             = 7.
     ASSERT sy-subrc = 0.
-    IF job_status = me-&gt;job_status-running.   RETURN.    ENDIF.
-  ENDIF.
-
-  f_has_changed = abap_true.
-  status = system_status-process-interupted.</SOURCE>
+    IF job_status &lt;&gt; me-&gt;job_status-running.
+      job_interupted.
+    ENDIF.
+  ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="CONV_RAW2DATA">
       <SOURCE>`
   ygpl_mt_messaging=&gt;conv_raw2data( EXPORTING rawdata = rawdata
                                      CHANGING    data = data ).</SOURCE>
      </ITEM>
-     <ITEM MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED"/>
+     <ITEM MTDNAME="DELETE">
+      <SOURCE>`
+  ASSERT check_delete_authorization( ) = abap_true.
+  _delete( ).</SOURCE>
+     </ITEM>
      <ITEM MTDNAME="READ">
       <SOURCE>`
   DATA _data TYPE ygplmt_process.
@@ -168,14 +176,13 @@
   SELECT SINGLE * INTO _data
     FROM ygplmt_process
     WHERE process_id = me-&gt;process_id.
-
-  ASSERT sy-subrc = 0.
-
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_process
+          EXPORTING textid = ygpl_mt_cx_process=&gt;do_not_exists
+                process_id = me-&gt;process_id.
+  ENDIF.
   status = _data-status.
-  workprocess-server = _data-wp_server.
-  workprocess-index = _data-wp_index.
-  workprocess-no = _data-wp_no.
-  workprocess-pid = _data-wp_pid.
+  workprocess = _data-workprocess.
 
   IF NOT f_is_final IS INITIAL.   unlock_with_share( ).   ENDIF.</SOURCE>
      </ITEM>
@@ -191,10 +198,7 @@
 * Lock release at commit.
   _process-process_id = process_id.
   _process-status = status.
-  _process-wp_server = workprocess-server.
-  _process-wp_index = workprocess-index.
-  _process-wp_no = workprocess-no.
-  _process-wp_pid = workprocess-pid.
+  _process-workprocess = workprocess.
   _process-timestamp = times-start.
   MODIFY ygplmt_process FROM _process.
   ASSERT sy-subrc = 0.</SOURCE>
@@ -216,91 +220,13 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="AUTOSAVE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="CHECK_DELETE_AUTHORIZATION" EXPOSURE="1" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Save if needed"/>
+     <ITEM LANG="E" TEXT="Check Delete is authorized"/>
     </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  CHECK NOT f_has_changed IS INITIAL.
-  save( ).
-  CLEAR f_has_changed.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Check is stauts is valid (look for interupted process)"/>
-    </TEXTS>
-    <SOURCE>`
-  DATA it_wpinfo    TYPE STANDARD TABLE OF wpinfo.
-  DATA job_status   TYPE tbtcjob-status.
-  FIELD-SYMBOLS &lt;wp&gt; LIKE LINE OF it_wpinfo.
-* FROM TSKHINCL @ 399
-*--------------------------------------------------------------------*/
-* Constants for field wp_istatus in structure wpinfo
-*--------------------------------------------------------------------*/
-  CONSTANTS: th_wp_slot_free  TYPE x VALUE 1,               &quot;#EC *
-             th_wp_wait       TYPE x VALUE 2,               &quot;#EC *
-             th_wp_run        TYPE x VALUE 4,               &quot;#EC *
-             th_wp_hold       TYPE x VALUE 8,               &quot;#EC *
-             th_wp_killed     TYPE x VALUE 16,              &quot;#EC *
-             th_wp_shutdown   TYPE x VALUE 32,              &quot;#EC *
-             th_wp_restricted TYPE x VALUE 64,              &quot;#EC *
-             th_wp_new        TYPE x VALUE 128.             &quot;#EC *
-
-  CHECK status = system_status-process-in_progress.
-  ASSERT workprocess-server IS NOT INITIAL.
-  CALL FUNCTION &apos;TH_WPINFO&apos;       &quot; Status @ 102
-    EXPORTING
-      srvname          = workprocess-server
-*     WITH_CPU         = 0
-    TABLES
-      wplist           = it_wpinfo
-    EXCEPTIONS
-      send_error       = 1
-      OTHERS           = 2.
-  ASSERT sy-subrc = 0.
-
-  READ TABLE it_wpinfo ASSIGNING &lt;wp&gt;
-       WITH KEY    wp_no = workprocess-no
-                  wp_pid = workprocess-pid
-                wp_index = workprocess-index.
-  ASSERT sy-subrc = 0.
-
-  IF &lt;wp&gt;-wp_istatus = th_wp_run OR &lt;wp&gt;-wp_istatus = th_wp_hold.     RETURN.     ENDIF.    &quot; process is dead
-
-  IF batch_info IS INITIAL.
-* Check user/program ?
-  ELSE.
-    CALL FUNCTION &apos;BP_JOB_CHECKSTATE&apos;
-      EXPORTING
-        dialog                             = &apos;N&apos;  &quot;#EC NOTEXT No dialog
-        jobcount                           = batch_info-jobcount
-        jobname                            = batch_info-jobname
-*       START_ASAP                         =
-*       TIME_LIMIT                         =
-      IMPORTING
-*       STATUS_ACCORDING_TO_DB             =
-        actual_status                      = job_status
-      EXCEPTIONS
-        checking_of_job_has_failed         = 1
-        correcting_job_status_failed       = 2
-        invalid_dialog_type                = 3
-        job_does_not_exist                 = 0
-        no_check_privilege_given           = 0
-        ready_switch_too_dangerous         = 6
-        OTHERS                             = 7.
-    ASSERT sy-subrc = 0.
-    IF job_status = me-&gt;job_status-running.   RETURN.    ENDIF.
-  ENDIF.
-
-  f_has_changed = abap_true.
-  status = system_status-process-interupted.</SOURCE>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
+    </PARAMETERS>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -320,7 +246,7 @@
   f_has_changed = abap_true.
   CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
     IMPORTING
-      server_name        = workprocess-server
+      server_name        = workprocess-wp_server
     EXCEPTIONS
       error_reading_name = 1
       OTHERS             = 2.
@@ -329,12 +255,15 @@
   CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
     IMPORTING
       subrc    = subrc
-      wp_no    = workprocess-no
-      wp_pid   = workprocess-pid
-      wp_index = workprocess-index.
+      wp_no    = workprocess-wp_no
+      wp_pid   = workprocess-wp_pid
+      wp_index = workprocess-wp_index.
 
   process_id = generate_new_process_id( ).
   GET TIME STAMP FIELD times-start.
+  workprocess-username = sy-uname.
+  workprocess-main_program = sy-repid.
+  status = system_status-process-started.
 
   IF NOT sy-batch IS INITIAL.
 * From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
@@ -345,25 +274,8 @@
   ENDIF.
   IF no_message IS INITIAL AND sy-batch IS NOT INITIAL.
 * This processus in on server (&amp;1/&amp;2) with jobname : &amp;3(&amp;4)
-    MESSAGE i000 WITH workprocess-server workprocess-no batch_info-jobname batch_info-jobcount.
+    MESSAGE i000 WITH workprocess-wp_server workprocess-wp_no batch_info-jobname batch_info-jobcount.
   ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Converti les donnée brute en donnée typé"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="DATA" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Donnée typée"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Donnée brute à décoder avec CONV_RAW2DATA"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
    </ITEM>
    <ITEM CMPNAME="GENERATE_NEW_PROCESS_ID" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -382,11 +294,6 @@
       ev_guid_16 = result.
 *     EV_GUID_22       =
 *     EV_GUID_32       = RUN_ID</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="IS_SYSTEM_MESSAGE_ALLOWED" EXPOSURE="2" STATE="1">
-    <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
-    </PARAMETERS>
    </ITEM>
    <ITEM CMPNAME="LOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -418,76 +325,6 @@
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="READ" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Read procesus definition from DB"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA _data TYPE ygplmt_process.
-
-  lock_with_share( ).
-
-  SELECT SINGLE * INTO _data
-    FROM ygplmt_process
-    WHERE process_id = me-&gt;process_id.
-
-  ASSERT sy-subrc = 0.
-
-  status = _data-status.
-  workprocess-server = _data-wp_server.
-  workprocess-index = _data-wp_index.
-  workprocess-no = _data-wp_no.
-  workprocess-pid = _data-wp_pid.
-
-  IF NOT f_is_final IS INITIAL.   unlock_with_share( ).   ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="REFRESH" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Refresh run informations"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  read( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SAVE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Save Processus definition"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA _process TYPE ygplmt_process.
-
-  lock_exclusive( ).
-* Lock release at commit.
-  _process-process_id = process_id.
-  _process-status = status.
-  _process-wp_server = workprocess-server.
-  _process-wp_index = workprocess-index.
-  _process-wp_no = workprocess-no.
-  _process-wp_pid = workprocess-pid.
-  _process-timestamp = times-start.
-  MODIFY ygplmt_process FROM _process.
-  ASSERT sy-subrc = 0.</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlock record (with exclusive option)"/>
@@ -517,6 +354,27 @@
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
           process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_DELETE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delete Processus definition"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Categories exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DELETE FROM ygplmt_process WHERE process_id = me-&gt;process_id.
+  IF sy-subrc &lt;&gt; 0.
+    my_key = me-&gt;process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_database
+          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                 tablename = my_table
+                 key_value = my_key.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>

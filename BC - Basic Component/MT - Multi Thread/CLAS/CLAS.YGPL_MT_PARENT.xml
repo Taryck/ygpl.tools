@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2FA784666B7A94422A1B3A4DD31B28E1" CODE_SIGNATURE="B884906FBBB22A6AB38900764B9D87E5" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="3D9F1C1035AF0B5A7F4B636AA028B73F" CODE_SIGNATURE="BCD69A0D5625D6D14114604A1BB9C046" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -12,11 +12,13 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="RECIEVING_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE"/>
    <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_COUNT"/>
    <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_SIZE"/>
    <ITEM CMPNAME="SET_MAX_MEMORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_MAX_MEMORY"/>
    <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_THREAD_COUNT"/>
    <ITEM CMPNAME="SET_WEIGHT_FN" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_WEIGHT_FN"/>
+   <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SUBMIT_THREAD"/>
    <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_FN"/>
    <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_JOBID"/>
    <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_JOBNAME"/>
@@ -39,55 +41,8 @@
      <ITEM LANG="E" TEXT="Information communication between process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_MESSAGING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Message communication between process"/>
-    </TEXTS>
-   </ITEM>
   </ATTRIBUTS>
-  <EVENTS>
-   <ITEM CMPNAME="RECIEVING_SPECIFIC_MESSAGE" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Handle specific messages (non system)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message Category"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message to handle"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-   <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Event raised to let submit program"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="JOBCOUNT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job ID to use in the submit"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Job Name to use in the submit"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Thread Number of the curren submit"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-  </EVENTS>
   <FRIENDS>
-   <ITEM REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
@@ -217,32 +172,26 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA length TYPE i.
-  DATA o_msg TYPE to_messaging.
-
-  super-&gt;constructor( ).
+  DATA o_nfo TYPE to_informations.
 
   length = XSTRLEN( run_id ).
 *  ASSERT factory_mode IS NOT INITIAL OR length = 16.
   ASSERT run_id IS INITIAL OR length = 16.
 
+  super-&gt;constructor( o_messaging ).
+
+  IF o_informations IS BOUND.               &quot; Informations required to read conditions from DB
+    set_informations( o_informations ).
+    me-&gt;o_informations-&gt;set_process( me ).
+  ELSE.
+    o_nfo ?= ygpl_mt_factories=&gt;get_informations( me ).
+    set_informations( o_nfo ).
+  ENDIF.
+
   IF run_id IS INITIAL.
   ELSE.
     me-&gt;process_id = run_id.
     read( ).
-  ENDIF.
-
-  IF o_messaging IS BOUND.
-    set_messaging( o_messaging ).
-    me-&gt;o_messaging-&gt;set_process( me ).
-  ELSE.
-    o_msg ?= ygpl_mt_factories=&gt;get_messaging( me ).
-    set_messaging( o_msg ).
-  ENDIF.
-  IF o_informations IS BOUND.
-    me-&gt;o_informations ?= o_informations.
-    me-&gt;o_informations-&gt;set_process( me ).
-  ELSE.
-    me-&gt;o_informations ?= ygpl_mt_factories=&gt;get_messaging( me ).
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="READ_CONDTIONS" STATE="1" MTDNEWEXC="X">
@@ -259,53 +208,11 @@
     <SOURCE>`
   DATA d_cond_ser TYPE td_serialized.
   Data o_cond     type to_conditions.
-  _get_information( EXPORTING category = system_categories-condition
-                     CHANGING info = d_cond_ser ).
+  _get_system_information( EXPORTING category = system_categories-condition
+                            CHANGING info = d_cond_ser ).
   o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
   o_cond-&gt;deserialize( d_cond_ser ).
   set_conditions( o_cond ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_BLOC_COUNT_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Màj Nombre de bloc"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="BLOC_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Bloc count"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-
-  lock_exclusive( ).
-* Lock released with commit.
-  UPDATE ygplmt_runs SET blocs = bloc_count
-    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_BLOC_SIZE_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the bloc size value"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Requested size of bloc counted in weight unit if provided"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-*  CHECK infos-bloc_size &lt;&gt; bloc_size.
-*  f_has_changed = abap_true.
-*  infos-bloc_size = bloc_size.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1">
     <TEXTS>
@@ -322,127 +229,20 @@
   ASSERT object IS BOUND.
   ygplimt_parent~conditions = o_conditions = object.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_MAX_MEMORY_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SET_INFORMATIONS" EXPOSURE="1" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Change the Maximum memory amount"/>
+     <ITEM LANG="E" TEXT="Define conditions"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="MAX_MEMORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_INFORMATIONS">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-*  DATA o_msg    TYPE to_messaging.
-*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-*  DATA s_condition TYPE ts_running_conditions.
-*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-*
-*  CHECK me-&gt;max_memory &lt;&gt; max_memory.
-*  o_job_monitoring-&gt;check_active_threads( ).
-*  IF o_job_monitoring-&gt;threads &gt; 0.
-** Task running
-*    it_list = o_job_monitoring-&gt;get_job_list( ).
-*    IF LINES( it_list ) &gt; LINES( task_list ).
-** Lock required
-*      ASSERT 0 = 1.   &quot; #TO_do
-*    ENDIF.
-*    LOOP AT task_list ASSIGNING &lt;j&gt;.
-*      s_condition-max_memory = max_memory.
-** Send message
-** #TO_do
-**      CREATE OBJECT o_msg
-**        EXPORTING
-**          process_id   = &lt;j&gt;-process_id
-**          o_categories = o_categories.
-*      o_msg-&gt;send_system_message( category = system_categories-condition
-*                                   message = s_condition ).
-*    ENDLOOP.
-*  ENDIF.
-*  me-&gt;max_memory = max_memory.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_MESSAGING" EXPOSURE="1" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Define Messaging"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message communication between process"/>
+       <ITEM LANG="E" TEXT="Information communication between process"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
   ASSERT object IS BOUND.
-  ygplimt_parent~messaging = o_messaging = object.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_THREAD_COUNT_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the thread count value"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="THREAD_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Number of thread to launch"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-*  DATA nb_stop  TYPE i.
-*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-*
-*  CHECK o_job_monitoring IS BOUND.
-*  CHECK infos-threads &lt;&gt; thread_count.
-*  f_has_changed = abap_true.
-*  IF o_job_monitoring-&gt;threads = 0.
-*    infos-threads = thread_count.
-*  ELSE.
-*    nb_stop = infos-threads - thread_count.
-*    IF nb_stop &lt; 0.
-*      ASSERT 0 = 1.   &quot; # To do
-*    ELSE.
-** Task running
-*      it_list = o_job_monitoring-&gt;get_job_list( ).
-*      IF LINES( task_list ) &lt; nb_stop.
-** Lock required
-*        ASSERT 0 = 1.   &quot; # To do
-*      ENDIF.
-** To improve
-*      LOOP AT task_list ASSIGNING &lt;j&gt; TO nb_stop.
-*        stop_task( &lt;j&gt;-process_id ).
-*      ENDLOOP.
-*    ENDIF.
-*  ENDIF.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="SET_WEIGHT_FN_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Change the field name of weight field"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="WEIGHT_FN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FN">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Weight Fieldname in object data table"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-*  me-&gt;weight_fn = weight_fn.</SOURCE>
+  ygplimt_parent~informations = o_informations = object.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -470,6 +270,33 @@
     <SOURCE>`
   o_informations-&gt;get_information( EXPORTING category = category
                                     CHANGING     info = info ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_GET_SYSTEM_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Read System Information from DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Information Category"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="INFO" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Information stored"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  o_informations-&gt;get_system_information( EXPORTING category = category
+                                           CHANGING     info = info ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -600,6 +427,33 @@
   o_informations-&gt;set_information( category = category
                                        info = info ).</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="_SET_SYSTEM_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Write System Information to DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Information Category"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="INFO" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Information to strore"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  o_informations-&gt;set_system_information( category = category
+                                              info = info ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Unlocking"/>
@@ -638,13 +492,6 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED" MTDFINAL="X">
-    <SOURCE>`
-*CALL METHOD SUPER-&gt;IS_SYSTEM_MESSAGE_ALLOWED
-*  RECEIVING
-*    RESULT =
-*    .</SOURCE>
-   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
@@ -656,26 +503,6 @@
   super-&gt;lock_with_share( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="READ">
-    <SOURCE>`
-  DATA _run TYPE ygplmt_runs.
-
-* Do the lock
-  super-&gt;read( ).
-
-  SELECT SINGLE * INTO _run
-    FROM ygplmt_runs
-    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.
-
-  read_condtions( ).
-
-  unlock_with_share( ).
-
-  times-start = _run-timestamp.
-  MOVE-CORRESPONDING _run TO infos.
-  status = _run-status.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
@@ -689,6 +516,29 @@
           process_id = me-&gt;process_id ).
   super-&gt;unlock_with_share( ).</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~READ">
+    <SOURCE>`
+  DATA _run TYPE ygplmt_runs.
+
+* Do the lock
+  super-&gt;ygplimt_process~read( ).
+
+  SELECT SINGLE * INTO _run
+    FROM ygplmt_runs
+    WHERE run_id = process_id.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_process
+          EXPORTING textid = ygpl_mt_cx_process=&gt;not_run
+                process_id = me-&gt;process_id.
+  ENDIF.
+  read_condtions( ).
+
+  unlock_with_share( ).
+
+  times-start = _run-timestamp.
+  MOVE-CORRESPONDING _run TO infos.
+  status = _run-status.</SOURCE>
+   </ITEM>
   </REDEFINITIONS>
   <TYPES>
    <ITEM CMPNAME="TD_CLASSNAME" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="SEOCLSNAME">
@@ -696,7 +546,7 @@
      <ITEM LANG="E" TEXT="Object Type Name"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TI_OBJECTS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="TI_OBJECTS_LOADING">
+   <ITEM CMPNAME="TI_OBJECTS" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="TI_OBJECTS_LOADING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Object store engine"/>
     </TEXTS>
@@ -706,14 +556,9 @@
      <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_INFORMATIONS" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="3" TYPE="YGPL_MT_INFORMATIONS">
+   <ITEM CMPNAME="TO_INFORMATIONS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="3" TYPE="YGPL_MT_INFORMATIONS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Information communication between process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
   </TYPES>

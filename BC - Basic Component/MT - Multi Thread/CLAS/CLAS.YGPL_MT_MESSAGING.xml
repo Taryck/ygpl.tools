@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="182C29F06151B5F975E6C973C29D04E7" CODE_SIGNATURE="E69FB747DCD7D1223D94E03AED0704DE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="990B1AC88E99B5D5A3ABEDC5FFEB1AA2" CODE_SIGNATURE="EF8DDB2AB2172EA65F2992456B3F8258" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -13,7 +13,6 @@
    <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="DELETE_ALL"/>
    <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="DELETE_PROCESS"/>
    <ITEM CMPNAME="HANDLE_MESSAGES" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="HANDLE_MESSAGES"/>
-   <ITEM CMPNAME="MSG_IN_BACKGROUND" EXPOSURE="2" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="MSG_IN_BACKGROUND"/>
    <ITEM CMPNAME="NEW_RUNNING_CONDITIONS" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="NEW_RUNNING_CONDITIONS"/>
    <ITEM CMPNAME="NEW_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="NEW_SPECIFIC_MESSAGE"/>
    <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_MESSAGING" REFCMPNAME="OBJECTS_CONFIRMED"/>
@@ -25,6 +24,8 @@
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
    <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DATA_TYPE"/>
+   <ITEM CMPNAME="TD_DB_TABLE_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_KEY"/>
+   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_RAWDATA"/>
    <ITEM CMPNAME="TI_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_CATEGORIES"/>
@@ -36,11 +37,6 @@
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="CLEAR_OBJ_OFF" EXPOSURE="2" STATE="1" ATTVALUE="&apos; &apos;" TYPTYPE="1" TYPE="TD_BOOLEAN">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Supprime les messages Oui &apos;X&apos; ou &apos;N&apos;"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="CONFIRMED_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="4">
     BEGIN OF confirmed_objects,
       count     TYPE td_count,
@@ -56,77 +52,17 @@
      <ITEM LANG="E" TEXT="Semaphore is set"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="MSG_IN_BACKGROUND_OFF" EXPOSURE="2" STATE="1" ATTVALUE="&apos;X&apos;" TYPTYPE="1" TYPE="TD_BOOLEAN">
+   <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Envoi message progression en arrière plan Oui &apos;X&apos; ou &apos;N&apos;"/>
+     <ITEM LANG="E" TEXT="Table Key value"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_PROCESS_OFF" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TI_PROCESS">
+   <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_MESSAGES&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Process for MultiThread (with category)"/>
+     <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
-  <EVENTS>
-   <ITEM CMPNAME="NEW_RUNNING_CONDITIONS_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="New runnning conditions recieved"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CONDITIONS" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TI_CONDITIONS">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="New running conditions"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-   <ITEM CMPNAME="NEW_SPECIFIC_MESSAGE_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Event raised when specific message recieved"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message Category"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message to handle"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-   <ITEM CMPNAME="OBJECTS_CONFIRMED_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Event to handle objects status update (count raised)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECT_COUNT" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Number of object confirmed"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="STATUS" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TT_STATUS_LIST">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Detailed status count"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-   <ITEM CMPNAME="TASK_DEFINITION_RECIEVED_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="New task definition recieved"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="TASK_DEFINITION" CMPTYPE="2" PARDECLTYP="1" TYPTYPE="1" TYPE="TS_PROCESS_DEFINITION">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="New task definition"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-   </ITEM>
-  </EVENTS>
   <FRIENDS>
    <ITEM REFCLSNAME="YGPL_MT_OBJECTS" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
@@ -153,8 +89,14 @@
 * No lock unique ID
 *  _lock( process_id = process_id
 *          lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive ).
-
-  DELETE FROM ygplmt_messages WHERE process_id = process_id.</SOURCE>
+  DELETE FROM ygplmt_messages WHERE process_id = process_id.
+  IF sy-subrc &lt;&gt; 0.
+    my_key = process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_database
+          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                 tablename = my_table
+                 key_value = my_key.
+  ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="HANDLE_MESSAGES">
       <SOURCE>`
@@ -249,31 +191,6 @@
   ASSERT o_process IS BOUND.
   set_process( o_process ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONV_RAW2DATA_OFF" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Converti les donnée brute en donnée typé"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="DATA" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Donnée typée"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_RAWDATA">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Donnée brute à décoder avec CONV_RAW2DATA"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  TRY.
-      IMPORT msg = data FROM DATA BUFFER rawdata.
-**CX_SY_CONVERSION_CODEPAGE
-**CX_SY_IMPORT_MISMATCH_ERROR
-**CX_SY_IMPORT_FORMAT_ERROR
-    CATCH cx_root.
-  ENDTRY.</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="DECODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Decode data to buffer"/>
@@ -284,57 +201,6 @@
     </PARAMETERS>
     <SOURCE>`
   IMPORT msg = any FROM DATA BUFFER buffer.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="DELETE_ALL_OFF" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Delete all messages"/>
-    </TEXTS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-  DELETE FROM ygplmt_messages.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="DELETE_PROCESS_OFF" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Delete all message for a process"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="FAILED" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Delete has failed"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-*  CALL METHOD _lock
-*    EXPORTING
-*      run_id       = process_id
-*    EXCEPTIONS
-*      foreign_lock = 1
-*      sys_failure  = 2
-*      OTHERS       = 3.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
-
-  DELETE FROM ygplmt_messages WHERE process_id = process_id.
-
-*  CALL METHOD _unlock( run_id = process_id ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ENCODE_DATA" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -368,77 +234,6 @@
 * Get global Lock on object processing.
   ygpl_mt_lock_managment=&gt;get_messages_semaphore( o_process-&gt;process_id ).
   f_semaphore = abap_true.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="HANDLE_MESSAGES_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Look for message"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="MESSAGE_READED" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="&apos;X&apos; if any message was read"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA it_msg       TYPE STANDARD TABLE OF ygplmt_messages.
-  DATA it_tmp_msg   TYPE STANDARD TABLE OF ygplmt_messages.
-*  data it_arch_msg  TYPE STANDARD TABLE OF ygplmt_msgs_arch.
-  DATA s_msg_arch   TYPE ygplmt_msgs_arch.
-  DATA it_messages  TYPE tt_msgs.
-  DATA s_msg        LIKE LINE OF it_messages.
-  DATA it_sys_msgs  TYPE tt_msgs.
-  DATA o_cx         TYPE REF TO cx_root.
-  FIELD-SYMBOLS &lt;m&gt; LIKE LINE OF it_msg.
-
-* Get global Lock on object processing.
-  get_semaphore( ).
-  TRY.
-      SELECT * INTO TABLE it_msg
-        FROM ygplmt_messages
-        WHERE process_id = o_process-&gt;process_id.
-      IF NOT it_msg IS INITIAL.
-        message_readed = abap_true.
-        it_tmp_msg = it_msg.
-        DELETE it_tmp_msg WHERE arch IS INITIAL.
-        LOOP AT it_tmp_msg ASSIGNING &lt;m&gt;.
-          CLEAR s_msg_arch.   s_msg_arch-key = &lt;m&gt;-key.   s_msg_arch-data = &lt;m&gt;-data.
-          INSERT ygplmt_msgs_arch FROM s_msg_arch.
-        ENDLOOP.
-        FREE it_tmp_msg.
-
-        DELETE ygplmt_messages FROM TABLE it_msg.
-        COMMIT WORK AND WAIT.
-      ENDIF.
-    CATCH cx_root INTO o_cx.
-      release_semaphore( ).
-      RAISE EXCEPTION o_cx.
-  ENDTRY.
-* Release global Lock on object processing.
-  release_semaphore( ).
-
-  CHECK NOT it_msg IS INITIAL.
-
-  SORT it_msg BY timestamp category.
-  LOOP AT it_msg ASSIGNING &lt;m&gt;.
-    CLEAR s_msg.   MOVE-CORRESPONDING &lt;m&gt; TO s_msg.
-    APPEND s_msg TO it_messages.
-  ENDLOOP.
-
-  it_sys_msgs = it_messages.
-  DELETE it_sys_msgs WHERE NOT category IN ygpl_mt_categories=&gt;r_system_categories.
-  DELETE it_messages WHERE category IN ygpl_mt_categories=&gt;r_system_categories.
-
-  IF NOT it_sys_msgs IS INITIAL.    handle_system_messages( it_sys_msgs ).         ENDIF.
-
-  IF NOT it_messages IS INITIAL.    handle_specific_messages( it_messages ).       ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_OBJECT_CONFIRMATION" STATE="1">
     <TEXTS>
@@ -621,9 +416,9 @@
   ygpl_mt_lock_managment=&gt;release_messages_semaphore( o_process-&gt;process_id ).
   CLEAR f_semaphore.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SEND_MESSAGE_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="SEND_CONDITIONS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Send User&apos;s message to DB"/>
+     <ITEM LANG="E" TEXT="Send conditionsmessage to DB"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="ARCHIVE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PAROPTIONL="X">
@@ -631,14 +426,9 @@
        <ITEM LANG="E" TEXT="Archive message after reception"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_CATEGORY">
+     <ITEM SCONAME="CONDITION" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_CONDITIONS">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Message category"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="MESSAGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Message data"/>
+       <ITEM LANG="E" TEXT="Condition"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -650,10 +440,11 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-*  CHECK NOT o_process-&gt;o_categories-&gt;is_valid_category( category ) IS INITIAL.
-*  _send_message( archive = archive
-*                category = category
-*                 message = message ).</SOURCE>
+  DATA conditions TYPE string.
+  conditions = condition-&gt;serialize( ).
+  _send_message( archive = archive
+                category = system_categories-condition
+                 message = conditions ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SEND_SYSTEM_MESSAGE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -684,7 +475,7 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_system_category( category ) IS INITIAL.
+  CHECK NOT ygpl_mt_categories=&gt;is_system_category( category ) IS INITIAL.
   CHECK NOT o_process-&gt;is_system_message_allowed( ) IS INITIAL.
 
   _send_message( archive = archive

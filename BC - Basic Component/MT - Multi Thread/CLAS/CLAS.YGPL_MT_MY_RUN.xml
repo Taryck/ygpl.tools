@@ -1,21 +1,102 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9B16B70A77A6623C0812F32DBB0B2AC6" CODE_SIGNATURE="6C62F4F6C6A0C97C43EB451433C6F72E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2C6E1F85359AA2610C93DCAA7AA90915" CODE_SIGNATURE="DC9FC85949EB80BAA8A2A8AB84B34216" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
-   <INHERITANCE REFCLSNAME="YGPL_MT_RUN" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT Tutorial - My RUN"/>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="ADD_THREAD" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="ADD_THREAD"/>
+   <ITEM CMPNAME="AUTOSAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="AUTOSAVE"/>
+   <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="BATCH_INFO"/>
+   <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="CHECK_STATUS"/>
+   <ITEM CMPNAME="CONDITIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="CONDITIONS"/>
+   <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="CONV_RAW2DATA"/>
+   <ITEM CMPNAME="GET_PROGRESSION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="GET_PROGRESSION"/>
+   <ITEM CMPNAME="GET_TASK_INFORMATIONS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="GET_TASK_INFORMATIONS"/>
+   <ITEM CMPNAME="INFORMATIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="INFORMATIONS"/>
+   <ITEM CMPNAME="IS_SYSTEM_MESSAGE_ALLOWED" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="IS_SYSTEM_MESSAGE_ALLOWED"/>
+   <ITEM CMPNAME="JOB_MONITORING" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="JOB_MONITORING"/>
+   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="JOB_STATUS"/>
+   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="LOCK_MODES"/>
+   <ITEM CMPNAME="MESSAGING" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="MESSAGING"/>
    <ITEM CMPNAME="MY_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_CATEGORIES"/>
+   <ITEM CMPNAME="MY_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_STATUS"/>
+   <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="NO_MESSAGE"/>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="PROCESS_ID"/>
+   <ITEM CMPNAME="READ" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="READ"/>
+   <ITEM CMPNAME="RECIEVING_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE"/>
+   <ITEM CMPNAME="REFRESH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="REFRESH"/>
+   <ITEM CMPNAME="SAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SAVE"/>
+   <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SET_CONDITIONS"/>
+   <ITEM CMPNAME="SET_TASK_CLASSNAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SET_TASK_CLASSNAME"/>
+   <ITEM CMPNAME="START_THREADS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="START_THREADS"/>
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="STATUS"/>
+   <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SUBMIT_THREAD"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SYSTEM_STATUS"/>
+   <ITEM CMPNAME="TD_CLASSNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TD_CLASSNAME"/>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TD_JOBID"/>
+   <ITEM CMPNAME="TD_JOBNAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TD_JOBNAME"/>
+   <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_MEMORY_SIZE"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_WAITTIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TD_WAITTIME"/>
+   <ITEM CMPNAME="TI_FULL_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TI_FULL_CONDITIONS"/>
+   <ITEM CMPNAME="TI_INFORMATIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TI_INFORMATIONS"/>
    <ITEM CMPNAME="TS_MY_PROCESS_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_PROCESS_INFO"/>
    <ITEM CMPNAME="TS_MY_RUN_PARAMETERS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_RUN_PARAMETERS"/>
+   <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TS_PROCESS_DEFINITION"/>
+   <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TS_PROGRESSION"/>
    <ITEM CMPNAME="TT_DATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TT_DATA"/>
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="TT_DEPENDENCIES"/>
+   <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="WAIT_PROGRESS"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_ENGINE" STATE="1" ATTDECLTYP="1" TYPTYPE="3" TYPE="YGPLIMT_RUN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Framework engine"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
   <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIMT_RUN" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ADD_OBJECTS">
+      <SOURCE>`
+  o_engine-&gt;add_objects( dependencies = dependencies
+                              objects = objects ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="ADD_THREAD">
+      <SOURCE>`
+  o_engine-&gt;add_thread( jobid = jobid
+                      jobname = jobname ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_PROGRESSION">
+      <SOURCE>`
+  result = o_engine-&gt;get_progression( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_CONDITIONS">
+      <SOURCE>`
+  o_engine-&gt;set_conditions( o_conditions ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_TASK_CLASSNAME">
+      <SOURCE>`
+  o_engine-&gt;set_task_classname( classname ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="START_THREADS">
+      <SOURCE>`
+  o_engine-&gt;start_threads( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="WAIT_PROGRESS">
+      <SOURCE>`
+  o_engine-&gt;wait_progress( ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
@@ -32,7 +113,7 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
-   <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" STATE="1">
+   <ITEM CMPNAME="ADD_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Add My Objects to work list"/>
     </TEXTS>
@@ -44,45 +125,51 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
-  _add_objects( objects = objects
-           dependencies = dependencies ).</SOURCE>
+  ygplimt_run~add_objects( objects = objects
+                      dependencies = dependencies ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="BLOC_SIZE" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Requested size of bloc counted in weight unit if provided"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="MAX_MEMORY" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_MEMORY_SIZE">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Maximum memory size task might use"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="THREAD_COUNT" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Number of thread to launch"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_FULL_CONDITIONS"/>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
-  DATA o_category TYPE REF TO ygpl_mt_my_categories.
-  DATA o_status   TYPE REF TO ygpl_mt_my_status.
+  DATA o_conditions   TYPE ygpl_mt_factories=&gt;ti_full_conditions.
 
-  CREATE OBJECT o_category.
-  CREATE OBJECT o_status.
-  super-&gt;constructor( thread_count = thread_count
-                        max_memory = max_memory
-                         bloc_size = bloc_size
-                        categories = o_category
-                            status = o_status ).
-  SET HANDLER submit_new_thread FOR me.</SOURCE>
+  IF conditions IS BOUND.  o_conditions = conditions.  ELSE.    o_conditions = ygpl_mt_factories=&gt;create_new_start_conditions( ).   ENDIF.
+  o_conditions-&gt;categories-&gt;add_specific_category( my_categories-task_param ).
+  o_conditions-&gt;status-&gt;add_specific_status( my_status-ok ).
+  o_conditions-&gt;status-&gt;add_specific_status( my_status-ko ).
+  o_conditions-&gt;status-&gt;add_specific_status( my_status-error ).
+  o_engine = ygpl_mt_factories=&gt;create_new_run( o_conditions ).
+  ygplimt_run~process_id = o_engine-&gt;process_id.
+  ygplimt_run~conditions = o_engine-&gt;conditions.
+  ygplimt_run~messaging = o_engine-&gt;messaging.
+  ygplimt_run~batch_info = o_engine-&gt;batch_info.
+  ygplimt_run~no_message = o_engine-&gt;no_message.
+  ygplimt_run~status = o_engine-&gt;status.
+  ygplimt_run~workprocess = o_engine-&gt;workprocess.
+  ygplimt_run~job_monitoring = o_engine-&gt;job_monitoring.
+  SET HANDLER submit_new_thread FOR o_engine.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE">
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Handle specific messages"/>
     </TEXTS>
@@ -97,9 +184,9 @@
     WHEN my_categories-task_param.
       conv_raw2data( EXPORTING rawdata = rawdata
                       CHANGING    data = s_param ).
-      s_task = get_task_informations( s_param-process_id ).
-      WRITE:/ &apos;New process&apos;, s_param-process_id, s_task-workprocess-server, s_task-batch_info-jobname, s_task-batch_info-jobcount, s_task-batch_info-jobclass.
-    when others.
+      s_task = o_engine-&gt;get_task_informations( s_param-process_id ).
+      WRITE:/ &apos;New process&apos;, s_param-process_id, s_task-workprocess-wp_server, s_task-batch_info-jobname, s_task-batch_info-jobcount, s_task-batch_info-jobclass.
+    WHEN OTHERS.
 * Unexcepted case
   ENDCASE.</SOURCE>
    </ITEM>
@@ -122,10 +209,10 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  _set_information( category = my_categories-task_param
-                        info = parameters ).</SOURCE>
+  o_engine-&gt;informations-&gt;set_information( category = my_categories-task_param
+                                               info = parameters ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SUBMIT_NEW_THREAD" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_RUN" REFCMPNAME="SUBMIT_THREAD">
+   <ITEM CMPNAME="SUBMIT_NEW_THREAD" STATE="1" MTDTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SUBMIT_THREAD">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create new thread"/>
     </TEXTS>
@@ -136,7 +223,7 @@
     </PARAMETERS>
     <SOURCE>`
   SUBMIT ygpl_mt_tutorial
-    WITH run_id = process_id
+    WITH run_id = o_engine-&gt;process_id
 *    WITH wait_t = wait_t
 *    WITH obj_c = obj_c
 *    WITH mem_size = mem_size

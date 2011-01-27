@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="97EC743531EE28451D6C222B71CA502C" CODE_SIGNATURE="126F668058AD199BFF681DDDE34685FF" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="7DCB1E2536AF9A1B32F94D19AF8F08BF" CODE_SIGNATURE="1F301D9E33D96FE2D14F40029C9744A8" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -15,6 +15,7 @@
 REPORT  ygpl_mt_tutorial_launch.
 
 TYPE-POOLS: abap.
+TABLES: ygpl_mt_workprocess_infos.
 
 SELECTION-SCREEN BEGIN OF BLOCK mode WITH FRAME TITLE text-trm.
 PARAMETERS :
@@ -23,13 +24,21 @@ PARAMETERS :
   p_spe   TYPE abap_bool RADIOBUTTON GROUP mode.
 SELECTION-SCREEN END OF BLOCK mode.
 
+SELECTION-SCREEN BEGIN OF BLOCK jobs WITH FRAME TITLE text-trj.
+PARAMETERS:
+  thread TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 2 OBLIGATORY.
+SELECT-OPTIONS:
+  s_server FOR ygpl_mt_workprocess_infos-wp_server.   &quot; ygpl_mt_typespool=&gt;ts_wp_info-wp_server.
+PARAMETERS:
+  p_job_p TYPE ygpl_mt_typespool=&gt;td_priority.
+SELECTION-SCREEN END OF BLOCK jobs.
+
+SELECTION-SCREEN BEGIN OF BLOCK objs WITH FRAME TITLE text-tro.
 PARAMETERS :
-*  clr_all TYPE oax AS CHECKBOX DEFAULT &apos; &apos;,
-  thread TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 2 OBLIGATORY,
-  bloc_s TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 10 OBLIGATORY,
-*  wait_m TYPE YGPL_MT_MY_RUN=&gt;TD_WAITTIME DEFAULT 30,
-*  prog_m TYPE YGPL_MT_MY_RUN=&gt;TD_COUNT DEFAULT 1,
+  p_b_rate TYPE ygpl_mt_typespool=&gt;td_batch_rate,
+  bloc_s   TYPE ygpl_mt_my_run=&gt;td_count DEFAULT 10 OBLIGATORY,
   mem_size TYPE ygpl_mt_my_run=&gt;td_memory_size DEFAULT 0.
+SELECTION-SCREEN END OF BLOCK objs.
 
 SELECTION-SCREEN BEGIN OF BLOCK load WITH FRAME TITLE text-tlp.
 PARAMETERS :
@@ -47,61 +56,66 @@ TYPES:
 DATA my_run  TYPE REF TO ygpl_mt_my_run.
 DATA it_objects TYPE ygpl_mt_my_run=&gt;tt_data.
 DATA it_dep TYPE ygpl_mt_my_run=&gt;tt_dependencies.
-* is_finished TYPE oax,
-* _jobname  TYPE tbtcjob-jobname,
-* _jobcount TYPE tbtcjob-jobcount,
-* 1st_c TYPE c,
-* line TYPE i,
-* c_line TYPE i,
-* w_dep LIKE LINE OF it_dep,
-* int TYPE i,
-* s_progress  TYPE ygpl_mt_my_run=&gt;ts_progression,
-* w_obj LIKE LINE OF it_objects,
-* w_lang LIKE LINE OF w_obj-lang.
 
 START-OF-SELECTION.
-  DATA s_param TYPE ygpl_mt_my_run=&gt;ts_my_run_parameters.
+  DATA o_conditions TYPE ygpl_mt_my_run=&gt;ti_full_conditions.
+  DATA s_param      TYPE ygpl_mt_my_run=&gt;ts_my_run_parameters.
+  data o_cx         type ref to ygpl_mt_cx.
+  data msg          type string.
 *  IF NOT clr_all IS INITIAL.
 *    CALL METHOD YGPL_MT_MY_RUN=&gt;delete_all.
 *  ENDIF.
 
-  CREATE OBJECT my_run
-    EXPORTING
-      thread_count = thread
-      max_memory   = mem_size
-      bloc_size    = bloc_s.
+  TRY.
+      o_conditions = ygpl_mt_factories=&gt;create_new_start_conditions( ).
+      o_conditions-&gt;set_threads( thread ).
+      IF NOT s_server IS INITIAL.   o_conditions-&gt;set_servers( s_server[] ).   ENDIF.
+      IF NOT p_job_p IS INITIAL.   o_conditions-&gt;set_job_priority( p_job_p ).   ENDIF.
+      IF NOT p_b_rate IS INITIAL.   o_conditions-&gt;set_batch_rate( p_b_rate ).   ENDIF.
+      o_conditions-&gt;set_maximum_memory( mem_size ).
+      o_conditions-&gt;set_bloc_size( bloc_s ).
 
-  s_param-memory_size = mem_size.
-  s_param-wait_time = wait_t.
-  s_param-obj_count = obj_c.
-  my_run-&gt;set_parameters( s_param ).
+      CREATE OBJECT my_run
+        EXPORTING
+          conditions = o_conditions.
 
-  PERFORM create_worklist.
+      s_param-wait_time = wait_t.
+      s_param-obj_count = obj_c.
+      my_run-&gt;set_parameters( s_param ).
+
+      PERFORM create_worklist.
 
 * Prepare MT
-  CALL METHOD my_run-&gt;add_objects
-    EXPORTING
-      OBJECTS      = it_objects
-      dependencies = it_dep.
+      CALL METHOD my_run-&gt;add_objects
+        EXPORTING
+          OBJECTS      = it_objects
+          dependencies = it_dep.
 
 * Before starting Clear Controle table
-  DELETE FROM ygpl_t100t.
-  COMMIT WORK AND WAIT.
+      DELETE FROM ygpl_t100t.
+      COMMIT WORK AND WAIT.
 
-  CASE abap_true.
-    WHEN p_gen.
-      my_run-&gt;set_task_classname( &apos;YGPL_MT_MY_TASK&apos; ).
-      my_run-&gt;start_threads( ) .
-    WHEN p_sub.
-      my_run-&gt;start_threads( ) .
-    WHEN p_spe.
-      PERFORM launch_theards_manually.
-    WHEN OTHERS.
-      ASSERT 0 = 1.
-  ENDCASE.
+      CASE abap_true.
+        WHEN p_gen.
+          my_run-&gt;set_task_classname( &apos;YGPL_MT_MY_TASK&apos; ).
+          my_run-&gt;start_threads( ) .
+        WHEN p_sub.
+          my_run-&gt;start_threads( ) .
+        WHEN p_spe.
+          my_run-&gt;job_monitoring-&gt;debug = abap_true.
+          my_run-&gt;start_threads( ) .
+* OR if you want to specify your own Job Names
+*      PERFORM launch_theards_manually.
+        WHEN OTHERS.
+          ASSERT 0 = 1.
+      ENDCASE.
 
 * Watching Threads.
-  my_run-&gt;wait_progress( ).
+      my_run-&gt;wait_progress( ).
+    CATCH ygpl_mt_cx INTO o_cx.
+      msg = o_cx-&gt;get_text( ).
+      message msg type &apos;A&apos;.
+  ENDTRY.
 
 END-OF-SELECTION.
 
@@ -317,9 +331,19 @@ ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
      <ITEM LANGU="E" ENTRY="Load simulation parameters :" LENGTH="40 "/>
     </TEXTS>
    </ITEM>
+   <ITEM ID="I" KEY="TRJ">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Jobs definitions" LENGTH="60 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="I" KEY="TRM">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="Run mode : Generic, specific or manual (allow debug)" LENGTH="60 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="TRO">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Object Blocs definitions" LENGTH="60 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="R">
@@ -336,7 +360,6 @@ ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
    </ITEM>
    <ITEM ID="S" KEY="CLR_ALL">
     <TEXTS>
-     <ITEM LANGU="E"/>
      <ITEM LANGU="F" ENTRY="        Purge tout les RUN" LENGTH="26 "/>
     </TEXTS>
    </ITEM>
@@ -362,9 +385,19 @@ ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
      <ITEM LANGU="F" ENTRY="        Min. Progression entre 2 msgs" LENGTH="37 "/>
     </TEXTS>
    </ITEM>
+   <ITEM ID="S" KEY="P_B_RATE">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="        Batch Rate" LENGTH="18 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="S" KEY="P_GEN">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Use Generic task Launcher" LENGTH="33 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="P_JOB_P">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="D       ." LENGTH="17 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_SPE">
@@ -375,6 +408,11 @@ ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
    <ITEM ID="S" KEY="P_SUB">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Use dedicated program + event" LENGTH="37 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="S_SERVER">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="THREAD">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="99296C281D5BED06453F23C71D605F72" CODE_SIGNATURE="7876AA3E94408002F796BEDA660FDC02" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS_4MT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E300039AF939BE85D5C04CEF397B096B" CODE_SIGNATURE="47088356572665206C2754BFB3842E2D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS_4MT" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSABSTRCT="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -23,8 +23,22 @@
    <ITEM CMPNAME="TI_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_STATUS"/>
    <ITEM CMPNAME="TI_TASK_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_TASK_CONDITIONS"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_PROCESS_4MT" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPLIMT_PROCESS_4MT" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED">
+      <SOURCE>`
+  result = abap_true.   &quot; feature not working</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -39,10 +53,62 @@
 *&quot;* use this source file for any macro definitions you need
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_MESSAGING" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message communication between process"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA o_msg TYPE to_messaging.
+
+  SUPER-&gt;CONSTRUCTOR( ).
+  IF o_messaging IS BOUND.
+    set_messaging( o_messaging ).
+    me-&gt;o_messaging-&gt;set_process( me ).
+  ELSE.
+    o_msg ?= ygpl_mt_factories=&gt;get_process_messaging( me ).
+    set_messaging( o_msg ).
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_MESSAGING" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define Messaging"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Message communication between process"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  ASSERT object IS BOUND.
+  ygplimt_process_4mt~messaging = o_messaging = object.</SOURCE>
+   </ITEM>
+  </METHODS>
   <TYPES>
-   <ITEM CMPNAME="TO_JOB_MONITORING" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_JOB_MONITORING">
+   <ITEM CMPNAME="TO_JOB_MONITORING" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_JOB_MONITORING">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Job monitoring"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
   </TYPES>

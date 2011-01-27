@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F8326D5B7B8A14A5B2BBDF87922BB6A8" CODE_SIGNATURE="50ABA7E602DD4ADC261F2C37B662010E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A8CE14F5F52BD7FCF053EC37447124E4" CODE_SIGNATURE="827A26795F0AA538C12C977E80698387" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CONDITIONS_TASK"/>
  </DEPENDENCIES>
@@ -22,15 +22,19 @@
     <COMPONENTS>
      <ITEM MTDNAME="SET_GLOBAL_PROGRESSION">
       <SOURCE>`
+  CHECK global_progression &lt;&gt; value.
   CHECK value-progress-maxi &lt;= 100.
   CHECK value-progress-mini &gt; 0.
   CHECK value-time-mini &gt; 0.
-  global_progression = value.</SOURCE>
+  global_progression = value.
+  f_has_changed = abap_true.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="SET_THREADS">
       <SOURCE>`
+  CHECK threads &lt;&gt; value.
   CHECK value &gt;= 1.
-  threads = value.</SOURCE>
+  threads = value.
+  f_has_changed = abap_true.</SOURCE>
      </ITEM>
     </COMPONENTS>
    </ITEM>

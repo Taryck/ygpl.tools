@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C4322C53AF76420D9A9F6163DE642CFD" CODE_SIGNATURE="41B3DD7B85A66BD174F2C28AFF9A4E42" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_DATABASE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E46C8B77AB3A804FC8A21398806FBC3C" CODE_SIGNATURE="9FBCEC42171A676F01431E4B38C21E5A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
@@ -30,65 +30,49 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
-   <ITEM CMPNAME="TD_DATA_TYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DATA_TYPE"/>
-   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="DELETE_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of DELETE_FAILED,
+   <ITEM CMPNAME="DO_NOT_EXISTS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of DO_NOT_EXISTS,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;053&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
+      msgno type symsgno value &apos;019&apos;,
+      attr1 type scx_attrname value &apos;PROCESS_ID&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of DELETE_FAILED
+    end of DO_NOT_EXISTS
 `</ITEM>
-   <ITEM CMPNAME="INSERT_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INSERT_FAILED,
+   <ITEM CMPNAME="NOT_RUN" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_RUN,
       msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;051&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
+      msgno type symsgno value &apos;020&apos;,
+      attr1 type scx_attrname value &apos;PROCESS_ID&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of INSERT_FAILED
+    end of NOT_RUN
 `</ITEM>
-   <ITEM CMPNAME="KEY_VALUE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
+   <ITEM CMPNAME="NOT_TASK" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_TASK,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;021&apos;,
+      attr1 type scx_attrname value &apos;PROCESS_ID&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of NOT_TASK
+`</ITEM>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Value of the key for the record"/>
+     <ITEM LANG="E" TEXT="Process_ID"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="NOT_FOUND" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_FOUND,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;050&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of NOT_FOUND
-`</ITEM>
-   <ITEM CMPNAME="TABLENAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Name of the table"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="UPDATE_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of UPDATE_FAILED,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;052&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of UPDATE_FAILED
-`</ITEM>
-   <ITEM CMPNAME="YGPL_MT_CX_DATABASE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_DATABASE,
+   <ITEM CMPNAME="YGPL_MT_CX_PROCESS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_PROCESS,
       msgid type symsgid value &apos;ZAPLINK&apos;,
       msgno type symsgno value &apos;105&apos;,
       attr1 type scx_attrname value &apos;CX_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
-    end of YGPL_MT_CX_DATABASE
+    end of YGPL_MT_CX_PROCESS
 `</ITEM>
   </ATTRIBUTS>
   <DEFERRED>

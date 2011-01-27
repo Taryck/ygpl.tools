@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="69C47F5C02904D68C05AA051AA46606C" CODE_SIGNATURE="5E80CCF5864F3FB434641105C48A1116" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="CB15DBCFF07C26B1AA43FF415785B2FC" CODE_SIGNATURE="893F5BBB45A3FEA043F198BAA923CB0C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <INHERITANCE REFCLSNAME="YGPL_MT_PROCESS_4MT" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT : Task process"/>
@@ -46,27 +46,32 @@
      <ITEM LANG="E" TEXT="Constructor in factory mode"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_CONDITIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CONDITIONS">
+   <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table Key value"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_TASKS&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_CONDITIONS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_CONDITIONS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run conditions"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_INFORMATIONS_OFF" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TI_INFORMATIONS">
+   <ITEM CMPNAME="O_DATA_BLOC_ENGINE" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPL_MT_DATA_BLOC">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Information communication between process"/>
+     <ITEM LANG="E" TEXT="Engine for Data Bloc handling using interface"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_MESSAGING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_MESSAGING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Message communication between process"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="O_OBJECTS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECTS">
+   <ITEM CMPNAME="O_OBJECTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_OBJECTS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Object store engine"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_RUN" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_RUN">
+   <ITEM CMPNAME="O_RUN" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_RUN">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Run Process"/>
     </TEXTS>
@@ -87,20 +92,36 @@
   o_objects-&gt;confirm_objects( status = status
                                count = count ).</SOURCE>
      </ITEM>
+     <ITEM MTDNAME="GET_BATCH">
+      <SOURCE>`
+  o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_OBJECTS_TO_RECOVER">
+      <SOURCE>`
+  o_objects-&gt;get_objects_to_recover( IMPORTING objects = objects ).</SOURCE>
+     </ITEM>
      <ITEM MTDNAME="GET_PROGRESSION">
       <SOURCE>`
   result-processed_objects = o_objects-&gt;processed_objects.
   result-global_status = o_objects-&gt;global_status.</SOURCE>
      </ITEM>
+     <ITEM MTDNAME="OBJECTS_ALREADY_DONE">
+      <SOURCE>`
+  o_objects-&gt;objects_already_done( count = count ).</SOURCE>
+     </ITEM>
      <ITEM MTDNAME="PROCESS_OBJECTS">
       <SOURCE>`
-  DATA t_objects    TYPE REF TO data.
+*  DATA t_objects    TYPE REF TO data.
   FIELD-SYMBOLS &lt;objects&gt; TYPE STANDARD TABLE.
 
-  ASSERT data_handler IS BOUND.
-  data_handler-&gt;new_bloc( IMPORTING table = t_objects ).
-  ASSERT t_objects IS BOUND.
-  ASSIGN t_objects-&gt;* TO &lt;objects&gt;.
+  ASSERT o_data_bloc_engine IS BOUND.
+  ASSERT o_data_bloc_engine-&gt;data_handler IS BOUND.
+  ASSERT o_data_bloc_engine-&gt;task = me.
+  o_data_bloc_engine-&gt;new_bloc( ).
+*  data_handler-&gt;new_bloc( IMPORTING table = t_objects ).
+*  ASSERT t_objects IS BOUND.
+  ASSIGN o_data_bloc_engine-&gt;t_objects-&gt;* TO &lt;objects&gt;.
+  ASSERT &lt;objects&gt; IS ASSIGNED.
 
   DO.
 * Get data
@@ -109,8 +130,9 @@
     IF &lt;objects&gt; IS INITIAL.     EXIT.       ENDIF.
 
 * Process Data set
-    data_handler-&gt;process_batch( EXPORTING objects = &lt;objects&gt; ).
-    ASSERT o_objects-&gt;get_confirmed_object_count( ) &gt; 0.
+    o_data_bloc_engine-&gt;process_batch( ).
+*    data_handler-&gt;process_batch( EXPORTING objects = &lt;objects&gt; ).
+    ASSERT o_objects-&gt;get_confirmed_object_count( ) &gt; 0.    &quot; Control that interface method have done something
 
     FREE &lt;objects&gt;.
 
@@ -162,43 +184,16 @@
      <ITEM LANG="E" TEXT="Check conditions still valid"/>
     </TEXTS>
     <SOURCE>`
+  f_stop_requested = abap_false.
+  IF conditions-&gt;stop_requested IS INITIAL.
+    CHECK NOT o_run-&gt;workprocess-wp_server IN conditions-&gt;servers.
+    CHECK NOT o_run-&gt;batch_info IS INITIAL AND NOT o_run-&gt;batch_info-jobclass = conditions-&gt;job_priority.
+* Conditions have changed. New conditions can&apos;t be satisfied =&gt; Stop task
+    MESSAGE s011.
+  ENDIF.
   f_stop_requested = abap_true.
-  CHECK o_run-&gt;workprocess-server IN conditions-&gt;servers.
-  CHECK o_run-&gt;batch_info IS INITIAL OR o_run-&gt;batch_info-jobclass = conditions-&gt;job_priority.
-  f_stop_requested = abap_false.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="CONFIRM_BATCH_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Confirm to correct handling of previous batch of objects"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  o_objects-&gt;confirm_batch( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="CONFIRM_OBJECTS_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Confirm each single object or set of objects"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT" PARVALUE="1" PAROPTIONL="X"/>
-     <ITEM SCONAME="STATUS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  o_objects-&gt;confirm_objects( status = status
-                               count = count ).</SOURCE>
+* Task recieve a stop request, finishing current work and stop
+  MESSAGE s012.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -246,12 +241,13 @@
     <SOURCE>`
   DATA length TYPE i.
   DATA o_msg TYPE to_messaging.
+  DATA o_cond TYPE to_conditions.
 
   length = XSTRLEN( task_id ).
   ASSERT task_id IS INITIAL OR length = 16.
   ASSERT o_data_handler IS BOUND.
 
-  super-&gt;constructor( ).
+  super-&gt;constructor( o_messaging ).
 
   me-&gt;data_handler = o_data_handler.
   IF task_id IS INITIAL.
@@ -259,17 +255,21 @@
 * Do not have any run yet
     status = system_status-process-started.
     f_has_changed = abap_true.
-    me-&gt;o_run = o_run.
+    set_parent( o_run ).
+    IF no_message IS INITIAL AND sy-batch IS NOT INITIAL.
+* New Task created : ID &apos;&amp;1&apos;
+      MESSAGE i014 WITH me-&gt;process_id.
+    ENDIF.
     is_new = abap_true.
   ELSE.
     ASSERT o_run IS NOT BOUND.    &quot; Can&apos;t override run
     is_new = abap_false.
     me-&gt;process_id = task_id.
     read( ).    &quot; Create O_run, O_information, O_messaging
-    me-&gt;conditions ?= o_run-&gt;conditions.
   ENDIF.
 
 * Conditions
+  me-&gt;conditions ?= o_run-&gt;conditions.    &quot; Get Parent conditions
   IF o_conditions IS BOUND.
     IF NOT me-&gt;o_conditions IS BOUND.
       set_conditions( o_conditions ).
@@ -277,14 +277,9 @@
       me-&gt;o_conditions-&gt;merge_with( o_conditions ).
     ENDIF.
   ENDIF.
-  IF NOT me-&gt;o_conditions IS BOUND.       me-&gt;o_conditions ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).   ENDIF.
-
-* Messaging
-  IF o_messaging IS BOUND.
-    set_messaging( o_messaging ).
-  ELSEIF me-&gt;o_messaging IS NOT BOUND.
-    o_msg ?= ygpl_mt_factories=&gt;get_messaging( me ).
-    set_messaging( o_msg ).
+  IF NOT me-&gt;o_conditions IS BOUND.
+    o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
+    set_conditions( o_cond ).
   ENDIF.
 
 * Object consuming
@@ -294,28 +289,20 @@
     get_default_object_consuming( ).
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_DEFAULT_OBJECT_CONSUMING" STATE="1">
+   <ITEM CMPNAME="GET_DEFAULT_OBJECT_CONSUMING" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create default Object consumming"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   me-&gt;o_objects ?= ygpl_mt_factories=&gt;create_objects_consuming( run = me-&gt;o_run
                                                          conditions = me-&gt;conditions ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_PROGRESSION_OFF" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get run progression"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_PROGRESSION">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Run&apos;s progression"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  result-processed_objects = o_objects-&gt;processed_objects.
-  result-global_status = o_objects-&gt;global_status.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_NEW_CONDITIONS" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="NEW_RUNNING_CONDITIONS">
     <TEXTS>
@@ -327,57 +314,6 @@
     <SOURCE>`
   conditions ?= conditions.
   check_conditions( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="PROCESS_BATCH" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Method to redefine by children to process objects batch"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-   </ITEM>
-   <ITEM CMPNAME="PROCESS_OBJECTS_OFF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Process objects"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA t_objects    TYPE REF TO data.
-  FIELD-SYMBOLS &lt;objects&gt; TYPE STANDARD TABLE.
-
-*  new_bloc( IMPORTING table = t_objects ).
-  ASSERT t_objects IS BOUND.
-  ASSIGN t_objects-&gt;* TO &lt;objects&gt;.
-
-  DO.
-* Get data
-    _get_batch( IMPORTING objects = &lt;objects&gt; ).
-
-    IF &lt;objects&gt; IS INITIAL.     EXIT.       ENDIF.
-
-* Process Data set
-    process_batch( EXPORTING objects = &lt;objects&gt; ).
-    ASSERT o_objects-&gt;get_confirmed_object_count( ) &gt; 0.
-
-    FREE &lt;objects&gt;.
-
-* Confirm Data
-    confirm_batch( ).
-
-  ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1">
     <TEXTS>
@@ -394,21 +330,20 @@
   ASSERT object IS BOUND.
   ygplimt_process_4mt~conditions = o_conditions = object.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_MESSAGING" EXPOSURE="1" STATE="1">
+   <ITEM CMPNAME="SET_PARENT" EXPOSURE="1" STATE="1">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Define Messaging"/>
+     <ITEM LANG="E" TEXT="Define Parent run"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_MESSAGING">
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_RUN">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Message communication between process"/>
+       <ITEM LANG="E" TEXT="Parent Run"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
   ASSERT object IS BOUND.
-*  ygplimt_parent~messaging =
-  o_messaging = object.</SOURCE>
+  ygplimt_task~parent = o_run = object.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_RUN" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -603,9 +538,6 @@
     <TEXTS>
      <ITEM LANG="E" TEXT="Send task definition is needed"/>
     </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
@@ -617,7 +549,7 @@
   DATA s_info TYPE ts_process_definition.
 
   IF f_definition_sended IS INITIAL.
-    autosave( ).
+*    autosave( ). &quot; Infinite loop
     s_info-process_id = me-&gt;process_id.
     s_info-batch_info = me-&gt;batch_info.
     s_info-workprocess = me-&gt;workprocess.
@@ -646,12 +578,14 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA f_no_msg TYPE td_boolean.
+  DATA o_run    TYPE to_run.
 
   IF o_run IS BOUND.    CHECK run_id &lt;&gt; o_run-&gt;process_id.      ENDIF.
   f_no_msg = ygpl_mt_process=&gt;no_message.
   ygpl_mt_process=&gt;no_message = abap_true.
   o_run ?= ygpl_mt_factories=&gt;get_run( run_id ).
   ygpl_mt_process=&gt;no_message = f_no_msg.
+  set_parent( o_run ).
   get_default_object_consuming( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_UNLOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
@@ -692,17 +626,6 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="AUTOSAVE">
-    <SOURCE>`
-  super-&gt;autosave( ).
-  CHECK NOT f_has_changed IS INITIAL.
-  save( ).
-  CLEAR f_has_changed.</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="IS_SYSTEM_MESSAGE_ALLOWED" MTDFINAL="X">
-    <SOURCE>`
-  result = f_system_message.</SOURCE>
-   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
@@ -714,35 +637,6 @@
   super-&gt;lock_with_share( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="READ">
-    <SOURCE>`
-  DATA _task TYPE ygplmt_tasks.
-
-  super-&gt;read( ).
-
-  SELECT SINGLE * INTO _task
-    FROM ygplmt_tasks
-    WHERE task_id = process_id.
-  ASSERT sy-subrc = 0.
-
-  unlock_with_share( ).
-
-  times-start = _task-timestamp.
-  _set_run( _task-run_id ).
-  status = _task-status.</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SAVE">
-    <SOURCE>`
-  DATA _task TYPE ygplmt_tasks.
-
-  super-&gt;save( ).
-
-  _task-task_id = process_id.
-  _task-status = status.
-  _task-run_id = o_run-&gt;process_id.
-  MODIFY ygplmt_tasks FROM _task.
-  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
@@ -756,16 +650,64 @@
           process_id = me-&gt;process_id ).
   super-&gt;unlock_with_share( ).</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">
+    <SOURCE>`
+  super-&gt;ygplimt_process~autosave( ).
+  CHECK NOT f_has_changed IS INITIAL.
+  save( ).
+  CLEAR f_has_changed.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~READ">
+    <SOURCE>`
+  DATA _task TYPE ygplmt_tasks.
+
+  super-&gt;ygplimt_process~read( ).
+
+  SELECT SINGLE * INTO _task
+    FROM ygplmt_tasks
+    WHERE task_id = process_id.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_process
+          EXPORTING textid = ygpl_mt_cx_process=&gt;not_task
+                process_id = me-&gt;process_id.
+  ENDIF.
+  unlock_with_share( ).
+
+  times-start = _task-timestamp.
+  _set_run( _task-run_id ).
+  status = _task-status.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~SAVE">
+    <SOURCE>`
+  DATA _task TYPE ygplmt_tasks.
+
+  super-&gt;ygplimt_process~save( ).
+
+  _task-task_id = process_id.
+  _task-status = status.
+  _task-run_id = o_run-&gt;process_id.
+  MODIFY ygplmt_tasks FROM _task.
+  ASSERT sy-subrc = 0.
+  _send_task_definition( ).</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="_DELETE">
+    <SOURCE>`
+  o_messaging-&gt;delete_process( me-&gt;process_id ).
+  DELETE FROM ygplmt_tasks WHERE task_id = me-&gt;process_id.
+  IF sy-subrc &lt;&gt; 0.
+    my_key = me-&gt;process_id.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_database
+          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                 tablename = my_table
+                 key_value = my_key.
+  ENDIF.
+  super-&gt;_delete( ).</SOURCE>
+   </ITEM>
   </REDEFINITIONS>
   <TYPES>
    <ITEM CMPNAME="TO_CONDITIONS" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_CONDITIONS_TASK">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run conditions"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TO_MESSAGING" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="3" TYPE="YGPL_MT_MESSAGING">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Message communication between process"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TO_OBJECTS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPL_MT_OBJECTS">

@@ -1,33 +1,62 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D335B4EE312E5C6503E50D2DED3CF383" CODE_SIGNATURE="D0E28BDECB571E33507ACA5A87D7BCB3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
- <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_MT_NEW_TASK"/>
- </DEPENDENCIES>
+<ZL_OBJECT CHECKSUM="DB1190392BEAFEC1571BFFCC46626CA8" CODE_SIGNATURE="8BB69D1FC772D520C2937967FADA2D94" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_TASK" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
-   <INHERITANCE REFCLSNAME="YGPL_MT_NEW_TASK" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MT Tutorial - My Task"/>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="ACTIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="ACTIONS"/>
+   <ITEM CMPNAME="AUTOSAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="AUTOSAVE"/>
+   <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="BATCH_INFO"/>
+   <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CHECK_STATUS"/>
+   <ITEM CMPNAME="CONDITIONS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONDITIONS"/>
+   <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONFIRM_BATCH"/>
+   <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONFIRM_OBJECTS"/>
+   <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONV_RAW2DATA"/>
+   <ITEM CMPNAME="DATA_HANDLER" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="DATA_HANDLER"/>
+   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_BATCH"/>
+   <ITEM CMPNAME="GET_OBJECTS_TO_RECOVER" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_OBJECTS_TO_RECOVER"/>
+   <ITEM CMPNAME="GET_PROGRESSION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_PROGRESSION"/>
+   <ITEM CMPNAME="IS_SYSTEM_MESSAGE_ALLOWED" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="IS_SYSTEM_MESSAGE_ALLOWED"/>
+   <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="JOB_STATUS"/>
+   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="LOCK_MODES"/>
+   <ITEM CMPNAME="MESSAGING" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="MESSAGING"/>
    <ITEM CMPNAME="MY_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_CATEGORIES"/>
    <ITEM CMPNAME="MY_STATUS" EXPOSURE="2" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="MY_STATUS"/>
+   <ITEM CMPNAME="NEW_TASK_DEFINED" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_DATA_BLOC" REFCMPNAME="NEW_TASK_DEFINED"/>
+   <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="NO_MESSAGE"/>
+   <ITEM CMPNAME="OBJECTS_ALREADY_DONE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="OBJECTS_ALREADY_DONE"/>
+   <ITEM CMPNAME="PARENT" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="PARENT"/>
+   <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="PROCESS_ID"/>
+   <ITEM CMPNAME="PROCESS_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="PROCESS_OBJECTS"/>
+   <ITEM CMPNAME="READ" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="READ"/>
+   <ITEM CMPNAME="REFRESH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="REFRESH"/>
+   <ITEM CMPNAME="SAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="SAVE"/>
+   <ITEM CMPNAME="STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="STATUS"/>
+   <ITEM CMPNAME="SYSTEM_CATEGORIES" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="SYSTEM_CATEGORIES"/>
+   <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="SYSTEM_STATUS"/>
+   <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
+   <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
+   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_STATUS"/>
    <ITEM CMPNAME="TD_WAITTIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TD_WAITTIME"/>
+   <ITEM CMPNAME="TI_TASK" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_TASK"/>
    <ITEM CMPNAME="TS_MY_PROCESS_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_PROCESS_INFO"/>
    <ITEM CMPNAME="TS_MY_RUN_PARAMETERS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TS_MY_RUN_PARAMETERS"/>
    <ITEM CMPNAME="TT_DATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" REFCMPNAME="TT_DATA"/>
+   <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="WORKPROCESS"/>
   </ALIASES>
   <ATTRIBUTS>
+   <ITEM CMPNAME="O_ENGINE" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_TASK">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Framework Task Engine"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="RUN_PARAMETERS" STATE="1" TYPTYPE="1" TYPE="TS_MY_RUN_PARAMETERS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run parameters"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="T_OBJECTS" STATE="1" TYPTYPE="1" TYPE="TT_DATA">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="My Objects worklist"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="WAIT_TIME" STATE="1" TYPTYPE="1" TYPE="TD_WAITTIME">
@@ -37,6 +66,72 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIMT_DATA_BLOC" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="NEW_BLOC">
+      <SOURCE>`
+  CREATE DATA table TYPE tt_data.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="NEW_TASK_DEFINED">
+      <SOURCE>`
+  DATA s_paramaters   TYPE ts_my_process_info.
+
+  o_engine ?= ygplimt_data_bloc~task.
+
+  process_id = o_engine-&gt;process_id.
+  conditions = o_engine-&gt;conditions.
+  messaging = o_engine-&gt;messaging.
+  batch_info = o_engine-&gt;batch_info.
+  no_message = o_engine-&gt;no_message.
+  status = o_engine-&gt;status.
+  workprocess = o_engine-&gt;workprocess.
+* Initialize
+  run_parameters = get_parameters( ).
+  compute_wait_time( ).
+  s_paramaters-wait_time = wait_time.
+  send_parameters( s_paramaters ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="PROCESS_BATCH">
+      <SOURCE>`
+  DATA t_objects  TYPE  tt_data.
+  t_objects = objects.
+  process_my_objects( t_objects = t_objects ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_TASK" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CONFIRM_BATCH">
+      <SOURCE>`
+  o_engine-&gt;confirm_batch( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CONFIRM_OBJECTS">
+      <SOURCE>`
+  o_engine-&gt;confirm_objects( count = count
+                            status = status ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_BATCH">
+      <SOURCE>`
+  o_engine-&gt;get_batch( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_OBJECTS_TO_RECOVER">
+      <SOURCE>`
+  o_engine-&gt;get_objects_to_recover( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_PROGRESSION">
+      <SOURCE>`
+  o_engine-&gt;get_progression( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="OBJECTS_ALREADY_DONE">
+      <SOURCE>`
+  o_engine-&gt;objects_already_done( ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="PROCESS_OBJECTS">
+      <SOURCE>`
+  o_engine-&gt;process_objects( ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
@@ -81,7 +176,7 @@
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="Run Process ID"/>
       </TEXTS>
@@ -95,21 +190,11 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA s_paramaters   TYPE ts_my_process_info.
-  DATA o_category     TYPE REF TO ygpl_mt_my_categories.
-  DATA o_status       TYPE REF TO ygpl_mt_my_status.
+  CHECK NOT run_id IS INITIAL.
 
-* Construct
-  super-&gt;constructor( run_id ).
-  CREATE OBJECT o_category.     &quot; My categories
-  CREATE OBJECT o_status.
-  set_category( o_category ).
-  set_status( o_status ).
-* Initialize
-  run_parameters = get_parameters( ).
-  compute_wait_time( ).
-  s_paramaters-wait_time = wait_time.
-  send_parameters( s_paramaters ).</SOURCE>
+  ygplimt_data_bloc~task = ygpl_mt_factories=&gt;create_new_task( id = run_id
+                                                   o_data_handler = me ).
+  new_task_defined( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DO_JOB" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -123,19 +208,21 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  DATA t_objects  TYPE  tt_data.
+
   DO.
 * Get data
-    _get_batch( IMPORTING objects = t_objects ).
+    o_engine-&gt;get_batch( IMPORTING objects = t_objects ).
 
     IF t_objects[] IS INITIAL.   EXIT.     ENDIF.
 
 * Process Data
-    process_my_objects(  ).
+    process_my_objects( t_objects = t_objects ).
 
     FREE t_objects.
 
 * Confirm Data
-    confirm_batch( ).
+    o_engine-&gt;confirm_batch( ).
 
   ENDDO.</SOURCE>
    </ITEM>
@@ -151,19 +238,22 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  DATA t_objects  TYPE  tt_data.
+
   DO.
 * Get data
-    _get_objects_to_recover( IMPORTING objects = t_objects ).
+    o_engine-&gt;get_objects_to_recover( IMPORTING objects = t_objects ).
 
     IF t_objects[] IS INITIAL.   EXIT.     ENDIF.
 
 * Process Data
-    process_my_objects( abap_true ).
+    process_my_objects( t_objects = t_objects
+                    recovery_mode = abap_true ).
 
     FREE t_objects.
 
 * Confirm Data
-    confirm_batch( ).
+    o_engine-&gt;confirm_batch( ).
 
   ENDDO.</SOURCE>
    </ITEM>
@@ -186,22 +276,8 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  _get_information( EXPORTING category = my_categories-task_param
-                     CHANGING     info = result ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_RUN" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get run"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_RUN">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Run of the task"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <SOURCE>`
-  result = o_run.</SOURCE>
+  o_engine-&gt;parent-&gt;informations-&gt;get_information( EXPORTING category = my_categories-task_param
+                                                    CHANGING     info = result ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="PROCESS_MY_OBJECTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -211,6 +287,11 @@
      <ITEM SCONAME="RECOVERY_MODE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_BOOLEAN" PAROPTIONL="X">
       <TEXTS>
        <ITEM LANG="E" TEXT="process worklist in recovery mode"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="T_OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_DATA">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object to do"/>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
@@ -236,7 +317,7 @@
         FROM ygpl_t100t
         WHERE arbgb = &lt;obj&gt;-msg.
       IF sy-subrc = 0.
-        confirm_objects( system_status-object-already_done ).
+        o_engine-&gt;objects_already_done( ).
         CONTINUE.
       ENDIF.
     ENDIF.
@@ -259,12 +340,13 @@
       _status = my_status-ko.
     ENDIF.
 
-    confirm_objects( _status ).
+    o_engine-&gt;confirm_objects( _status ).
 
     IF _count &gt;= run_parameters-obj_count.
       CLEAR _count.
       WRITE:/ _ctrl-arbgb, _ctrl-stext.
-      confirm_objects( my_status-error ). &quot; error wanted
+      o_engine-&gt;confirm_objects( my_status-error ). &quot; error wanted
+      COMMIT WORK AND WAIT.
       WAIT UP TO wait_time SECONDS.
     ENDIF.
   ENDLOOP.</SOURCE>
@@ -289,24 +371,13 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA s_param TYPE ts_my_process_info.
-  _send_task_definition( ).
+  o_engine-&gt;autosave( ).
   s_param = parameters.
-  s_param-process_id = me-&gt;process_id.
-  _send_message( archive = abap_true
-                category = my_categories-task_param
-                 message = s_param ).</SOURCE>
+  s_param-process_id = o_engine-&gt;process_id.
+  o_engine-&gt;messaging-&gt;send_message( archive = abap_true
+                                    category = my_categories-task_param
+                                     message = s_param ).</SOURCE>
    </ITEM>
   </METHODS>
-  <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_NEW_TASK" MTDNAME="NEW_BLOC">
-    <SOURCE>`
-*** inactive deleted ***</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_NEW_TASK" MTDNAME="PROCESS_BATCH">
-    <SOURCE>`
-  t_objects = objects.
-  process_my_objects( ).</SOURCE>
-   </ITEM>
-  </REDEFINITIONS>
  </RAW>
 </ZL_OBJECT>
