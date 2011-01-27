@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4E82274ACC7FCCD3133F142EF187448D" CODE_SIGNATURE="D5DBC3343982B2E9571C13EAF8B8993D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_USECASEINDEX" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="04108ED92B2639D379C45DC56FAE829A" CODE_SIGNATURE="F5B2AC1B03A0E89B279CB5B36BB81171" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_USECASEINDEX" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-USECASEINDEX" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_USECASEINDEX">
@@ -31,6 +31,11 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="COMPONENTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_GENSETC">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Generation Set for ABAP Objects and BSP Applications"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="COMPONENTS_WITH_ERROR" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_GENSETC">
     <TEXTS>
      <ITEM LANG="E" TEXT="Generation Set for ABAP Objects and BSP Applications"/>
     </TEXTS>
@@ -519,19 +524,30 @@ ASThis service/functionality is dedicated to the memory of Pascal CUENIN
   DATA t_bloc   TYPE programt.
   DATA d_index  TYPE i.
   DATA d_to     TYPE i.
+  DATA f_err    TYPE abap_bool.
+  FIELD-SYMBOLS: &lt;p&gt; LIKE LINE OF components.
 
   determine_step( ).
   d_index = 1.
-  WHILE d_index &lt;= t_count.
-    d_to = d_index + bloc_size.
-    IF d_to &gt; t_count.    d_to = t_count.   ENDIF.
-    CLEAR t_bloc. APPEND LINES OF t_progs FROM d_index TO d_to TO t_bloc.
-    cl_wb_crossreference=&gt;activate_index( t_bloc ).
-    COMMIT WORK.
-    d_index = d_to + 1.
+  LOOP AT components ASSIGNING &lt;p&gt;.
+    cl_wb_crossreference=&gt;program_index( EXPORTING p_name = &lt;p&gt;-name
+                                        IMPORTING p_error = f_err ).
+    IF NOT f_err IS INITIAL.
+      APPEND &lt;p&gt; TO components_with_error.
+    ENDIF.
+    ADD 1 TO d_index.
     show_progress( d_index ).
-    IF d_index &gt; t_count.     EXIT.     ENDIF.
-  ENDWHILE.</SOURCE>
+  ENDLOOP.
+*  WHILE d_index &lt;= t_count.
+*    d_to = d_index + bloc_size.
+*    IF d_to &gt; t_count.    d_to = t_count.   ENDIF.
+*    CLEAR t_bloc. APPEND LINES OF t_progs FROM d_index TO d_to TO t_bloc.
+*    cl_wb_crossreference=&gt;activate_index( t_bloc ).
+*    COMMIT WORK.
+*    d_index = d_to + 1.
+*    show_progress( d_index ).
+*    IF d_index &gt; t_count.     EXIT.     ENDIF.
+*  ENDWHILE.</SOURCE>
    </ITEM>
   </METHODS>
   <TEXTSPOOL>
