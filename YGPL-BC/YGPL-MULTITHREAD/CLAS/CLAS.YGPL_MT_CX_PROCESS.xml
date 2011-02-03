@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E46C8B77AB3A804FC8A21398806FBC3C" CODE_SIGNATURE="9FBCEC42171A676F01431E4B38C21E5A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="564E8AEE5FFE9F1ED4C99E1444129999" CODE_SIGNATURE="7F3A12C12A0DEBC03777D191274E686F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
@@ -10,9 +10,7 @@
    <INHERITANCE REFCLSNAME="YGPL_MT_CX" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="MultyThread : Categories exception class">U1&amp;FUNCTIONALITY&amp;
-ASZAPLink framework root exception class. All Exception classes raised
-  from the framework inherit from this class. Have a look to each method
-  for more details.
+ASException class for process concept
 U1&amp;RELATIONS&amp;
 AS
 U1&amp;EXAMPLE&amp;
@@ -20,13 +18,7 @@ AS
 U1&amp;HINTS&amp;
 AS
 U1&amp;FURTHER_SOURCES_OF_INF&amp;
-AS
-U1Memories
-ASThis application is dedicated to the memories of :
-B2My father : Lamri BENSIALI (1940-2004) without whom I never started
-  programming
-B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
-  application</ITEM>
+AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
@@ -66,8 +58,8 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="YGPL_MT_CX_PROCESS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_PROCESS,
-      msgid type symsgid value &apos;ZAPLINK&apos;,
-      msgno type symsgno value &apos;105&apos;,
+      msgid type symsgid value &apos;YGPL_CX&apos;,
+      msgno type symsgno value &apos;001&apos;,
       attr1 type scx_attrname value &apos;CX_NAME&apos;,
       attr2 type scx_attrname value &apos;&apos;,
       attr3 type scx_attrname value &apos;&apos;,
@@ -80,9 +72,6 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
     <ITEM TYPEGROUP="IF_T100_MESSAGE" TPUTYPE="2" EXPLICIT="X"/>
    </INTERFACES>
   </DEFERRED>
-  <FRIENDS>
-   <ITEM REFCLSNAME="ZAPLINK_CX" STATE="1"/>
-  </FRIENDS>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPL_MT_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
