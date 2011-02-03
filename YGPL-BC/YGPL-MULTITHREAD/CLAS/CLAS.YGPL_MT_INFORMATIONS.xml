@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5E7C217EA523551D21FAE9363FC156DC" CODE_SIGNATURE="7588B150A5D64DB0306CF5384344D163" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="7705095DE09A5E824ED175C6B081DBDE" CODE_SIGNATURE="561E306A8B6CA69E0C57A7BEE01C11D9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -12,8 +12,6 @@
    <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_ALL"/>
    <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_PROCESS"/>
    <ITEM CMPNAME="GET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="GET_INFORMATION"/>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="HANDLE_SPECIFIC_MESSAGE"/>
-   <ITEM CMPNAME="OBJECTS_CONFIRMED" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="OBJECTS_CONFIRMED"/>
    <ITEM CMPNAME="O_PROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="O_PROCESS"/>
    <ITEM CMPNAME="SET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="SET_INFORMATION"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
@@ -68,18 +66,23 @@
      </ITEM>
      <ITEM MTDNAME="DELETE_PROCESS">
       <SOURCE>`
-  _lock( process_id = process_id
+  CHECK o_process-&gt;fake IS INITIAL.
+  _lock( process_id = o_process-&gt;process_id
           lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
            category = &apos;@&apos; ).    &quot; All Categories
 * Locks released by the next Commit/Roll back
 
-  DELETE FROM ygplmt_infos WHERE process_id = process_id.
+  DELETE FROM ygplmt_infos WHERE process_id = o_process-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
-    my_key = process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_database
-          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                 tablename = my_table
-                 key_value = my_key.
+    SELECT SINGLE process_id INTO my_key
+      FROM ygplmt_infos
+      WHERE process_id = o_process-&gt;process_id.
+    IF sy-subrc = 0.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_database
+            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                   tablename = my_table
+                   key_value = my_key.
+    ENDIF.
   ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_INFORMATION">
@@ -348,6 +351,7 @@
   DATA o_cx       TYPE REF TO ygpl_mt_cx.
   DATA my_key     TYPE string.
 
+  CHECK o_process-&gt;fake IS INITIAL.
   lock_with_share( category ).
   TRY.
       SELECT SINGLE info_data
@@ -478,6 +482,7 @@
   DATA _info TYPE ygplmt_infos.
   DATA o_cx TYPE REF TO ygpl_mt_cx.
 
+  CHECK o_process-&gt;fake IS INITIAL.
   lock_exclusive( category ).
 * Locks released by the next Commit/Roll back
   TRY.

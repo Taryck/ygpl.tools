@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="514C215658D4CDC78BE48002C9F6CD0C" CODE_SIGNATURE="C2821C2CBB8A47CCFDFF1BA3C8A5121F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="243EE8D8A88130E8BDF8466112EB6A5E" CODE_SIGNATURE="52CEED03883F122584B43FA9C7C5E848" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CONDITIONS_RUN"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <INHERITANCE REFCLSNAME="YGPL_MT_CONDITIONS_RUN" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
@@ -47,7 +47,8 @@
 *&quot;* local helper classes</IMPLEMENTATIONS>
    <MACROS>`
 *&quot;* use this source file for any macro definitions you need
-*&quot;* in the implementation part of the class</MACROS>
+*&quot;* in the implementation part of the class
+INCLUDE ygpl_mt_conditions_macros.</MACROS>
   </LOCAL>
   <METHODS>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
@@ -61,32 +62,42 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="MERGE_WITH">
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="COMPARE_WITH">
     <SOURCE>`
-  DATA i_condition TYPE REF TO ygplimt_startconditions.
-  super-&gt;merge_with( conditions ).
+  DATA i_conditions TYPE ti_full_conditions.
+  super-&gt;compare_with( conditions ).
   TRY.
-      i_condition ?= conditions.
-      bloc_size = i_condition-&gt;bloc_size.
-      weight_fieldname = i_condition-&gt;weight_fieldname.
+      i_conditions ?= conditions.
+      simple_compare text-bls me-&gt;bloc_size i_conditions-&gt;bloc_size.
+      simple_compare text-wfn me-&gt;weight_fieldname i_conditions-&gt;weight_fieldname.
     CATCH cx_sy_move_cast_error.
 * Ignore this error
   ENDTRY.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="YGPLIMT_CONDITIONS~DESERIALIZE">
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_RUN" MTDNAME="MERGE_WITH">
     <SOURCE>`
-  DATA o_start  TYPE REF TO ygplimt_startconditions.
-
-  super-&gt;ygplimt_conditions~deserialize( xml ).
-
+  DATA i_conditions TYPE ti_full_conditions.
+  super-&gt;merge_with( conditions ).
   TRY.
-      o_start ?= deserialized_object.
-      set_bloc_size( o_start-&gt;bloc_size ).
-      set_weight_fieldname( o_start-&gt;weight_fieldname ).
-      set_servers( o_start-&gt;servers ).
+      i_conditions ?= conditions.
+      set_bloc_size( i_conditions-&gt;bloc_size ).
+      set_weight_fieldname( i_conditions-&gt;weight_fieldname ).
     CATCH cx_sy_move_cast_error.
+* Ignore this error
   ENDTRY.</SOURCE>
    </ITEM>
   </REDEFINITIONS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="BLS">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Bloc Size" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="WFN">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Weight FieldName" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
  </RAW>
 </ZL_OBJECT>

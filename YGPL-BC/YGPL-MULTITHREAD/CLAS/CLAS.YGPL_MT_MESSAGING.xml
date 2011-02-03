@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="63D20BA17256D71E74A0A8D039FE9A06" CODE_SIGNATURE="EF8DDB2AB2172EA65F2992456B3F8258" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A271AD6AC943719C75DD4DDC740319E8" CODE_SIGNATURE="7AA7C72B9BB63532AA1998D1637EBC28" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -86,16 +86,21 @@
      </ITEM>
      <ITEM MTDNAME="DELETE_PROCESS">
       <SOURCE>`
+  CHECK o_process-&gt;fake IS INITIAL.
 * No lock unique ID
 *  _lock( process_id = process_id
 *          lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive ).
-  DELETE FROM ygplmt_messages WHERE process_id = process_id.
+  DELETE FROM ygplmt_messages WHERE process_id = o_process-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
-    my_key = process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_database
-          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                 tablename = my_table
-                 key_value = my_key.
+    SELECT SINGLE process_id into my_key
+      FROM ygplmt_messages
+      WHERE process_id = o_process-&gt;process_id.
+    IF sy-subrc = 0.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_database
+            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                   tablename = my_table
+                   key_value = my_key.
+    ENDIF.
   ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="HANDLE_MESSAGES">
@@ -110,6 +115,7 @@
   DATA o_cx         TYPE REF TO cx_root.
   FIELD-SYMBOLS &lt;m&gt; LIKE LINE OF it_msg.
 
+  CHECK o_process-&gt;fake IS INITIAL.
 * Get global Lock on object processing.
   get_semaphore( ).
   TRY.
@@ -154,6 +160,7 @@
      </ITEM>
      <ITEM MTDNAME="SEND_MESSAGE">
       <SOURCE>`
+  CHECK o_process-&gt;fake IS INITIAL.
   CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_valid_category( category ) IS INITIAL.
   _send_message( archive = archive
                 category = category
@@ -263,7 +270,7 @@
     COLLECT &lt;statut&gt; INTO confirmed_objects-t_status.
   ENDLOOP.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGES" STATE="1">
+   <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGES" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Handle your own message"/>
     </TEXTS>
@@ -275,9 +282,9 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="FAILED" LANGU="E">
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Message processing has failed (abort futher processing)"/>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
      </ITEM>
     </EXCEPTIONS>
@@ -291,6 +298,7 @@
 *    _data TYPE REF TO data,
     _has_failed TYPE td_boolean.
 
+  CHECK NOT messages IS INITIAL.
   LOOP AT messages ASSIGNING &lt;msg&gt;.
 ** Get Categorie data Type
 *    READ TABLE msg_cat_types WITH TABLE KEY cat = &lt;msg&gt;-categ ASSIGNING &lt;dt&gt;.
@@ -338,10 +346,8 @@
         rawdata  = &lt;msg&gt;-msg_data.
   ENDLOOP.
 
-  DELETE ygplmt_messages FROM TABLE messages.
-
-*Raise exception if one of the message couldn&apos;t be processed
-  IF _has_failed = abap_true. RAISE failed. ENDIF.</SOURCE>
+**Raise exception if one of the message couldn&apos;t be processed
+*  IF _has_failed = abap_true. RAISE failed. ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_SYSTEM_MESSAGES" STATE="1">
     <TEXTS>
@@ -370,7 +376,7 @@
   DATA f_obj_conf TYPE td_boolean.
   DATA s_task TYPE ts_process_definition.
   DATA s_cond TYPE string.
-  DATA o_cond TYPE TI_CONDITIONS.
+  DATA o_cond TYPE ti_conditions.
 
   LOOP AT messages ASSIGNING &lt;msg&gt;.
     CASE &lt;msg&gt;-category.
@@ -384,8 +390,9 @@
       WHEN system_categories-condition.
         decode_data( EXPORTING buffer = &lt;msg&gt;-msg_data
                       CHANGING    any = s_cond ).
-        o_cond = ygpl_mt_factories=&gt;create_new_run_conditions( ).
-        o_cond-&gt;deserialize( s_cond ).
+*        o_cond = ygpl_mt_factories=&gt;create_new_run_conditions( ).
+*        o_cond-&gt;deserialize( s_cond ).
+        o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( s_cond ).
         RAISE EVENT new_running_conditions EXPORTING conditions = o_cond.
       WHEN OTHERS.
 * Unexpected messages type
@@ -441,6 +448,7 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA conditions TYPE string.
+  CHECK o_process-&gt;fake IS INITIAL.
   conditions = condition-&gt;serialize( ).
   _send_message( archive = archive
                 category = system_categories-condition
@@ -496,7 +504,7 @@
     <SOURCE>`
   me-&gt;o_process = o_process.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="_DEL_MSG" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="_DEL_MSG_OFF" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Delete messages records"/>
     </TEXTS>
@@ -587,6 +595,7 @@
     <SOURCE>`
   DATA _msg TYPE ygplmt_messages.
 
+  CHECK o_process-&gt;fake IS INITIAL.
   _msg-message_id = _generate_msg_id( ).
   _msg-process_id = o_process-&gt;process_id.
   _msg-category = category.

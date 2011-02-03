@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A8CE14F5F52BD7FCF053EC37447124E4" CODE_SIGNATURE="827A26795F0AA538C12C977E80698387" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="239F4696D3CD7B619CD96ABF72DADF20" CODE_SIGNATURE="171E22372B1E934187B52191A9B6A237" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONDITIONS_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CONDITIONS_TASK"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
    <INHERITANCE REFCLSNAME="YGPL_MT_CONDITIONS_TASK" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="Run conditions"/>
@@ -50,7 +50,8 @@
 *&quot;* local helper classes</IMPLEMENTATIONS>
    <MACROS>`
 *&quot;* use this source file for any macro definitions you need
-*&quot;* in the implementation part of the class</MACROS>
+*&quot;* in the implementation part of the class
+INCLUDE ygpl_mt_conditions_macros.</MACROS>
   </LOCAL>
   <METHODS>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
@@ -61,36 +62,52 @@
   super-&gt;constructor( ).
 
   threads = 2.
+  global_progression-active = abap_true.
   global_progression-time-mini = 30.
   global_progression-progress-maxi = 5.</SOURCE>
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_TASK" MTDNAME="MERGE_WITH">
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_TASK" MTDNAME="COMPARE_WITH">
     <SOURCE>`
-  DATA i_condition TYPE REF TO ygplimt_runconditions_4run.
-  super-&gt;merge_with( conditions ).
+  DATA i_conditions TYPE ti_run_conditions.
+  super-&gt;compare_with( conditions ).
   TRY.
-      i_condition ?= conditions.
-      threads = i_condition-&gt;threads.
-      global_progression = i_condition-&gt;global_progression.
+      i_conditions ?= conditions.
+      simple_compare text-ths me-&gt;threads i_conditions-&gt;threads.
+      IF i_conditions-&gt;global_progression &lt;&gt; me-&gt;global_progression.
+        MESSAGE i017 WITH text-gpg.
+        compare_progression( from = me-&gt;global_progression
+                             with = i_conditions-&gt;global_progression ).
+      ENDIF.
     CATCH cx_sy_move_cast_error.
 * Ignore this error
   ENDTRY.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_TASK" MTDNAME="YGPLIMT_CONDITIONS~DESERIALIZE">
+   <ITEM REFCLSNAME="YGPL_MT_CONDITIONS_TASK" MTDNAME="MERGE_WITH">
     <SOURCE>`
-  DATA o_run    TYPE REF TO ygplimt_runconditions_4run.
-
-  super-&gt;ygplimt_conditions~deserialize( xml ).
-
+  DATA i_conditions TYPE ti_run_conditions.
+  super-&gt;merge_with( conditions ).
   TRY.
-      o_run ?= deserialized_object.
-      set_threads( o_run-&gt;threads ).
-      set_global_progression( o_run-&gt;global_progression ).
+      i_conditions ?= conditions.
+      set_threads( i_conditions-&gt;threads ).
+      set_global_progression( i_conditions-&gt;global_progression ).
     CATCH cx_sy_move_cast_error.
+* Ignore this error
   ENDTRY.</SOURCE>
    </ITEM>
   </REDEFINITIONS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="GPG">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Global Progression" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="THS">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Threads" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
  </RAW>
 </ZL_OBJECT>
