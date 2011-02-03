@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E5A4F4470AD4CAFB81FE8EFE3E308988" CODE_SIGNATURE="1D48B43FCB8C693CD3352C2A9033395E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CX" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="EDBEDCC11F15D9ACF93FF4AFB956565B" CODE_SIGNATURE="1CC9A66DBFFD359CE95ACCB07867F49A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CX" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="CX_STATIC_CHECK"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
@@ -10,9 +10,8 @@
    <INHERITANCE REFCLSNAME="CX_STATIC_CHECK" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="YGPL : Root exception class">U1&amp;FUNCTIONALITY&amp;
-ASZAPLink framework root exception class. All Exception classes raised
-  from the framework inherit from this class. Have a look to each method
-  for more details.
+ASYGPL root exception class. All Exception classes raised from YGPL
+  inherit from this class. Have a look to each method for more details.
 U1&amp;RELATIONS&amp;
 AS
 U1&amp;EXAMPLE&amp;
@@ -20,13 +19,7 @@ AS
 U1&amp;HINTS&amp;
 AS
 U1&amp;FURTHER_SOURCES_OF_INF&amp;
-AS
-U1Memories
-ASThis application is dedicated to the memories of :
-B2My father : Lamri BENSIALI (1940-2004) without whom I never started
-  programming
-B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
-  application</ITEM>
+AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
@@ -61,10 +54,10 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
   </DEFERRED>
   <EXCEPTIONS_TEXTS>
    <ITEM CMPNAME="SYSTEM_ERROR" EDITORDER="2 ">
-    <MESSAGE CLASS="ZAPLINK" NUMBER="104" ATTRIBUT_1="CX_NAME"/>
+    <MESSAGE CLASS="YGPL_CX" ATTRIBUT_1="CX_NAME"/>
    </ITEM>
    <ITEM CMPNAME="YGPL_CX" EDITORDER="1 ">
-    <MESSAGE CLASS="ZAPLINK" NUMBER="105" ATTRIBUT_1="CX_NAME"/>
+    <MESSAGE CLASS="YGPL_CX" NUMBER="001" ATTRIBUT_1="CX_NAME"/>
    </ITEM>
   </EXCEPTIONS_TEXTS>
   <FRIENDS>
@@ -84,9 +77,7 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
 *&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
    <MACROS>`
 *&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
-*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS
-
-INCLUDE zaplink_macros.</MACROS>
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
   </LOCAL>
   <METHODS>
    <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
@@ -236,7 +227,7 @@ INCLUDE zaplink_macros.</MACROS>
     source-str = source-name.
   ENDIF.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CREATE_FROM_METHOD_CX" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="CREATE_FROM_METHOD_CX" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create Exception from Method Exception (non class exception)">U1&amp;FUNCTIONALITY&amp;
 ASGenerate an exception class based on the exception number of the method.
@@ -253,9 +244,9 @@ ASException number in the method call must be in alphabetical order, not
   won&apos;t be the right one. Exception &quot;OTHERS&quot; should always be the last
   exception number.
 U1&amp;RESULT&amp;
-ASA exception class based on the CLASSNAME value (ZAPLINK_CX if leaved
-  blank) is generated with CX_NAME filled with the name of the exception
-  in the method.
+ASA exception class based on the CLASSNAME value (YGPL_CX if leaved blank)
+  is generated with CX_NAME filled with the name of the exception in the
+  method.
 U1&amp;PARAMETERS&amp;
 AS
 U1&amp;EXCEPTIONS&amp;
@@ -276,7 +267,7 @@ AS</ITEM>
      </ITEM>
      <ITEM SCONAME="CX_CLASSNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Exception class name inherited from ZAPLINK_CX"/>
+       <ITEM LANG="E" TEXT="Exception class name inherited from YGPL_CX"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="METHOD" CMPTYPE="1" TYPTYPE="1" TYPE="STRING">
@@ -329,7 +320,7 @@ AS</ITEM>
   ASSERT sy-subrc = 0.
   result-&gt;cx_name = &lt;e&gt;-name.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CREATE_FROM_MF_CX" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="CREATE_FROM_MF_CX" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create Exception from Module Function Exception">U1&amp;FUNCTIONALITY&amp;
 ASGenerate an exception class based on the exception number of the
@@ -340,9 +331,9 @@ U1&amp;PRECONDITION&amp;
 ASException number in the function module call must be in the exact order
   in the function module definition.
 U1&amp;RESULT&amp;
-ASA exception class based on the CLASSNAME value (ZAPLINK_CX if leaved
-  blank) is generated with CX_NAME filled with the name of the exception
-  in function module.
+ASA exception class based on the CLASSNAME value (YGPL_CX if leaved blank)
+  is generated with CX_NAME filled with the name of the exception in
+  function module.
 U1&amp;PARAMETERS&amp;
 AS
 U1&amp;EXCEPTIONS&amp;
@@ -353,7 +344,7 @@ AS</ITEM>
     <PARAMETERS>
      <ITEM SCONAME="CLASSNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Exception class name inherited from ZAPLINK_CX"/>
+       <ITEM LANG="E" TEXT="Exception class name inherited from YGPL_CX"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="FUNCNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="RS38L-NAME">
@@ -423,7 +414,7 @@ AS</ITEM>
     _cx = create_from_mf_cx( funcname = &apos;FUNC_GET_OBJECT&apos;
                                 subrc = sy-subrc ).
     result-&gt;previous = _cx.
-    result-&gt;textid_msg = zaplink_cx=&gt;system_error.
+    result-&gt;textid_msg = ygpl_cx=&gt;system_error.
     EXIT.
   ENDIF.
 
@@ -443,8 +434,8 @@ AS</ITEM>
   ENDIF.
   ASSERT &lt;p&gt; IS ASSIGNED.     CHECK &lt;p&gt; IS ASSIGNED.
 *  IF NOT &lt;p&gt; IS ASSIGNED.
-*    RAISE EXCEPTION TYPE zaplink_cx
-*          EXPORTING textid = zaplink_cx=&gt;system_error.
+*    RAISE EXCEPTION TYPE ygpl_cx
+*          EXPORTING textid = ygpl_cx=&gt;system_error.
 *  ENDIF.
 
   result-&gt;cx_name = &lt;p&gt;-parameter.
@@ -474,7 +465,7 @@ AS</ITEM>
     <PARAMETERS>
      <ITEM SCONAME="CLASSNAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Exception class name inherited from ZAPLINK_CX"/>
+       <ITEM LANG="E" TEXT="Exception class name inherited from YGPL_CX"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_ME">
@@ -488,13 +479,6 @@ AS</ITEM>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="ZAPLINK_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="ZAPlink Framework : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
     <SOURCE>`
 
   result = _create_cx( cx_name = classname
@@ -666,7 +650,7 @@ AS</ITEM>
   WHILE _cx IS BOUND.
     _msg = _cx-&gt;get_text( ).
 *    if not _cx-&gt;systemstack is INITIAL.   t_stack = _cx-&gt;systemstack.   endif.
-    _pos = zaplink_cx=&gt;source_position_as_string( _cx ).
+    _pos = source_position_as_string( _cx ).
     CONCATENATE _msg _pos INTO _msg SEPARATED BY space.
     APPEND _msg TO _exceptions.
     _cx = _cx-&gt;previous.
@@ -704,7 +688,7 @@ AS</ITEM>
     <PARAMETERS>
      <ITEM SCONAME="CX_NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X">
       <TEXTS>
-       <ITEM LANG="E" TEXT="Exception class name inherited from ZAPLINK_CX"/>
+       <ITEM LANG="E" TEXT="Exception class name inherited from YGPL_CX"/>
       </TEXTS>
      </ITEM>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_ME">

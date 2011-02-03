@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="80F05F3D3F00ABAF65902B1CA6752969" CODE_SIGNATURE="0DCEAC77304E213F2F4D22369C3414A8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="BA1C39C55869008DE9B0E64E76B269BE" CODE_SIGNATURE="57FB3C517BF32C0C011CCBD3DE0033AE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-GENERATION" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
    <TEXTS>
-    <ITEM LANG="E" TEXT="ZAPLink : Activate components">U1&amp;FUNCTIONALITY&amp;
-ASAllow to activate (compile) a component list.
+    <ITEM LANG="E" TEXT="Activate components">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
 U1&amp;RELATIONS&amp;
 AS
 U1&amp;EXAMPLE&amp;
@@ -13,13 +13,7 @@ AS
 U1&amp;HINTS&amp;
 AS
 U1&amp;FURTHER_SOURCES_OF_INF&amp;
-AS
-U1Memories
-ASThis application is dedicated to the memories of :
-B2My father : Lamri BENSIALI (1940-2004) without whom I never started
-  programming
-B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
-  application</ITEM>
+AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
   <ATTRIBUTS>
@@ -32,6 +26,16 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
    <ITEM CMPNAME="IT_OBJ_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_OBJLIST">
     <TEXTS>
      <ITEM LANG="E" TEXT="Objects list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MAX_ORDER" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;999999&apos;" TYPTYPE="1" TYPE="TD_TYPEORDER">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Max (and default) Rank for type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SAPTYPES" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_SAPTYPES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of SAP Types"/>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
@@ -893,6 +897,34 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
     IF inact IS INITIAL.    DELETE obj_list.    ENDIF.
   ENDLOOP.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA t_types    TYPE STANDARD TABLE OF ko100 WITH DEFAULT KEY.
+  DATA s_saptypes LIKE LINE OF saptypes.
+  DATA t_saptypes TYPE STANDARD TABLE OF ts_saptypes.
+  FIELD-SYMBOLS:
+    &lt;t&gt; LIKE LINE OF t_types.
+
+  CALL FUNCTION &apos;TR_OBJECT_TABLE&apos;
+*   IMPORTING
+*     WE_TABLE_LINES       =
+    TABLES
+      wt_object_text       = t_types.
+
+  SORT t_types BY object.
+  DELETE ADJACENT DUPLICATES FROM t_types COMPARING object.
+
+  LOOP AT t_types ASSIGNING &lt;t&gt;.
+    CLEAR s_saptypes. s_saptypes-hdr = &lt;t&gt;.
+    s_saptypes-order = max_order.
+    APPEND s_saptypes TO t_saptypes.
+  ENDLOOP.
+
+  saptypes = t_saptypes.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="COMPKEYS_2_GENSET" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Convert List from Compkeys to Generation Set"/>
@@ -917,7 +949,7 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
     CLEAR s_obj.
     s_obj-object = &lt;k&gt;-type.
     s_obj-objname = &lt;k&gt;-name.
-    s_obj-pgmid = zaplink_connectors=&gt;get_typekind( &lt;k&gt;-type ).
+    s_obj-pgmid = get_typekind( &lt;k&gt;-type ).
 *    s_obj-component
     APPEND s_obj TO result.
   ENDLOOP.
@@ -1313,6 +1345,21 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
   SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
   s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_TYPEKIND" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Program ID of object type"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COMPTYPE"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_TRANSPORT_KIND"/>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS &lt;t&gt; LIKE LINE OF saptypes.
+
+  READ TABLE saptypes ASSIGNING &lt;t&gt;
+       WITH TABLE KEY object = data.
+  IF sy-subrc = 0.    result = &lt;t&gt;-pgmid.   ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="LIMIT_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Limit/extend packages to Software component"/>
@@ -1437,6 +1484,16 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
      <ITEM LANG="E" TEXT="Object Type"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TD_TRANSPORT_KIND" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="KO100-PGMID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Program ID in Requests and Tasks"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TYPEORDER" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Order/Rank of component type"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TR_AUTHOR" EXPOSURE="2" STATE="1" EDITORDER="8 " TYPTYPE="4">
     tr_author TYPE RANGE OF tadir-author
 `
@@ -1489,6 +1546,12 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
      <ITEM LANG="E" TEXT="Component Key (unique)"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TS_SAPTYPES" EXPOSURE="1" STATE="1" EDITORDER="5 " TYPTYPE="4">BEGIN OF ts_saptypes.
+  INCLUDE TYPE ko100 AS hdr.
+  TYPES:
+      order TYPE td_typeorder,     &quot; order of prefered load
+    END OF ts_saptypes
+`</ITEM>
    <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">
     tt_compkeys TYPE STANDARD TABLE OF ts_compkey WITH DEFAULT KEY
 `
@@ -1528,6 +1591,13 @@ B2My uncle : Jacky BEDU (1934-2009) who died during the completion of this
    </ITEM>
    <ITEM CMPNAME="TT_PACK" EXPOSURE="1" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_pack TYPE STANDARD TABLE OF tdevc-devclass with DEFAULT KEY
 `</ITEM>
+   <ITEM CMPNAME="TT_SAPTYPES" EXPOSURE="1" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    tt_saptypes TYPE HASHED TABLE OF ts_saptypes WITH UNIQUE KEY object
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of SAP CTS Types"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="T_MAINPROG" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">
     BEGIN OF t_mainprog,
       master TYPE d010inc-master,
