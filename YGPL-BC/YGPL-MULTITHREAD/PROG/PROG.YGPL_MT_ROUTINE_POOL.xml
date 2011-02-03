@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="19742DDB6BB7F38E28AD2B59B36B92D4" CODE_SIGNATURE="CF6C6DFB1657B128B5DB6790C43F3EFF" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_ROUTINE_POOL" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="S" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Subroutine Pool   YGPL_MT_ROUTINE_POOL
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+PROGRAM  ygpl_mt_routine_pool.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  set_limits
+*&amp;---------------------------------------------------------------------*
+FORM set_limits  USING p_act
+                       p_p_min
+                       p_p_max
+                       p_t_min
+                       p_t_max
+              CHANGING p_limits TYPE ygpl_mt_typespool=&gt;ts_limits.
+  p_limits-active = p_act.
+  p_limits-progress-mini = p_p_min.
+  p_limits-progress-maxi = p_p_max.
+  p_limits-time-mini = p_t_min.
+  p_limits-time-maxi = p_t_max.
+ENDFORM.                    &quot;set_limits
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_limits
+*&amp;---------------------------------------------------------------------*
+FORM get_limits  USING p_limits TYPE ygpl_mt_typespool=&gt;ts_limits
+              CHANGING p_act
+                       p_p_min
+                       p_p_max
+                       p_t_min
+                       p_t_max.
+  p_act = p_limits-active.
+  p_p_min = p_limits-progress-mini.
+  p_p_max = p_limits-progress-maxi.
+  p_t_min = p_limits-time-mini.
+  p_t_max = p_limits-time-maxi.
+ENDFORM.                    &quot; CREATE_LIMITS</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Routine Pool for MT Framework" LENGTH="29 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
