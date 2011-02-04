@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6D4B43359A78A316FD6C34C5A451B72B" CODE_SIGNATURE="64387B4A13240843FB6EF98FB9E54999" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="AA2C9B71432E68E01E2171AAF8A8249F" CODE_SIGNATURE="DFA2F659F276FF4A178A03CEFBBC15FD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -131,6 +131,31 @@
 *  o_cond-&gt;deserialize( d_cond_ser ).
   o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( d_cond_ser ).
   set_conditions( o_cond ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Update remaining blocs"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BLOC_COUNT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Remaing blocs count"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  lock_exclusive( ).
+* Lock released with commit.
+  UPDATE ygplmt_runs SET blocs = bloc_count
+         WHERE run_id = process_id.
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
