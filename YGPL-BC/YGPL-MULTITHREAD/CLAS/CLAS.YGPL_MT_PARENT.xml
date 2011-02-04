@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="66B96187E9DB2426622F568CFBD1D536" CODE_SIGNATURE="AD12C75D9D613F476A3E893D1D2AB78D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6D4B43359A78A316FD6C34C5A451B72B" CODE_SIGNATURE="64387B4A13240843FB6EF98FB9E54999" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -13,11 +13,6 @@
   </A0_MAINDATA>
   <ALIASES>
    <ITEM CMPNAME="RECIEVING_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE"/>
-   <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_COUNT"/>
-   <ITEM CMPNAME="SET_BLOC_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_BLOC_SIZE"/>
-   <ITEM CMPNAME="SET_MAX_MEMORY" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_MAX_MEMORY"/>
-   <ITEM CMPNAME="SET_THREAD_COUNT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_THREAD_COUNT"/>
-   <ITEM CMPNAME="SET_WEIGHT_FN" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SET_WEIGHT_FN"/>
    <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_PARENT" REFCMPNAME="SUBMIT_THREAD"/>
    <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_FN"/>
    <ITEM CMPNAME="TD_JOBID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_JOBID"/>
@@ -46,87 +41,7 @@
    <ITEM REFCLSNAME="YGPL_MT_TASK" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_PARENT" EXPOSURE="2" STATE="1" RELTYPE="1">
-    <COMPONENTS>
-     <ITEM MTDNAME="SET_BLOC_COUNT">
-      <SOURCE>`
-  lock_exclusive( ).
-* Lock released with commit.
-  UPDATE ygplmt_runs SET blocs = bloc_count
-    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.</SOURCE>
-     </ITEM>
-     <ITEM MTDNAME="SET_BLOC_SIZE">
-      <SOURCE>`
-*  CHECK infos-bloc_size &lt;&gt; bloc_size.
-*  f_has_changed = abap_true.
-*  infos-bloc_size = bloc_size.</SOURCE>
-     </ITEM>
-     <ITEM MTDNAME="SET_MAX_MEMORY">
-      <SOURCE>`
-*  DATA o_msg    TYPE to_messaging.
-*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-*  DATA s_condition TYPE ts_running_conditions.
-*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-*
-*  CHECK me-&gt;max_memory &lt;&gt; max_memory.
-*  o_job_monitoring-&gt;check_active_threads( ).
-*  IF o_job_monitoring-&gt;threads &gt; 0.
-** Task running
-*    it_list = o_job_monitoring-&gt;get_job_list( ).
-*    IF LINES( it_list ) &gt; LINES( task_list ).
-** Lock required
-*      ASSERT 0 = 1.   &quot; #TO_do
-*    ENDIF.
-*    LOOP AT task_list ASSIGNING &lt;j&gt;.
-*      s_condition-max_memory = max_memory.
-** Send message
-** #TO_do
-**      CREATE OBJECT o_msg
-**        EXPORTING
-**          process_id   = &lt;j&gt;-process_id
-**          o_categories = o_categories.
-*      o_msg-&gt;send_system_message( category = system_categories-condition
-*                                   message = s_condition ).
-*    ENDLOOP.
-*  ENDIF.
-*  me-&gt;max_memory = max_memory.</SOURCE>
-     </ITEM>
-     <ITEM MTDNAME="SET_THREAD_COUNT">
-      <SOURCE>`
-*  DATA it_list  TYPE ygpl_mt_job_monitoring=&gt;tt_joblist.
-*  DATA nb_stop  TYPE i.
-*  FIELD-SYMBOLS &lt;j&gt; LIKE LINE OF task_list.
-*
-*  CHECK o_job_monitoring IS BOUND.
-*  CHECK infos-threads &lt;&gt; thread_count.
-*  f_has_changed = abap_true.
-*  IF o_job_monitoring-&gt;threads = 0.
-*    infos-threads = thread_count.
-*  ELSE.
-*    nb_stop = infos-threads - thread_count.
-*    IF nb_stop &lt; 0.
-*      ASSERT 0 = 1.   &quot; # To do
-*    ELSE.
-** Task running
-*      it_list = o_job_monitoring-&gt;get_job_list( ).
-*      IF LINES( task_list ) &lt; nb_stop.
-** Lock required
-*        ASSERT 0 = 1.   &quot; # To do
-*      ENDIF.
-** To improve
-*      LOOP AT task_list ASSIGNING &lt;j&gt; TO nb_stop.
-*        stop_task( &lt;j&gt;-process_id ).
-*      ENDLOOP.
-*    ENDIF.
-*  ENDIF.</SOURCE>
-     </ITEM>
-     <ITEM MTDNAME="SET_WEIGHT_FN">
-      <SOURCE>`
-*  me-&gt;weight_fn = weight_fn.</SOURCE>
-     </ITEM>
-    </COMPONENTS>
-   </ITEM>
+   <ITEM REFCLSNAME="YGPLIMT_PARENT" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`

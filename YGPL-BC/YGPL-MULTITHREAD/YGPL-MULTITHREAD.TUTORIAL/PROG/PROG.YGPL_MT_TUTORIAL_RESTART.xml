@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="3B1163A027DF79675690B39D1C3E87D6" CODE_SIGNATURE="8A0F2EAB593AA05032924C78EF3FF00D" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_RESTART" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="370BDBF31849641C7E2998F42F4F2FE5" CODE_SIGNATURE="C70BE529DF4F3D1878B6BF58AA96835C" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_RESTART" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -36,18 +36,18 @@ PARAMETERS :
 SELECTION-SCREEN END OF BLOCK load.
 
 START-OF-SELECTION.
-  DATA my_run     TYPE REF TO ygpl_mt_my_run.
+  DATA my_run     TYPE REF TO ygplimt_run.
   DATA my_task    TYPE REF TO ygpl_mt_my_task.
   DATA s_param    TYPE ygpl_mt_my_run=&gt;ts_my_run_parameters.
 
   CREATE OBJECT my_task
     EXPORTING
       run_id = run_id.
-  my_run ?= my_task-&gt;parent.
+  my_run = ygpl_mt_factories=&gt;get_run( run_id ).
 
   my_run-&gt;check_status( ).
 
-  ASSERT my_run-&gt;status = ygpl_mt_my_task=&gt;system_status-process-interupted.
+  ASSERT my_run-&gt;status = ygplimt_parent=&gt;system_status-process-interupted.
 
   my_task-&gt;do_recovery( ).
   my_run-&gt;messaging-&gt;handle_messages( ).

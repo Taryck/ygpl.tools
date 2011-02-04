@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="22C42FFA1A59AE9A232FD48EB9A473C1" CODE_SIGNATURE="CFAB3B698439B8A81CF8A5F729AB6225" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9B1D2758AC225CF79CCAE8DDE60F84D0" CODE_SIGNATURE="096EDEA7B123899BFCC0906210700494" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -322,13 +322,8 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
   DATA _bloc TYPE ygplmt_objects.
 
-  CHECK o_run-&gt;fake IS INITIAL.
   _bloc-bloc_id =  generate_bloc_id( ).
   _bloc-run_id = o_run-&gt;process_id.
   _bloc-status = system_status-bloc-to_do.
@@ -1198,7 +1193,6 @@
     &lt;fs&gt; LIKE objects,
     &lt;wa&gt; LIKE LINE OF _blocs.
 
-  CHECK o_run-&gt;fake IS INITIAL.
   ASSERT status = system_status-bloc-to_do OR status = system_status-bloc-in_progress.    &quot; Security
   ASSERT current_blocs[] IS INITIAL.
 

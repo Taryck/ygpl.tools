@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7705095DE09A5E824ED175C6B081DBDE" CODE_SIGNATURE="561E306A8B6CA69E0C57A7BEE01C11D9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="499D18575ED2DAE83A661D4B02942D7B" CODE_SIGNATURE="5223FCB178E003F15283C4DF8167246E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -66,7 +66,6 @@
      </ITEM>
      <ITEM MTDNAME="DELETE_PROCESS">
       <SOURCE>`
-  CHECK o_process-&gt;fake IS INITIAL.
   _lock( process_id = o_process-&gt;process_id
           lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
            category = &apos;@&apos; ).    &quot; All Categories
@@ -351,7 +350,6 @@
   DATA o_cx       TYPE REF TO ygpl_mt_cx.
   DATA my_key     TYPE string.
 
-  CHECK o_process-&gt;fake IS INITIAL.
   lock_with_share( category ).
   TRY.
       SELECT SINGLE info_data
@@ -482,7 +480,6 @@
   DATA _info TYPE ygplmt_infos.
   DATA o_cx TYPE REF TO ygpl_mt_cx.
 
-  CHECK o_process-&gt;fake IS INITIAL.
   lock_exclusive( category ).
 * Locks released by the next Commit/Roll back
   TRY.

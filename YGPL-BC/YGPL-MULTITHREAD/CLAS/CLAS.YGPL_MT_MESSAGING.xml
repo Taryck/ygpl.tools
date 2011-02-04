@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7231FB7063C9117D7446B7CC30E84524" CODE_SIGNATURE="43A5F032DBE762555B074A22C77F71B5" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="34D569C0F464EFA4A9BAC8A26653D3C2" CODE_SIGNATURE="D5574DFFD7D4C84EA8F3E7076A6E683E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -86,7 +86,6 @@
      </ITEM>
      <ITEM MTDNAME="DELETE_PROCESS">
       <SOURCE>`
-  CHECK o_process-&gt;fake IS INITIAL.
 * No lock unique ID
 *  _lock( process_id = process_id
 *          lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-exclusive ).
@@ -115,7 +114,6 @@
   DATA o_cx         TYPE REF TO cx_root.
   FIELD-SYMBOLS &lt;m&gt; LIKE LINE OF it_msg.
 
-  CHECK o_process-&gt;fake IS INITIAL.
 * Get global Lock on object processing.
   get_semaphore( ).
   TRY.
@@ -160,7 +158,6 @@
      </ITEM>
      <ITEM MTDNAME="SEND_MESSAGE">
       <SOURCE>`
-  CHECK o_process-&gt;fake IS INITIAL.
   CHECK NOT o_process-&gt;conditions-&gt;categories-&gt;is_valid_category( category ) IS INITIAL.
   _send_message( archive = archive
                 category = category
@@ -448,7 +445,6 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA conditions TYPE string.
-  CHECK o_process-&gt;fake IS INITIAL.
   conditions = condition-&gt;serialize( ).
   _send_message( archive = archive
                 category = system_categories-condition
@@ -595,7 +591,6 @@
     <SOURCE>`
   DATA _msg TYPE ygplmt_messages.
 
-  CHECK o_process-&gt;fake IS INITIAL.
   _msg-message_id = _generate_msg_id( ).
   _msg-process_id = o_process-&gt;process_id.
   _msg-category = category.
