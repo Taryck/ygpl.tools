@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="747F7438C82571EAD850B140C056C18B" CODE_SIGNATURE="B952867C38698056602A8A0E6A592E36" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="66B96187E9DB2426622F568CFBD1D536" CODE_SIGNATURE="AD12C75D9D613F476A3E893D1D2AB78D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -175,10 +175,10 @@
   DATA o_nfo TYPE to_informations.
 
   length = XSTRLEN( run_id ).
-*  ASSERT factory_mode IS NOT INITIAL OR length = 16.
   ASSERT run_id IS INITIAL OR length = 16.
 
-  super-&gt;constructor( o_messaging ).
+  super-&gt;constructor( process_id = run_id
+                     o_messaging = o_messaging ).
 
   IF o_informations IS BOUND.               &quot; Informations required to read conditions from DB
     set_informations( o_informations ).
@@ -209,11 +209,12 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA d_cond_ser TYPE td_serialized.
-  Data o_cond     type to_conditions.
+  DATA o_cond     TYPE to_conditions.
   _get_system_information( EXPORTING category = system_categories-condition
                             CHANGING info = d_cond_ser ).
-  o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
-  o_cond-&gt;deserialize( d_cond_ser ).
+*  o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
+*  o_cond-&gt;deserialize( d_cond_ser ).
+  o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( d_cond_ser ).
   set_conditions( o_cond ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">

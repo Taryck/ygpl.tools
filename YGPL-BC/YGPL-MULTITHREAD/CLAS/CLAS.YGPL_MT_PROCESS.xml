@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2160F827BC2D720372EDEEFC2F21423F" CODE_SIGNATURE="C7EE8BDFC72A77AD39B19B0870F8C533" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="66C5E03541CF11B973159EE0CD40BE52" CODE_SIGNATURE="BC5DB1E21D0BD4A170324C517F13ECA1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -13,6 +13,7 @@
    <ITEM CMPNAME="BATCH_INFO" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="BATCH_INFO"/>
    <ITEM CMPNAME="CHECK_STATUS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="CHECK_STATUS"/>
    <ITEM CMPNAME="CONV_RAW2DATA" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="CONV_RAW2DATA"/>
+   <ITEM CMPNAME="DELETE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="DELETE"/>
    <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="JOB_STATUS"/>
    <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="LOCK_MODES"/>
    <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="NO_MESSAGE"/>
@@ -227,11 +228,20 @@
     <PARAMETERS>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
     </PARAMETERS>
+    <SOURCE>`
+  result = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PROCESS_ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Process ID"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
     <EXCEPTIONS>
      <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
       <TEXTS>
@@ -240,41 +250,50 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  DATA length TYPE i.
   DATA subrc    TYPE sy-subrc.
   DATA _jobinfo TYPE tbtcm.
 
-  f_has_changed = abap_true.
-  CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
-    IMPORTING
-      server_name        = workprocess-wp_server
-    EXCEPTIONS
-      error_reading_name = 1
-      OTHERS             = 2.
-  ASSERT sy-subrc = 0.
+  length = XSTRLEN( process_id ).
+  ASSERT process_id IS INITIAL OR length = 16.
 
-  CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
-    IMPORTING
-      subrc    = subrc
-      wp_no    = workprocess-wp_no
-      wp_pid   = workprocess-wp_pid
-      wp_index = workprocess-wp_index.
-
-  process_id = generate_new_process_id( ).
-  GET TIME STAMP FIELD times-start.
-  workprocess-username = sy-uname.
-  workprocess-main_program = sy-repid.
-  status = system_status-process-started.
-
-  IF NOT sy-batch IS INITIAL.
-* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
-    CALL &apos;GetRuntimeInfo&apos;
-      ID &apos;JOB&apos; FIELD _jobinfo.
+  IF process_id IS INITIAL.
+    f_has_changed = abap_true.
+    CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
+      IMPORTING
+        server_name        = workprocess-wp_server
+      EXCEPTIONS
+        error_reading_name = 1
+        OTHERS             = 2.
     ASSERT sy-subrc = 0.
-    batch_info = _jobinfo.
-  ENDIF.
-  IF no_message IS INITIAL AND sy-batch IS NOT INITIAL.
+
+    CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
+      IMPORTING
+        subrc    = subrc
+        wp_no    = workprocess-wp_no
+        wp_pid   = workprocess-wp_pid
+        wp_index = workprocess-wp_index.
+
+    me-&gt;process_id = generate_new_process_id( ).
+    GET TIME STAMP FIELD times-start.
+    workprocess-username = sy-uname.
+    workprocess-main_program = sy-repid.
+    status = system_status-process-started.
+
+    IF NOT sy-batch IS INITIAL.
+* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
+      CALL &apos;GetRuntimeInfo&apos;
+        ID &apos;JOB&apos; FIELD _jobinfo.
+      ASSERT sy-subrc = 0.
+      batch_info = _jobinfo.
+    ENDIF.
+    IF no_message IS INITIAL AND sy-batch IS NOT INITIAL.
 * This processus in on server (&amp;1/&amp;2) with jobname : &amp;3(&amp;4)
-    MESSAGE i000 WITH workprocess-wp_server workprocess-wp_no batch_info-jobname batch_info-jobcount.
+      MESSAGE i000 WITH workprocess-wp_server workprocess-wp_no batch_info-jobname batch_info-jobcount.
+    ENDIF.
+  ELSE.
+    me-&gt;process_id = process_id.
+    read( ).
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GENERATE_NEW_PROCESS_ID" EXPOSURE="1" STATE="1" MTDDECLTYP="1">

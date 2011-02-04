@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A81F28BD836B0E3AE94C0E7DCCAC258F" CODE_SIGNATURE="FE8639FCC76DE0B404A37511E7C00132" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="22C42FFA1A59AE9A232FD48EB9A473C1" CODE_SIGNATURE="CFAB3B698439B8A81CF8A5F729AB6225" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -32,6 +32,8 @@
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
    <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_COUNT"/>
+   <ITEM CMPNAME="TD_DB_TABLE_KEY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_KEY"/>
+   <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
    <ITEM CMPNAME="TD_FN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_FN"/>
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_MEMORY_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_MEMORY_SIZE"/>
@@ -46,6 +48,7 @@
    <ITEM CMPNAME="TOTAL_BLOCS_COUNT" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="TOTAL_BLOCS_COUNT"/>
    <ITEM CMPNAME="TOTAL_OBJECTS" EXPOSURE="2" REFCLSNAME="YGPLIMT_OBJECTS_CONSUMING" REFCMPNAME="TOTAL_OBJECTS"/>
    <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_CHRONO"/>
+   <ITEM CMPNAME="TS_LIMITS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_LIMITS"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_BLOCS_NFO"/>
    <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_DEPENDENCIES"/>
@@ -93,6 +96,16 @@
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Progresion and time of the last message send/recieved"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table Key value"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="MY_TABLE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPLMT_OBJECTS&apos;" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_RUN" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_RUN">
@@ -218,7 +231,19 @@
   get_semaphore( ). &quot; #TO_DO
 * Locks released by the next Commit/Roll back
 
-  DELETE FROM ygplmt_objects WHERE run_id = process_id.
+  DELETE FROM ygplmt_objects WHERE run_id = o_run-&gt;process_id.
+  IF sy-subrc &lt;&gt; 0.
+    SELECT SINGLE run_id INTO my_key
+      FROM ygplmt_objects
+      WHERE run_id = o_run-&gt;process_id.
+    IF sy-subrc = 0.
+      release_semaphore( ).
+      RAISE EXCEPTION TYPE ygpl_mt_cx_database
+            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                   tablename = my_table
+                   key_value = my_key.
+    ENDIF.
+  ENDIF.
   release_semaphore( ).</SOURCE>
      </ITEM>
     </COMPONENTS>
@@ -303,6 +328,7 @@
 **********************************************************************
   DATA _bloc TYPE ygplmt_objects.
 
+  CHECK o_run-&gt;fake IS INITIAL.
   _bloc-bloc_id =  generate_bloc_id( ).
   _bloc-run_id = o_run-&gt;process_id.
   _bloc-status = system_status-bloc-to_do.
@@ -382,6 +408,37 @@
       bloc      = bloc
     CHANGING
       obj2blocs = obj2blocs.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHECK_PROGRESS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check progression"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LIMITS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_LIMITS"/>
+     <ITEM SCONAME="PROGRESS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROGRESS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Progression"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
+     <ITEM SCONAME="TIME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TIME"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CHECK limits-active IS NOT INITIAL.
+  CHECK progress &gt;= limits-progress-mini      &quot; Minimum Progress limit
+     OR ( time &gt;= limits-time-maxi            &quot; Or maximum Time limit (if set)
+          AND limits-time-maxi &lt;&gt; 0 ).
+  CHECK time &gt;= limits-time-mini              &quot; Minimum Time limit
+     OR ( progress &gt;= limits-progress-maxi    &quot; Or maximum Progress limit (if set)
+          AND limits-progress-maxi  &lt;&gt; 0 ).
+  result = abap_true.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_WEIGHT_FN" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -894,13 +951,10 @@
   GET TIME STAMP FIELD _now.
   _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
                                   tstmp2 = last_message-time ).
-*  _delta = _now - last_message-time.
-*  _sec = _delta.
 
-  CHECK delta_p &gt;= o_start_conditions-&gt;global_progression-progress-mini
-     OR _sec &lt;= o_start_conditions-&gt;global_progression-time-maxi.
-  CHECK _sec &gt;= o_start_conditions-&gt;global_progression-time-mini
-     OR delta_p &lt;= o_start_conditions-&gt;global_progression-progress-maxi.
+  CHECK check_progress( time = _sec
+                    progress = delta_p
+                      limits = o_start_conditions-&gt;progression ) IS NOT INITIAL.
 
   last_message-progress = new_p.
   last_message-time = _now.
@@ -1133,6 +1187,7 @@
   DATA rem_rows   TYPE i.
   DATA rows       TYPE i.
   DATA mem_size   TYPE td_memory_size.
+  DATA batch_size TYPE td_count.
   DATA t_size     TYPE td_memory_size.
   DATA _blocs     TYPE STANDARD TABLE OF ygplmt_objects.
   DATA _bloc      LIKE LINE OF current_blocs.
@@ -1143,6 +1198,7 @@
     &lt;fs&gt; LIKE objects,
     &lt;wa&gt; LIKE LINE OF _blocs.
 
+  CHECK o_run-&gt;fake IS INITIAL.
   ASSERT status = system_status-bloc-to_do OR status = system_status-bloc-in_progress.    &quot; Security
   ASSERT current_blocs[] IS INITIAL.
 
@@ -1181,10 +1237,16 @@
       IF NOT _blocs IS INITIAL.
         SORT _blocs BY mem_size DESCENDING.
         LOOP AT _blocs ASSIGNING &lt;wa&gt;.
+* Size limits
+          IF o_task_conditions-&gt;maximum_batch_size &gt; 0.
+            t_size = batch_size + &lt;wa&gt;-bloc_size.
+            CHECK o_task_conditions-&gt;maximum_batch_size &gt; t_size OR current_blocs IS NOT INITIAL.
+            ADD &lt;wa&gt;-bloc_size TO batch_size.
+          ENDIF.
 * Memory limits
           IF o_task_conditions-&gt;maximum_memory &gt; 0.
             t_size = mem_size + &lt;wa&gt;-mem_size.
-            CHECK t_size &gt; o_task_conditions-&gt;maximum_memory AND mem_size &gt; 0.
+            CHECK o_task_conditions-&gt;maximum_memory &gt; t_size OR current_blocs IS NOT INITIAL.
             ADD &lt;wa&gt;-mem_size TO mem_size.
           ENDIF.
 
@@ -1733,10 +1795,9 @@
   GET TIME STAMP FIELD _now.
   _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _now
                                   tstmp2 = last_message-time ).
-  CHECK delta_p &gt;= o_task_conditions-&gt;progression-progress-mini
-     OR _sec &lt;= o_task_conditions-&gt;progression-time-maxi.
-  CHECK _sec &gt;= o_task_conditions-&gt;progression-time-mini
-     OR delta_p &lt;= o_task_conditions-&gt;progression-progress-maxi.
+  CHECK check_progress( time = _sec
+                    progress = delta_p
+                      limits = o_task_conditions-&gt;progression ) IS NOT INITIAL.
 
   last_message-progress = new_p.
   last_message-time = _now.

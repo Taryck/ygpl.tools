@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="09B400E3853F8B428D46BE1EAAC7C8C5" CODE_SIGNATURE="2FDA654B19C5E50C99D9DEC7F9615CE7" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8BAE9491E86D0FFA78778454DD2EC7B3" CODE_SIGNATURE="EE4DEB1356A0907612B06C0356B6B1AB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -15,7 +15,10 @@
    <ITEM CMPNAME="CONFIRM_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONFIRM_BATCH"/>
    <ITEM CMPNAME="CONFIRM_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="CONFIRM_OBJECTS"/>
    <ITEM CMPNAME="DATA_HANDLER" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="DATA_HANDLER"/>
+   <ITEM CMPNAME="GET_BATCH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_BATCH"/>
+   <ITEM CMPNAME="GET_OBJECTS_TO_RECOVER" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_OBJECTS_TO_RECOVER"/>
    <ITEM CMPNAME="GET_PROGRESSION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="GET_PROGRESSION"/>
+   <ITEM CMPNAME="OBJECT_PROVIDER" EXPOSURE="2" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="OBJECT_PROVIDER"/>
    <ITEM CMPNAME="PROCESS_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="PROCESS_OBJECTS"/>
    <ITEM CMPNAME="TI_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="TI_CONDITIONS"/>
    <ITEM CMPNAME="TI_DATA_BLOC" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="TI_DATA_BLOC"/>
@@ -56,6 +59,11 @@
      <ITEM LANG="E" TEXT="Table name of the main table used by this component"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="NEXT_CHECK_MESSAGE" STATE="1" TYPTYPE="1" TYPE="TIMESTAMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Timestamp for next check message"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="O_CONDITIONS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TO_CONDITIONS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Run conditions"/>
@@ -78,6 +86,7 @@
    </ITEM>
   </ATTRIBUTS>
   <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_MT_FACTORIES" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
@@ -85,19 +94,25 @@
     <COMPONENTS>
      <ITEM MTDNAME="CONFIRM_BATCH">
       <SOURCE>`
+  handle_messages( ).
   o_objects-&gt;confirm_batch( ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="CONFIRM_OBJECTS">
       <SOURCE>`
+  handle_messages( ).
   o_objects-&gt;confirm_objects( status = status
                                count = count ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_BATCH">
       <SOURCE>`
+  before_get( ).
+  CHECK f_stop_requested IS INITIAL.
   o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_OBJECTS_TO_RECOVER">
       <SOURCE>`
+  before_get( ).
+  CHECK f_stop_requested IS INITIAL.
   o_objects-&gt;get_objects_to_recover( IMPORTING objects = objects ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_PROGRESSION">
@@ -125,7 +140,7 @@
 
   DO.
 * Get data
-    _get_batch( IMPORTING objects = &lt;objects&gt; ).
+    get_batch( IMPORTING objects = &lt;objects&gt; ).
 
     IF &lt;objects&gt; IS INITIAL.     EXIT.       ENDIF.
 
@@ -158,6 +173,40 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="APPLY_NEW_CONDITIONS" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Recieving new running conditions"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_BASE_CONDITIONS"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA o_cond       TYPE REF TO ygpl_mt_conditions_task.
+
+  TRY.
+      o_cond ?= conditions.
+    CATCH cx_sy_move_cast_error.
+      EXIT.
+  ENDTRY.
+
+  f_stop_requested = abap_false.
+  IF NOT o_cond-&gt;stop_requested IS INITIAL.
+    set_stop_signal( ).
+  ELSE.
+    CHECK NOT o_run-&gt;workprocess-wp_server IN o_cond-&gt;servers.
+    CHECK NOT o_run-&gt;batch_info IS INITIAL AND NOT o_run-&gt;batch_info-jobclass = o_cond-&gt;job_priority.
+* Conditions have changed. New conditions can&apos;t be satisfied =&gt; Stop task
+    MESSAGE s011.
+    set_stop_signal( ).
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="BEFORE_GET" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Action to do before Getting batch or recovery"/>
@@ -177,21 +226,8 @@
   ELSE.
     autosave( ).
   ENDIF.
-  _send_task_definition( ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="CHECK_CONDITIONS" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Check conditions still valid"/>
-    </TEXTS>
-    <SOURCE>`
-  f_stop_requested = abap_false.
-  IF conditions-&gt;stop_requested IS INITIAL.
-    CHECK NOT o_run-&gt;workprocess-wp_server IN conditions-&gt;servers.
-    CHECK NOT o_run-&gt;batch_info IS INITIAL AND NOT o_run-&gt;batch_info-jobclass = conditions-&gt;job_priority.
-* Conditions have changed. New conditions can&apos;t be satisfied =&gt; Stop task
-    MESSAGE s011.
-  ENDIF.
-  set_stop_signal( ).</SOURCE>
+  _send_task_definition( ).
+  handle_messages( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -238,14 +274,16 @@
     </EXCEPTIONS>
     <SOURCE>`
   DATA length TYPE i.
-  DATA o_msg TYPE to_messaging.
+  DATA o_msg  TYPE to_messaging.
   DATA o_cond TYPE to_conditions.
+  DATA o_obj  TYPE to_objects.
 
   length = XSTRLEN( task_id ).
   ASSERT task_id IS INITIAL OR length = 16.
   ASSERT o_data_handler IS BOUND.
 
-  super-&gt;constructor( o_messaging ).
+  super-&gt;constructor( process_id = task_id
+                     o_messaging = o_messaging ).
 
   me-&gt;data_handler = o_data_handler.
   IF task_id IS INITIAL.
@@ -267,7 +305,10 @@
   ENDIF.
 
 * Conditions
-  me-&gt;conditions ?= o_run-&gt;conditions.    &quot; Get Parent conditions
+  IF me-&gt;o_run-&gt;conditions IS BOUND.
+    o_cond ?= me-&gt;o_run-&gt;conditions.    &quot; Get Parent conditions
+    set_conditions( o_cond ).
+  ENDIF.
   IF o_conditions IS BOUND.
     IF NOT me-&gt;o_conditions IS BOUND.
       set_conditions( o_conditions ).
@@ -282,10 +323,12 @@
 
 * Object consuming
   IF o_objects IS BOUND.
-    me-&gt;o_objects = o_objects.
+    o_obj ?= o_objects.
+    set_object( o_obj ).
   ELSE.
     get_default_object_consuming( ).
-  ENDIF.</SOURCE>
+  ENDIF.
+  set_messaging_handler( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_DEFAULT_OBJECT_CONSUMING" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -299,8 +342,30 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  me-&gt;o_objects ?= ygpl_mt_factories=&gt;create_objects_consuming( run = me-&gt;o_run
-                                                         conditions = me-&gt;conditions ).</SOURCE>
+  data o_obj type to_objects.
+  o_obj ?= ygpl_mt_factories=&gt;get_objects_consuming( run = me-&gt;o_run
+                                              conditions = me-&gt;conditions ).
+  set_object( o_obj ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_MESSAGES" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check mail :-)"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA now      TYPE timestampl.
+
+  GET TIME STAMP FIELD now.
+  CHECK next_check_message &lt; now.
+  next_check_message = cl_abap_tstmp=&gt;add( tstmp = now
+                                            secs = o_conditions-&gt;message_lookup_time ).
+  o_messaging-&gt;handle_messages( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_NEW_CONDITIONS" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="NEW_RUNNING_CONDITIONS">
     <TEXTS>
@@ -310,8 +375,28 @@
      <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
     </PARAMETERS>
     <SOURCE>`
-  conditions ?= conditions.
-  check_conditions( ).</SOURCE>
+  DATA o_cond TYPE to_conditions.
+  DATA o_runc TYPE ti_run_conditions.
+
+  TRY.
+      o_runc ?= conditions.
+* Reduce conditions to task conditions only
+      o_cond ?= ygpl_mt_factories=&gt;create_new_task_conditions( ).
+      o_cond-&gt;merge_with( o_conditions ).
+      o_cond-&gt;changes_saved( ).
+      o_cond-&gt;merge_with( conditions ).
+      CHECK NOT o_cond-&gt;has_changed( ) IS INITIAL.
+    CATCH cx_sy_move_cast_error.
+* OK Conditions are task conditions only
+      o_cond ?= conditions.
+  ENDTRY.
+
+*New running conditions recieved. Changes will be applied and propagated.
+  MESSAGE s015.
+  IF NOT sy-batch IS INITIAL.
+    o_conditions-&gt;compare_with( o_cond ).
+  ENDIF.
+  apply_new_conditions( conditions ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS" EXPOSURE="1" STATE="1">
     <TEXTS>
@@ -327,6 +412,21 @@
     <SOURCE>`
   ASSERT object IS BOUND.
   ygplimt_process_4mt~conditions = o_conditions = object.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_OBJECT" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set Handler for Object Event"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_OBJECTS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object store engine"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  ASSERT object IS BOUND.
+  ygplimt_task~object_provider = o_objects = object.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_PARENT" EXPOSURE="1" STATE="1">
     <TEXTS>
@@ -365,10 +465,17 @@
   CHECK is_new = abap_true.
   _set_run( run_id ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="SET_STOP_SIGNAL" STATE="1">
+   <ITEM CMPNAME="SET_STOP_SIGNAL" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Set stop signal"/>
     </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   DATA s_info TYPE ts_process_definition.
   f_stop_requested = abap_true.
@@ -378,25 +485,6 @@
   s_info-stop_r = abap_true.
   o_messaging-&gt;send_system_message( category = system_categories-task_def
                                      message = s_info ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_GET_BATCH" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get a batch of objects"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  before_get( ).
-  CHECK f_stop_requested IS INITIAL.
-  o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -424,25 +512,6 @@
     <SOURCE>`
   o_run-&gt;o_informations-&gt;get_information( EXPORTING category = category
                                            CHANGING     info = info ).</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_GET_OBJECTS_TO_RECOVER" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get object to recover (if recovery is needed)"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STANDARD TABLE"/>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  before_get( ).
-  CHECK f_stop_requested IS INITIAL.
-  o_objects-&gt;get_objects_to_recover( IMPORTING objects = objects ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -565,8 +634,8 @@
     s_info-process_id = me-&gt;process_id.
     s_info-batch_info = me-&gt;batch_info.
     s_info-workprocess = me-&gt;workprocess.
-    o_messaging-&gt;send_system_message( category = system_categories-task_def
-                                       message = s_info ).
+    o_run-&gt;o_messaging-&gt;send_system_message( category = system_categories-task_def
+                                              message = s_info ).
     f_definition_sended = abap_true.
   ENDIF.</SOURCE>
    </ITEM>
@@ -650,6 +719,11 @@
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_MESSAGING_HANDLER">
+    <SOURCE>`
+  super-&gt;set_messaging_handler( ).
+  SET HANDLER handle_new_conditions FOR o_messaging.</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
@@ -698,13 +772,13 @@
   _task-task_id = process_id.
   _task-status = status.
   _task-run_id = o_run-&gt;process_id.
+  _task-timestamp = times-start.
   MODIFY ygplmt_tasks FROM _task.
-  ASSERT sy-subrc = 0.
-  _send_task_definition( ).</SOURCE>
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="_DELETE">
     <SOURCE>`
-  o_messaging-&gt;delete_process( me-&gt;process_id ).
+  o_messaging-&gt;delete_process( ).
   DELETE FROM ygplmt_tasks WHERE task_id = me-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
     my_key = me-&gt;process_id.
