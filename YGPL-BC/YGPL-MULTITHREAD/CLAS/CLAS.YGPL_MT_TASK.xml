@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8BAE9491E86D0FFA78778454DD2EC7B3" CODE_SIGNATURE="EE4DEB1356A0907612B06C0356B6B1AB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="CC83935D21777F66EE9584366BDB8ADA" CODE_SIGNATURE="01AFC4A5892F48501BB68D319CC0D3C4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -22,6 +22,7 @@
    <ITEM CMPNAME="PROCESS_OBJECTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="PROCESS_OBJECTS"/>
    <ITEM CMPNAME="TI_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="TI_CONDITIONS"/>
    <ITEM CMPNAME="TI_DATA_BLOC" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIMT_TASK" REFCMPNAME="TI_DATA_BLOC"/>
+   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_PROCESS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="F_DEFINITION_SENDED" STATE="1" TYPTYPE="1" TYPE="TD_BOOLEAN">
@@ -119,6 +120,10 @@
       <SOURCE>`
   result-processed_objects = o_objects-&gt;processed_objects.
   result-global_status = o_objects-&gt;global_status.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="HAS_OBJECTS_TO_RECOVER">
+      <SOURCE>`
+  result = o_objects-&gt;has_objects_to_recover( ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="OBJECTS_ALREADY_DONE">
       <SOURCE>`
@@ -346,6 +351,42 @@
   o_obj ?= ygpl_mt_factories=&gt;get_objects_consuming( run = me-&gt;o_run
                                               conditions = me-&gt;conditions ).
   set_object( o_obj ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_RUN_TASKS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get task related to Run"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Run Process ID"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TASK_LIST" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_PROCESS_LIST">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Task list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  FIELD-SYMBOLS: &lt;t&gt; LIKE LINE OF task_list.
+  DATA o_process TYPE ti_process.
+  SELECT task_id INTO TABLE task_list
+    FROM ygplmt_tasks
+    WHERE run_id = run_id.
+  CHECK NOT task_list IS INITIAL.
+  LOOP AT task_list ASSIGNING &lt;t&gt;.
+    o_process = ygpl_mt_factories=&gt;get_process( &lt;t&gt;-process_id ).
+    &lt;t&gt;-batch_info = o_process-&gt;batch_info.
+    &lt;t&gt;-workprocess = o_process-&gt;workprocess.
+  ENDLOOP.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_MESSAGES" STATE="1" MTDNEWEXC="X">
     <TEXTS>
