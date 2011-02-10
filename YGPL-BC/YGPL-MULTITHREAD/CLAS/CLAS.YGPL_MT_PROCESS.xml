@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E3235301862D154C1A3ECAC0B9820668" CODE_SIGNATURE="BC5DB1E21D0BD4A170324C517F13ECA1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="AF835B9AE16E8337F6FE1C9DE2E8F70D" CODE_SIGNATURE="9C975DD8CC2BAF90E68B194986AC8CF6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -79,8 +79,7 @@
      <ITEM MTDNAME="AUTOSAVE">
       <SOURCE>`
   CHECK NOT f_has_changed IS INITIAL.
-  save( ).
-  CLEAR f_has_changed.</SOURCE>
+  save( ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="CHECK_STATUS">
       <SOURCE>`
@@ -102,7 +101,7 @@
 
   DEFINE job_interupted.
     f_has_changed = abap_true.
-    status = system_status-process-interupted.
+    set_status( system_status-process-interupted ).
     return.
   END-OF-DEFINITION.
 
@@ -202,7 +201,8 @@
   _process-workprocess = workprocess.
   _process-timestamp = times-start.
   MODIFY ygplmt_process FROM _process.
-  ASSERT sy-subrc = 0.</SOURCE>
+  ASSERT sy-subrc = 0.
+  CLEAR f_has_changed.</SOURCE>
      </ITEM>
     </COMPONENTS>
    </ITEM>
@@ -343,6 +343,29 @@
     <SOURCE>`
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Update status in DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="VALUE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STATUS"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  lock_exclusive( ).
+* Lock release at commit.
+  UPDATE ygplmt_process
+     SET status = value
+   WHERE process_id = process_id.
+  ASSERT sy-subrc = 0.
+  status = value.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CC83935D21777F66EE9584366BDB8ADA" CODE_SIGNATURE="01AFC4A5892F48501BB68D319CC0D3C4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="04938F9B26A771535C1A6705C21200CA" CODE_SIGNATURE="F90DB1F400999AF5E3C84DA8A7E6A629" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -225,14 +225,14 @@
     </EXCEPTIONS>
     <SOURCE>`
   IF status &lt;&gt; system_status-process-in_progress.
-    status = system_status-process-in_progress.
-    f_has_changed = abap_true.
-    save( ).
+    IF f_has_changed = abap_true.     save( ).      ENDIF.
+    set_status( system_status-process-in_progress ).
   ELSE.
     autosave( ).
   ENDIF.
   _send_task_definition( ).
-  handle_messages( ).</SOURCE>
+  handle_messages( ).
+  COMMIT WORK.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -525,7 +525,8 @@
   s_info-process_id = me-&gt;process_id.
   s_info-stop_r = abap_true.
   o_messaging-&gt;send_system_message( category = system_categories-task_def
-                                     message = s_info ).</SOURCE>
+                                     message = s_info ).
+  set_status( system_status-process-stop_requested ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>

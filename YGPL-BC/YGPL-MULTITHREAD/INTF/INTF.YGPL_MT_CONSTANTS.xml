@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="92F9D191F666733E8B913FC860ED5D29" CODE_SIGNATURE="C2DD5A3A349E6857F125DE018898FFC2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONSTANTS" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="96A7E5D473F4A206271396478E6DD842" CODE_SIGNATURE="5BE038D8A79201F5CFDDD5D0F066033B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONSTANTS" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -70,10 +70,11 @@
    <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF system_status,
       BEGIN OF process,
-        started       TYPE td_status VALUE &apos;l&apos;,             &quot;#EC NOTEXT
-        in_progress   TYPE td_status VALUE &apos;i&apos;,             &quot;#EC NOTEXT
-        interupted    TYPE td_status VALUE &apos;s&apos;,             &quot;#EC NOTEXT
-        finished      TYPE td_status VALUE &apos;d&apos;,             &quot;#EC NOTEXT
+        started         TYPE td_status VALUE &apos;l&apos;,             &quot;#EC NOTEXT
+        in_progress     TYPE td_status VALUE &apos;i&apos;,             &quot;#EC NOTEXT
+        stop_requested  TYPE td_status VALUE &apos;r&apos;,             &quot;#EC NOTEXT
+        interupted      TYPE td_status VALUE &apos;s&apos;,             &quot;#EC NOTEXT
+        finished        TYPE td_status VALUE &apos;d&apos;,             &quot;#EC NOTEXT
       END OF process,
       BEGIN OF bloc,
         to_do         TYPE td_status VALUE &apos;t&apos;,             &quot;#EC NOTEXT

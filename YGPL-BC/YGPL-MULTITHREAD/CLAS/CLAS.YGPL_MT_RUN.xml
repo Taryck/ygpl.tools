@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="1C014FF36FF865DB0EE2E717D7C7E52C" CODE_SIGNATURE="336972ED078DEDB94869BCE5E002CA4C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E332D1A173B678089C828E0C0BE6C1E2" CODE_SIGNATURE="97B431D94089E33031055F37DD6D132B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -93,7 +93,7 @@
 
   o_objects-&gt;add_objects( objects = objects
                      dependencies = dependencies ).
-  infos-objects = o_objects-&gt;total_objects.       f_has_changed = abap_true.</SOURCE>
+  update_objects_counts( ).</SOURCE>
      </ITEM>
      <ITEM MTDNAME="ADD_THREAD">
       <SOURCE>`
@@ -193,7 +193,8 @@
       <SOURCE>`
   f_waiting_for_thread = abap_true.
   o_job_monitoring-&gt;wait_progress( ).
-  o_messaging-&gt;handle_messages( ).</SOURCE>
+  o_messaging-&gt;handle_messages( ).
+  set_status( system_status-process-finished ).</SOURCE>
      </ITEM>
     </COMPONENTS>
    </ITEM>
@@ -249,53 +250,60 @@
 *     - Threads
 *     - Global Progression
   IF o_cond IS BOUND.
-    task_count = get_task_count( ).
-    IF o_cond-&gt;threads &gt; task_count.    &quot; Need to add threads
-      task_2_start = o_cond-&gt;threads - task_count.
-    ELSEIF o_cond-&gt;threads &lt; task_count.    &quot; Need to stop threads
+    IF NOT o_cond-&gt;stop_requested IS INITIAL.
+* Task recieve a stop request, finishing current work and stop
+      MESSAGE s012.
+      set_status( system_status-process-stop_requested ).
+* Let condition progration stop task and then stop run
+    ELSE.
+      task_count = get_task_count( ).
+      IF o_cond-&gt;threads &gt; task_count.    &quot; Need to add threads
+        task_2_start = o_cond-&gt;threads - task_count.
+      ELSEIF o_cond-&gt;threads &lt; task_count.    &quot; Need to stop threads
 * Find thread to stop : On wrong Server
-      LOOP AT task_list ASSIGNING &lt;task&gt;
-              WHERE stop_r IS INITIAL
-              AND ( NOT workprocess-wp_server IN o_cond-&gt;servers
-                 OR NOT batch_info-jobclass = o_cond-&gt;job_priority ).
-        stop_task( &lt;task&gt;-process_id ).
-        &lt;task&gt;-stop_r = abap_true.
-      ENDLOOP.
-
-      IF sy-subrc = 0.     task_count = get_task_count( ).    ENDIF.
-
-      task_2_del = task_count - o_cond-&gt;threads.
-      IF task_2_del &gt; 0.
-        CLEAR task_count.
-* Find Job not started
-        o_job_monitoring-&gt;check_active_threads( ).
-        t_joblist = o_job_monitoring-&gt;get_job_list( ).
-        LOOP AT t_joblist ASSIGNING &lt;job&gt; WHERE status = job_status-scheduled
-                                             OR status = job_status-released.
-          CHECK task_count &lt; task_2_del.
-          TRY.
-              o_job_monitoring-&gt;delete_thread( jobname = &lt;job&gt;-jobname
-                                              jobcount = &lt;job&gt;-jobcount ).
-              ADD 1 TO task_count.
-            CATCH ygpl_mt_cx.
-          ENDTRY.
+        LOOP AT task_list ASSIGNING &lt;task&gt;
+                WHERE stop_r IS INITIAL
+                AND ( NOT workprocess-wp_server IN o_cond-&gt;servers
+                   OR NOT batch_info-jobclass = o_cond-&gt;job_priority ).
+          stop_task( &lt;task&gt;-process_id ).
+          &lt;task&gt;-stop_r = abap_true.
         ENDLOOP.
-        IF sy-subrc = 0.
-          o_job_monitoring-&gt;check_active_threads( ).
-          task_count = get_task_count( ).
-        ENDIF.
-      ENDIF.
 
-      WHILE o_cond-&gt;threads &lt; task_count.    &quot; Need to stop threads
-        _as = o_job_monitoring-&gt;get_next_as_roundrobin( ).
-        READ TABLE task_list ASSIGNING &lt;task&gt;
-             WITH KEY stop_r = space
-                  workprocess-wp_server = _as.
-        CHECK sy-subrc = 0.
-        stop_task( &lt;task&gt;-process_id ).
-        &lt;task&gt;-stop_r = abap_true.
-        SUBTRACT 1 FROM task_count.
-      ENDWHILE.
+        IF sy-subrc = 0.     task_count = get_task_count( ).    ENDIF.
+
+        task_2_del = task_count - o_cond-&gt;threads.
+        IF task_2_del &gt; 0.
+          CLEAR task_count.
+* Find Job not started
+          o_job_monitoring-&gt;check_active_threads( ).
+          t_joblist = o_job_monitoring-&gt;get_job_list( ).
+          LOOP AT t_joblist ASSIGNING &lt;job&gt; WHERE status = job_status-scheduled
+                                               OR status = job_status-released.
+            CHECK task_count &lt; task_2_del.
+            TRY.
+                o_job_monitoring-&gt;delete_thread( jobname = &lt;job&gt;-jobname
+                                                jobcount = &lt;job&gt;-jobcount ).
+                ADD 1 TO task_count.
+              CATCH ygpl_mt_cx.
+            ENDTRY.
+          ENDLOOP.
+          IF sy-subrc = 0.
+            o_job_monitoring-&gt;check_active_threads( ).
+            task_count = get_task_count( ).
+          ENDIF.
+        ENDIF.
+
+        WHILE o_cond-&gt;threads &lt; task_count.    &quot; Need to stop threads
+          _as = o_job_monitoring-&gt;get_next_as_roundrobin( ).
+          READ TABLE task_list ASSIGNING &lt;task&gt;
+               WITH KEY stop_r = space
+                    workprocess-wp_server = _as.
+          CHECK sy-subrc = 0.
+          stop_task( &lt;task&gt;-process_id ).
+          &lt;task&gt;-stop_r = abap_true.
+          SUBTRACT 1 FROM task_count.
+        ENDWHILE.
+      ENDIF.
     ENDIF.
   ENDIF.
 
@@ -487,16 +495,7 @@
      <ITEM LANG="E" TEXT="Handle event for object confirmation"/>
     </TEXTS>
     <SOURCE>`
-  DATA _left TYPE i.
-
-  _left = o_objects-&gt;total_objects - o_objects-&gt;processed_objects.
-
-  lock_exclusive( ).
-
-  UPDATE ygplmt_runs SET obj_left = _left
-    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.
-
+  update_objects_counts( ).
   COMMIT WORK.    &quot; To release locks</SOURCE>
    </ITEM>
    <ITEM CMPNAME="HANDLE_SPECIFIC_MESSAGE" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_MT_MESSAGING" REFCMPNAME="NEW_SPECIFIC_MESSAGE">
@@ -689,12 +688,25 @@
     <SOURCE>`
   IF status &lt;&gt; system_status-process-in_progress.
     IF f_has_changed = abap_true.     save( ).      ENDIF.
-    status = system_status-process-in_progress.
-    f_has_changed = abap_true.
-    save( ).
+    set_status( system_status-process-in_progress ).
   ELSE.
     autosave( ).
   ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UPDATE_OBJECTS_COUNTS" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Update object count in DB"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA _left TYPE i.
+
+  _left = o_objects-&gt;total_objects - o_objects-&gt;processed_objects.
+
+  lock_exclusive( ).
+
+  UPDATE ygplmt_runs SET obj_left = _left
+    WHERE run_id = process_id.
+  ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="WRITE_CONDITIONS" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -738,13 +750,23 @@
   super-&gt;set_messaging_handler( ).
   SET HANDLER handle_new_conditions handle_task_definition handle_specific_message FOR me-&gt;o_messaging.</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_STATUS">
+    <SOURCE>`
+  super-&gt;set_status( value ).
+  lock_exclusive( ).
+* Lock release at commit.
+  UPDATE ygplmt_runs
+     SET status = value
+   WHERE run_id = process_id.
+  ASSERT sy-subrc = 0.
+  status = value.</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">
     <SOURCE>`
   super-&gt;ygplimt_process~autosave( ).
   write_conditions( ).
   CHECK NOT f_has_changed IS INITIAL.
-  save( ).
-  CLEAR f_has_changed.</SOURCE>
+  save( ).</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~READ">
     <SOURCE>`
@@ -778,7 +800,8 @@
     ENDIF.
   ENDIF.
   ASSERT sy-subrc = 0.
-  write_conditions( ).</SOURCE>
+  write_conditions( ).
+  CLEAR f_has_changed.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="_DELETE">
     <SOURCE>`

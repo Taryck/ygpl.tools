@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0ED014F88350688DF7261AD5F78B83FF" CODE_SIGNATURE="1335DF36FBE87395716DCC8E9DB1139C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4B056CF0D5C4FA041EC692E882AA3813" CODE_SIGNATURE="DA638EEA8A101091153A264B05F878BE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -616,9 +616,9 @@
   DATA tab_ref  TYPE REF TO data.
   DATA _from    TYPE i.
   DATA _to      TYPE i.
+  DATA _size    TYPE i.
 
-  FIELD-SYMBOLS :
-    &lt;fs&gt; LIKE objects.
+  FIELD-SYMBOLS &lt;fs&gt; LIKE objects.
 
   IF NOT weight_fn IS INITIAL.
     CALL METHOD check_weight_fn
@@ -633,14 +633,15 @@
     CREATE DATA tab_ref LIKE objects.
     ASSIGN tab_ref-&gt;* TO &lt;fs&gt;.
     _from = 1.
+    _size = LINES( objects ).
     DO.
       _to = _from + bloc_size - 1.
-      IF _to &gt; total_objects. _to = total_objects. ENDIF.
+      IF _to &gt; _size. _to = _size. ENDIF.
       APPEND LINES OF objects FROM _from TO _to TO &lt;fs&gt;.
       CALL METHOD add_bloc
         EXPORTING
           OBJECTS = &lt;fs&gt;.
-      IF _to &gt;= total_objects.
+      IF _to &gt;= _size.
         EXIT.
       ELSE.
         _from = _to + 1.
