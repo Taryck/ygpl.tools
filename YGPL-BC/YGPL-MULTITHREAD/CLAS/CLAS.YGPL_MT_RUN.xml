@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F7327FE713E7D55BBE26F851734E07D4" CODE_SIGNATURE="EF4418EFF013262467F754308D90D834" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="721C0DB64BE1A5A4809290EF63B750C5" CODE_SIGNATURE="705EA89E64E4D02443EF021F910971D3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -711,8 +711,10 @@
 
   lock_exclusive( ).
 
-  UPDATE ygplmt_runs SET obj_left = _left
-    WHERE run_id = process_id.
+  UPDATE ygplmt_runs
+     SET obj_left = _left
+          objects = o_objects-&gt;total_objects
+   WHERE run_id = process_id.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="WRITE_CONDITIONS" STATE="1" MTDNEWEXC="X">
@@ -759,13 +761,22 @@
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_STATUS">
     <SOURCE>`
-  super-&gt;set_status( value ).
-  lock_exclusive( ).
-* Lock release at commit.
-  UPDATE ygplmt_runs
-     SET status = value
+  DATA t_st TYPE td_status.
+
+  SELECT SINGLE status INTO t_st
+    FROM ygplmt_runs
    WHERE run_id = process_id.
-  ASSERT sy-subrc = 0.
+  IF sy-subrc = 0.    t_st = abap_true.   ENDIF.
+
+  IF t_st = abap_true.    lock_exclusive( ).    ENDIF.
+  super-&gt;set_status( value ).
+  IF t_st = abap_true.
+* Lock release at commit.
+    UPDATE ygplmt_runs
+       SET status = value
+     WHERE run_id = process_id.
+    ASSERT sy-subrc = 0.
+  ENDIF.
   status = value.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">

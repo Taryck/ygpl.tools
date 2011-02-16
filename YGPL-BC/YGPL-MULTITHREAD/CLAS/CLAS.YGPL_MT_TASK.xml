@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="04938F9B26A771535C1A6705C21200CA" CODE_SIGNATURE="F90DB1F400999AF5E3C84DA8A7E6A629" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="1AD6099316B91BB2AC037AF4482015B7" CODE_SIGNATURE="AF5A7FC8DAE19C3773680CE7FFEBB57A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -50,6 +50,7 @@
      <ITEM LANG="E" TEXT="Constructor in factory mode"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="LOCK_SCOPE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_SCOPE"/>
    <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
     <TEXTS>
      <ITEM LANG="E" TEXT="Table Key value"/>
@@ -586,18 +587,31 @@
     <SOURCE>`
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
+  DATA parameters TYPE ygpl_lock_release=&gt;tt_function_parameters.
+  DATA release_on_commit  TYPE td_boolean.
+  DATA:
+    BEGIN OF my_lock,
+      mode_ygplmt_tasks TYPE enqmode,
+      _scope    TYPE ddenqscope,
+     task_id TYPE  YGPLMT_TASKS-task_id,
+   END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  my_lock-mode_ygplmt_tasks = lock_mode.
+  my_lock-_scope = lock_scope.
+  IF lock_mode = lock_modes-write.    release_on_commit = abap_true.   ENDIF.
+  my_lock-task_id = process_id.
 
   ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
   DO.
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_TASKS&apos;
       EXPORTING
-        mode_ygplmt_tasks = lock_mode
+        mode_ygplmt_tasks = my_lock-mode_ygplmt_tasks
         mandt             = sy-mandt
-        task_id           = process_id
+        task_id           = my_lock-task_id
         x_task_id         = abap_true
-        _scope            = &apos;2&apos;
+        _scope            = my_lock-_scope
         _wait             = abap_true
         _collect          = &apos; &apos;
       EXCEPTIONS
@@ -620,7 +634,23 @@
     ELSE.
       ASSERT sy-subrc = 0.
     ENDIF.
-    CALL FUNCTION &apos;YGPL_RELEASE_LOCK_ON_COMMIT&apos;.
+    IF release_on_commit = abap_true.
+      ygpl_lock_release=&gt;add_parameters( EXPORTING kind = abap_func_exporting
+                                              structure = my_lock
+                                    CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;MODE_YGPLMT_TASKS&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;ENQMODE&apos;
+*                                                 value = mode-lock
+*                                   CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;TASK_ID&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;YGPLMT_TASKS-TASK_ID&apos;
+*                                                 value = process_id
+*                                   CHANGING parameters = parameters ).
+      ygpl_lock_release=&gt;register_dequeue( dequeue_name = &apos;DEQUEUE_EYGPLMT_TASKS&apos;
+                                             parameters = parameters ).
+    ENDIF.
     EXIT.
   ENDDO.</SOURCE>
    </ITEM>
@@ -743,7 +773,7 @@
       mandt             = sy-mandt
       task_id           = process_id
       x_task_id         = abap_true
-      _scope            = &apos;2&apos;
+      _scope            = lock_scope
       _synchron         = &apos; &apos;
       _collect          = &apos; &apos;.</SOURCE>
    </ITEM>
@@ -765,6 +795,26 @@
     <SOURCE>`
   super-&gt;set_messaging_handler( ).
   SET HANDLER handle_new_conditions FOR o_messaging.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_STATUS">
+    <SOURCE>`
+  DATA t_st TYPE td_status.
+
+  SELECT SINGLE status INTO t_st
+    FROM ygplmt_tasks
+   WHERE task_id = process_id.
+  IF sy-subrc = 0.    t_st = abap_true.   ENDIF.
+
+  IF t_st = abap_true.    lock_exclusive( ).    ENDIF.
+  super-&gt;set_status( value ).
+  IF t_st = abap_true.
+* Lock release at commit.
+    UPDATE ygplmt_tasks
+       SET status = value
+     WHERE task_id = process_id.
+    ASSERT sy-subrc = 0.
+  ENDIF.
+  status = value.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
     <SOURCE>`

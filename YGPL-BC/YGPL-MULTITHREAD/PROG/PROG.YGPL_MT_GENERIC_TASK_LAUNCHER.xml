@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="99F69F7BC2AEB7D30622E1AE92E0FFC0" CODE_SIGNATURE="B2A58890EF405FB55304205ECBA39075" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_GENERIC_TASK_LAUNCHER" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="7D070CA096B4D6A06E60F9685B1E6C93" CODE_SIGNATURE="0D1CE0B835D1AE66FE0A59FB29F14315" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_GENERIC_TASK_LAUNCHER" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="S" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -19,19 +19,19 @@ START-OF-SELECTION.
   DATA err_msg          TYPE string.
   DATA o_handler        TYPE REF TO ygpl_mt_data_bloc.
 
-  TRY.
-      CREATE OBJECT o_handler.
-      o_handler-&gt;create_task_and_handler( handler_classname = p_class
-                                                     run_id = p_runid ).
-    CATCH ygpl_mt_cx INTO o_cx.
-      err_msg = o_cx-&gt;get_longtext( ).
-      WRITE err_msg.
-      MESSAGE err_msg TYPE &apos;E&apos;.
-    CATCH cx_root INTO o_cx.
-      err_msg = o_cx-&gt;get_longtext( ).
-      WRITE err_msg.
-      MESSAGE err_msg TYPE &apos;A&apos;.
-  ENDTRY.
+*  TRY.
+  CREATE OBJECT o_handler.
+  o_handler-&gt;create_task_and_handler( handler_classname = p_class
+                                                 run_id = p_runid ).
+*    CATCH ygpl_mt_cx INTO o_cx.
+*      err_msg = o_cx-&gt;get_longtext( ).
+*      WRITE err_msg.
+*      MESSAGE err_msg TYPE &apos;E&apos;.
+*    CATCH cx_root INTO o_cx.
+*      err_msg = o_cx-&gt;get_longtext( ).
+*      WRITE err_msg.
+*      MESSAGE err_msg TYPE &apos;A&apos;.
+*  ENDTRY.
 
   o_handler-&gt;task-&gt;process_objects( ).
 

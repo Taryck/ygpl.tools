@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="499D18575ED2DAE83A661D4B02942D7B" CODE_SIGNATURE="5223FCB178E003F15283C4DF8167246E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4639D1C1DF59F82D1D30CC94DC72DAFB" CODE_SIGNATURE="0AA680E3EB54D483FD251DA27F74739B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -12,7 +12,9 @@
    <ITEM CMPNAME="DELETE_ALL" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_ALL"/>
    <ITEM CMPNAME="DELETE_PROCESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="DELETE_PROCESS"/>
    <ITEM CMPNAME="GET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="GET_INFORMATION"/>
+   <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="LOCK_MODES"/>
    <ITEM CMPNAME="O_PROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="O_PROCESS"/>
+   <ITEM CMPNAME="SCOPE_MODES" EXPOSURE="2" REFCLSNAME="YGPL_MT_CONSTANTS" REFCMPNAME="SCOPE_MODES"/>
    <ITEM CMPNAME="SET_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_INFORMATIONS" REFCMPNAME="SET_INFORMATION"/>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_BOOLEAN"/>
    <ITEM CMPNAME="TD_CATEGORY" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_CATEGORY"/>
@@ -23,14 +25,17 @@
    <ITEM CMPNAME="TD_LOCK_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_LOCK_MODE"/>
    <ITEM CMPNAME="TD_PROCESS_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_PROCESS_ID"/>
    <ITEM CMPNAME="TD_RAWDATA" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_RAWDATA"/>
+   <ITEM CMPNAME="TD_SCOPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_SCOPE"/>
    <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
    <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIMESTAMP"/>
    <ITEM CMPNAME="TI_PROCESS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_PROCESS"/>
    <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TR_CATEGORIES"/>
+   <ITEM CMPNAME="TS_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_MODE"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_STATUS_LIST"/>
   </ALIASES>
   <ATTRIBUTS>
+   <ITEM CMPNAME="LOCK_SCOPE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_SCOPE"/>
    <ITEM CMPNAME="MY_KEY" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_KEY">
     <TEXTS>
      <ITEM LANG="E" TEXT="Table Key value"/>
@@ -98,6 +103,7 @@
      </ITEM>
     </COMPONENTS>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -410,22 +416,40 @@
     <SOURCE>`
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
-
-  ygpl_mt_lock_managment=&gt;get_information_clearance( process_id ).
+  DATA parameters TYPE ygpl_lock_release=&gt;tt_function_parameters.
+  DATA mode	TYPE ts_mode.
+  DATA:
+    BEGIN OF my_lock,
+      mode_ygplmt_infos TYPE enqmode,
+      _scope    TYPE ddenqscope,
+     process_id TYPE  ygplmt_locks-process_id,
+     category TYPE  ygplmt_infos-category,
+   END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  mode-lock = lock_mode.
+  mode-scope = lock_scope.
+  IF mode-lock = lock_modes-write.    mode-release_on_commit = abap_true.   ENDIF.
+
+  my_lock-mode_ygplmt_infos = mode-lock.
+  my_lock-_scope = mode-scope.
+  my_lock-process_id = process_id.
+  my_lock-category = category.
+
+  ygpl_mt_lock_managment=&gt;wait_for_information_clearance( my_lock-process_id ).
 
   ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
   DO.
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_INFOS&apos;
       EXPORTING
-        mode_ygplmt_infos = lock_mode
+        mode_ygplmt_infos = my_lock-mode_ygplmt_infos
         mandt             = sy-mandt
-        process_id        = process_id
-        category          = category
+        process_id        = my_lock-process_id
+        category          = my_lock-category
         x_process_id      = abap_true
         x_category        = abap_true
-        _scope            = &apos;2&apos;
+        _scope            = my_lock-_scope
         _wait             = abap_true
         _collect          = &apos; &apos;
       EXCEPTIONS
@@ -449,7 +473,28 @@
     ELSE.
       ASSERT sy-subrc = 0.
     ENDIF.
-    CALL FUNCTION &apos;YGPL_RELEASE_LOCK_ON_COMMIT&apos;.
+    IF mode-release_on_commit = abap_true.
+      ygpl_lock_release=&gt;add_parameters( EXPORTING kind = abap_func_exporting
+                                              structure = my_lock
+                                    CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;MODE_YGPLMT_INFOS&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;ENQMODE&apos;
+*                                                 value = mode-lock
+*                                   CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;PROCESS_ID&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;YGPLMT_INFOS-process_id&apos;
+*                                                 value = process_id
+*                                   CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;CATEGORY&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;YGPLMT_INFOS-CATEGORY&apos;
+*                                                 value = category
+*                                   CHANGING parameters = parameters ).
+      ygpl_lock_release=&gt;register_dequeue( dequeue_name = &apos;DEQUEUE_EYGPLMT_INFOS&apos;
+                                             parameters = parameters ).
+    ENDIF.
     EXIT.
   ENDDO.</SOURCE>
    </ITEM>
@@ -535,11 +580,9 @@
       category          = category
       x_process_id      = abap_true
       x_category        = abap_true
-      _scope            = &apos;2&apos;
+      _scope            = lock_scope
       _synchron         = &apos; &apos;
-      _collect          = &apos; &apos;.
-
-  ygpl_mt_lock_managment=&gt;release_information_clearance( process_id ).</SOURCE>
+      _collect          = &apos; &apos;.</SOURCE>
    </ITEM>
   </METHODS>
   <TYPEGROUPS>

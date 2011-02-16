@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AA2C9B71432E68E01E2171AAF8A8249F" CODE_SIGNATURE="DFA2F659F276FF4A178A03CEFBBC15FD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B7DEE2C02DCD61FB88F54E1F59E341AD" CODE_SIGNATURE="C248E6D9057288F444AF3A8ACE23FC80" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -26,6 +26,7 @@
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="LOCK_SCOPE" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" TYPTYPE="1" TYPE="TD_SCOPE"/>
    <ITEM CMPNAME="O_CONDITIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CONDITIONS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Conditions : Starting, Running (Run &amp; Task)"/>
@@ -287,18 +288,31 @@
     <SOURCE>`
   DATA _key TYPE string.
   DATA user TYPE sy-uname.
+  DATA parameters TYPE ygpl_lock_release=&gt;tt_function_parameters.
+  DATA release_on_commit  TYPE td_boolean.
+  DATA:
+    BEGIN OF my_lock,
+      mode_ygplmt_runs TYPE enqmode,
+      _scope    TYPE ddenqscope,
+     run_id TYPE ygplmt_runs-run_id,
+   END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
+
+  my_lock-mode_ygplmt_runs = lock_mode.
+  my_lock-_scope = lock_scope.
+  IF lock_mode = lock_modes-write.    release_on_commit = abap_true.   ENDIF.
+  my_lock-run_id = process_id.
 
   ygpl_mt_lock_managment=&gt;set_timeout_timestamp( timeout ).
   DO.
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_RUNS&apos;
       EXPORTING
-        mode_ygplmt_runs = lock_mode
+        mode_ygplmt_runs = my_lock-mode_ygplmt_runs
         mandt            = sy-mandt
-        run_id           = process_id
+        run_id           = my_lock-run_id
         x_run_id         = abap_true
-        _scope           = &apos;2&apos;
+        _scope           = my_lock-_scope
         _wait            = abap_true
         _collect         = &apos; &apos;
       EXCEPTIONS
@@ -321,7 +335,23 @@
     ELSE.
       ASSERT sy-subrc = 0.
     ENDIF.
-    CALL FUNCTION &apos;YGPL_RELEASE_LOCK_ON_COMMIT&apos;.
+    IF release_on_commit = abap_true.
+      ygpl_lock_release=&gt;add_parameters( EXPORTING kind = abap_func_exporting
+                                              structure = my_lock
+                                    CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;MODE_YGPLMT_RUNS&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;ENQMODE&apos;
+*                                                 value = mode-lock
+*                                   CHANGING parameters = parameters ).
+*      ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;RUN_ID&apos;
+*                                                  kind = abap_func_exporting
+*                                                  type = &apos;YGPLMT_RUNS-RUN_ID&apos;
+*                                                 value = process_id
+*                                   CHANGING parameters = parameters ).
+      ygpl_lock_release=&gt;register_dequeue( dequeue_name = &apos;DEQUEUE_EYGPLMT_RUNS&apos;
+                                             parameters = parameters ).
+    ENDIF.
     EXIT.
   ENDDO.</SOURCE>
    </ITEM>
@@ -444,7 +474,7 @@
       mandt            = sy-mandt
       run_id           = process_id
       x_run_id         = abap_true
-      _scope           = &apos;2&apos;
+      _scope           = lock_scope
       _synchron        = &apos; &apos;
       _collect         = &apos; &apos;.</SOURCE>
    </ITEM>
