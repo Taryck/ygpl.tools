@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7F3FF6BDF71AB8B4974104CBB0F595D7" CODE_SIGNATURE="B3C72BF254C610647A9FD1C99B1A30B9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4DDFA75C982FD03BB5000FB95EC15F6C" CODE_SIGNATURE="3610DDAABB18987D849BDB8946F6E550" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX_LOCKS"/>
  </DEPENDENCIES>
@@ -56,7 +56,7 @@
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
-    <ITEM TYPEGROUP="YGPL_MT_CX_LOCKS" TPUTYPE="1" IMPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_MT_CX_LOCKS" TPUTYPE="1" EXPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
   <INTERFACES>
@@ -703,16 +703,6 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA t_locks TYPE STANDARD TABLE OF seqg3.
-  DATA l_subrc TYPE sy-subrc.
-  DATA l_arg   TYPE seqg3-garg.
-*  DATA s_lock  TYPE zbcmt_locks.
-*  s_lock-mandt = sy-mandt.
-*  s_lock-process_id = process_id.
-*  s_lock-action = actions-reserve_process.
-*  l_arg = s_lock.
-  l_arg = process_id.
-  CONCATENATE sy-mandt l_arg actions-reserve_process INTO l_arg.
   DO.
     IF check_lock_exists( process_id = process_id
                               action = actions-reserve_process ) IS INITIAL.

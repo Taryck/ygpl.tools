@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2756F6D88FA4E09F51FBD2C676D01768" CODE_SIGNATURE="E5AD3DB0A843D25B62226E963A7FA2B1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="468D9E183FAF8CABC21363C9B4615E60" CODE_SIGNATURE="CBF82BB8F3C8B17922DF43215E29CAC9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -1237,6 +1237,7 @@
   DATA _bloc      LIKE LINE OF current_blocs.
   DATA f_commit   TYPE td_boolean.
   DATA o_cx       TYPE REF TO cx_root.
+  DATA o_lock_cx  TYPE REF TO ygpl_mt_cx_locks.
 
   FIELD-SYMBOLS:
     &lt;fs&gt; LIKE objects,
@@ -1248,8 +1249,16 @@
   CREATE DATA tab_ref LIKE objects.
   ASSIGN tab_ref-&gt;* TO &lt;fs&gt;.
 
+  TRY.
 * Get global Lock on object processing.
-  get_semaphore( ).
+      get_semaphore( ).
+    CATCH ygpl_mt_cx_locks INTO o_lock_cx.
+      IF o_lock_cx-&gt;is_exception_text( ygpl_mt_cx_locks=&gt;foreign_lock ) IS INITIAL.
+        RAISE EXCEPTION o_lock_cx.
+      ELSE.
+        RAISE EXCEPTION TYPE ygpl_mt_cx_object_semaphore.
+      ENDIF.
+  ENDTRY.
 
   TRY.
 * Get data : Big ones first

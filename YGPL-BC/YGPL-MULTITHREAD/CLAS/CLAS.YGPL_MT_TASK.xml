@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="1085C677F9CB70C9EF6D76B265C6A37E" CODE_SIGNATURE="AF5A7FC8DAE19C3773680CE7FFEBB57A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="47B1E88891262C644240AE023A43EC65" CODE_SIGNATURE="D87E718E364D88F75AF5BB734D6DEBC0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -109,7 +109,12 @@
       <SOURCE>`
   before_get( ).
   CHECK f_stop_requested IS INITIAL.
-  o_objects-&gt;get_batch( IMPORTING objects = objects ).</SOURCE>
+  TRY.
+      o_objects-&gt;get_batch( IMPORTING objects = objects ).
+    CATCH ygpl_mt_cx_object_semaphore.  &quot; Taks can&apos;t get new work and will stop, this problem don&apos;t need a recovery
+* Can&apos;t Get object Semaphore =&gt; Task will stop
+      MESSAGE i022(ygpl_mt_cx).
+  ENDTRY.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_OBJECTS_TO_RECOVER">
       <SOURCE>`
