@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="B7DEE2C02DCD61FB88F54E1F59E341AD" CODE_SIGNATURE="C248E6D9057288F444AF3A8ACE23FC80" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="FD97B6DE5C9736867F350E4A74287F4F" CODE_SIGNATURE="BACD4C7215B45A0731D1DE33B9D3BF00" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -132,6 +132,15 @@
 *  o_cond-&gt;deserialize( d_cond_ser ).
   o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( d_cond_ser ).
   set_conditions( o_cond ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="REFRESH_OBJECT_INFORMATION" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Refresh object count information"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA _run TYPE ygplmt_runs.
+  _run = _read( ).
+  MOVE-CORRESPONDING _run TO infos.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_BLOC_COUNT" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -293,9 +302,9 @@
   DATA:
     BEGIN OF my_lock,
       mode_ygplmt_runs TYPE enqmode,
-      _scope    TYPE ddenqscope,
-     run_id TYPE ygplmt_runs-run_id,
-   END OF my_lock.
+      _scope           TYPE ddenqscope,
+      run_id           TYPE ygplmt_runs-run_id,
+    END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
 
@@ -354,6 +363,34 @@
     ENDIF.
     EXIT.
   ENDDO.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="_READ" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Read procesus definition from DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="YGPLMT_RUNS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Multy Thread run definition"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  SELECT SINGLE * INTO result
+    FROM ygplmt_runs
+    WHERE run_id = process_id.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_mt_cx_process
+          EXPORTING textid = ygpl_mt_cx_process=&gt;not_run
+                process_id = me-&gt;process_id.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_SEND_MESSAGE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -511,14 +548,7 @@
 * Do the lock
   super-&gt;ygplimt_process~read( ).
 
-  SELECT SINGLE * INTO _run
-    FROM ygplmt_runs
-    WHERE run_id = process_id.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_process
-          EXPORTING textid = ygpl_mt_cx_process=&gt;not_run
-                process_id = me-&gt;process_id.
-  ENDIF.
+  _run = _read( ).
   read_condtions( ).
 
   unlock_with_share( ).

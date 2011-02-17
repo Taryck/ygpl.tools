@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4639D1C1DF59F82D1D30CC94DC72DAFB" CODE_SIGNATURE="0AA680E3EB54D483FD251DA27F74739B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="497AC9882BA8FDF3E40A07B67A0649A8" CODE_SIGNATURE="0AA680E3EB54D483FD251DA27F74739B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -421,9 +421,9 @@
   DATA:
     BEGIN OF my_lock,
       mode_ygplmt_infos TYPE enqmode,
-      _scope    TYPE ddenqscope,
-     process_id TYPE  ygplmt_locks-process_id,
-     category TYPE  ygplmt_infos-category,
+      _scope            TYPE ddenqscope,
+     process_id         TYPE ygplmt_locks-process_id,
+     category           TYPE ygplmt_infos-category,
    END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).

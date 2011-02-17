@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F8B2E14AC8DA0A58DFBF03843E11E8EC" CODE_SIGNATURE="F1E9B960FE34F954B414BABFCA112298" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONSTANTS" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="7CBE905D68FDD37EB5D7E5F8AFAFBC83" CODE_SIGNATURE="8F80B2E5E617FCDD0448F659CD3B4523" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CONSTANTS" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -17,11 +17,13 @@
   <ATTRIBUTS>
    <ITEM CMPNAME="ACTIONS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF actions,
-      existence     TYPE td_action VALUE &apos;-&apos;,               &quot;#EC NOTEXT
-      object        TYPE td_action VALUE &apos;O&apos;,               &quot;#EC NOTEXT
-      messaging     TYPE td_action VALUE &apos;M&apos;,               &quot;#EC NOTEXT
-      information   TYPE td_action VALUE &apos;I&apos;,               &quot;#EC NOTEXT
-      process_data  TYPE td_action VALUE &apos;D&apos;,               &quot;#EC NOTEXT
+      existence         TYPE td_action VALUE &apos;-&apos;,           &quot;#EC NOTEXT
+      object            TYPE td_action VALUE &apos;O&apos;,           &quot;#EC NOTEXT
+      messaging         TYPE td_action VALUE &apos;M&apos;,           &quot;#EC NOTEXT
+      information       TYPE td_action VALUE &apos;I&apos;,           &quot;#EC NOTEXT
+      reserve_info      TYPE td_action VALUE &apos;i&apos;,           &quot;#EC NOTEXT
+      reserve_process   TYPE td_action VALUE &apos;d&apos;,           &quot;#EC NOTEXT
+      process_data      TYPE td_action VALUE &apos;D&apos;,           &quot;#EC NOTEXT
     END OF actions
 `
     <TEXTS>
@@ -38,7 +40,7 @@
       finished      TYPE tbtco-status VALUE &apos;F&apos;,            &quot;#EC NOTEXT
       put_active    TYPE tbtco-status VALUE &apos;Z&apos;,            &quot;#EC NOTEXT
       unknown_state TYPE tbtco-status VALUE &apos;X&apos;,            &quot;#EC NOTEXT
-    END OF Job_status
+    END OF job_status
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="SAP background Job Status"/>
@@ -57,9 +59,9 @@
    </ITEM>
    <ITEM CMPNAME="SCOPE_MODES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF scope_modes ,
-      dialog_only   TYPE td_scope VALUE &apos;1&apos;,              &quot;#EC NOTEXT
-      update_only   TYPE td_scope VALUE &apos;2&apos;,              &quot;#EC NOTEXT
-      both          TYPE td_scope VALUE &apos;3&apos;,              &quot;#EC NOTEXT
+      dialog_only   TYPE td_scope VALUE &apos;1&apos;,                &quot;#EC NOTEXT
+      update_only   TYPE td_scope VALUE &apos;2&apos;,                &quot;#EC NOTEXT
+      both          TYPE td_scope VALUE &apos;3&apos;,                &quot;#EC NOTEXT
     END OF scope_modes
 `
     <TEXTS>
@@ -82,11 +84,11 @@
    <ITEM CMPNAME="SYSTEM_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF system_status,
       BEGIN OF process,
-        started         TYPE td_status VALUE &apos;l&apos;,             &quot;#EC NOTEXT
-        in_progress     TYPE td_status VALUE &apos;i&apos;,             &quot;#EC NOTEXT
-        stop_requested  TYPE td_status VALUE &apos;r&apos;,             &quot;#EC NOTEXT
-        interupted      TYPE td_status VALUE &apos;s&apos;,             &quot;#EC NOTEXT
-        finished        TYPE td_status VALUE &apos;d&apos;,             &quot;#EC NOTEXT
+        started         TYPE td_status VALUE &apos;l&apos;,           &quot;#EC NOTEXT
+        in_progress     TYPE td_status VALUE &apos;i&apos;,           &quot;#EC NOTEXT
+        stop_requested  TYPE td_status VALUE &apos;r&apos;,           &quot;#EC NOTEXT
+        interupted      TYPE td_status VALUE &apos;s&apos;,           &quot;#EC NOTEXT
+        finished        TYPE td_status VALUE &apos;d&apos;,           &quot;#EC NOTEXT
       END OF process,
       BEGIN OF bloc,
         to_do         TYPE td_status VALUE &apos;t&apos;,             &quot;#EC NOTEXT

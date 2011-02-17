@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="99690B8839858BC163BF583F2791DE88" CODE_SIGNATURE="8B681644547354B14E459F9BEFC869AC" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="00BDF43AB5245AD524D5D02E9D6B8DC6" CODE_SIGNATURE="5C2BCB5491C902B71CD61DD809AB129F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -467,8 +467,8 @@
   DATA:
     BEGIN OF my_lock,
       mode_ygplmt_process TYPE enqmode,
-      _scope    TYPE ddenqscope,
-     process_id TYPE  ygplmt_process-process_id,
+      _scope              TYPE ddenqscope,
+     process_id           TYPE ygplmt_process-process_id,
    END OF my_lock.
 
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
@@ -572,7 +572,13 @@
       x_process_id        = abap_true
       _scope              = mode-scope
       _synchron           = &apos; &apos;
-      _collect            = &apos; &apos;.</SOURCE>
+      _collect            = &apos; &apos;.
+
+  IF mode-lock = lock_modes-read.
+    ygpl_mt_lock_managment=&gt;release_process_clearance( process_id ).
+  ELSE.
+*   ygpl_mt_lock_managment=&gt;Free_process_lock( process_id ).   &quot; Released by Commit
+  ENDIF.</SOURCE>
    </ITEM>
   </METHODS>
  </RAW>

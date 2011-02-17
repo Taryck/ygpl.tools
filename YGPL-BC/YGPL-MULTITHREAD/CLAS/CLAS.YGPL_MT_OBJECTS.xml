@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="15CB674EE596571D62D8C7C0D6CFF899" CODE_SIGNATURE="D8B1B30575F18878F1B21500DF4FC3BF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2756F6D88FA4E09F51FBD2C676D01768" CODE_SIGNATURE="E5AD3DB0A843D25B62226E963A7FA2B1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -196,7 +196,7 @@
   DATA maxrow     TYPE i.
 
 * Determine Maxrow
-  o_run-&gt;refresh( ).
+  o_run-&gt;refresh_object_information( ).
 
   maxrow = ( o_run-&gt;infos-obj_left / o_run-&gt;infos-objects * o_run-&gt;infos-blocs * batch_rate / 100 ) DIV o_run-&gt;infos-threads + 1.
   IF maxrow &lt; 1. maxrow = 1. ENDIF.
@@ -1283,13 +1283,15 @@
 * Size limits
           IF o_task_conditions-&gt;maximum_batch_size &gt; 0.
             t_size = batch_size + &lt;wa&gt;-bloc_size.
-            CHECK o_task_conditions-&gt;maximum_batch_size &gt; t_size OR current_blocs IS NOT INITIAL.
+            CHECK o_task_conditions-&gt;maximum_batch_size &gt; t_size
+               OR current_blocs IS INITIAL.
             ADD &lt;wa&gt;-bloc_size TO batch_size.
           ENDIF.
 * Memory limits
           IF o_task_conditions-&gt;maximum_memory &gt; 0.
             t_size = mem_size + &lt;wa&gt;-mem_size.
-            CHECK o_task_conditions-&gt;maximum_memory &gt; t_size OR current_blocs IS NOT INITIAL.
+            CHECK o_task_conditions-&gt;maximum_memory &gt; t_size
+               OR current_blocs IS INITIAL.
             ADD &lt;wa&gt;-mem_size TO mem_size.
           ENDIF.
 
