@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="47B1E88891262C644240AE023A43EC65" CODE_SIGNATURE="D87E718E364D88F75AF5BB734D6DEBC0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E342C9BE708A37ABF54F2549A5F5312B" CODE_SIGNATURE="E6D08B37244EAFC61CEDA5B2C0E77D8A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -530,8 +530,8 @@
   MESSAGE s012.
   s_info-process_id = me-&gt;process_id.
   s_info-stop_r = abap_true.
-  o_messaging-&gt;send_system_message( category = system_categories-task_def
-                                     message = s_info ).
+  o_run-&gt;o_messaging-&gt;send_system_message( category = system_categories-task_def
+                                            message = s_info ).
   set_status( system_status-process-stop_requested ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
