@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4DDF98963AE4EB466759D64E1247D451" CODE_SIGNATURE="ECD75507B8D549B67C5D15ADF824A3E8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="39FCA14359AE529313DC97E6E2E62810" CODE_SIGNATURE="BE593B57A22C60EFE5FC0CD2A281B798" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -439,13 +439,19 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
+  DATA _key TYPE td_process_id.
   DELETE FROM ygplmt_process WHERE process_id = me-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
-    my_key = me-&gt;process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_database
-          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                 tablename = my_table
-                 key_value = my_key.
+    SELECT SINGLE process_id INTO _key
+      FROM ygplmt_process
+      WHERE process_id = me-&gt;process_id.
+    IF sy-subrc = 0.
+      my_key = _key.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_database
+            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                   tablename = my_table
+                   key_value = my_key.
+    ENDIF.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_LOCK" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">

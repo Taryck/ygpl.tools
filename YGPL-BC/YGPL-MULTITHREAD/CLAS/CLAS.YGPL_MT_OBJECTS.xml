@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="468D9E183FAF8CABC21363C9B4615E60" CODE_SIGNATURE="CBF82BB8F3C8B17922DF43215E29CAC9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="02ABD2203204656A295BBDA247B9569D" CODE_SIGNATURE="B8F88BD795890A19F059EB60C41C1A0D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -276,15 +276,17 @@
      </ITEM>
      <ITEM MTDNAME="DELETE_PROCESS">
       <SOURCE>`
+  DATA _key TYPE td_process_id.
   get_semaphore( ). &quot; #TO_DO
 * Locks released by the next Commit/Roll back
 
   DELETE FROM ygplmt_objects WHERE run_id = o_run-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
-    SELECT SINGLE run_id INTO my_key
+    SELECT SINGLE run_id INTO _key
       FROM ygplmt_objects
       WHERE run_id = o_run-&gt;process_id.
     IF sy-subrc = 0.
+      my_key = _key.
       release_semaphore( ).
       RAISE EXCEPTION TYPE ygpl_mt_cx_database
             EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed

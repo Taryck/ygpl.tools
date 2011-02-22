@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BF1281769CE0509DD4937BC97214924A" CODE_SIGNATURE="922AAB555F0DE24C58D54A1FF0D3E544" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B9034AC937757E03F341DF68468A6D00" CODE_SIGNATURE="E464686F207BF4FEB83798E5E6D6AC75" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -895,16 +895,22 @@
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="_DELETE">
     <SOURCE>`
+  DATA _key TYPE td_process_id.
   o_messaging-&gt;delete_process( ).
   o_informations-&gt;delete_process(  ).
   o_objects-&gt;delete_process( ).
   DELETE FROM ygplmt_runs WHERE run_id = me-&gt;process_id.
   IF sy-subrc &lt;&gt; 0.
-    my_key = me-&gt;process_id.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_database
-          EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                 tablename = my_table
-                 key_value = my_key.
+    SELECT SINGLE run_id INTO _key
+      FROM ygplmt_runs
+      WHERE run_id = me-&gt;process_id.
+    IF sy-subrc = 0.
+      my_key = _key.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_database
+            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
+                   tablename = my_table
+                   key_value = my_key.
+    ENDIF.
   ENDIF.
   super-&gt;_delete( ).</SOURCE>
    </ITEM>
