@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D54E535F3B044099EAD6734E32D3FAAE" CODE_SIGNATURE="5FE2DFC6B2C127642C24E568C3A3C4A8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B2551C2B968C1529037543135ECCBB22" CODE_SIGNATURE="055E23B7F3442C482AC416B3D5552876" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -172,10 +172,8 @@
 * Thread #&amp;1 - &amp;2(&amp;3) - Job aborded, recovery required
         MESSAGE i006 WITH &lt;th&gt;-num &lt;th&gt;-jobname &lt;th&gt;-jobcount.
       ENDIF.
-      RAISE EVENT on_thread_end EXPORTING o_job_monitoring = me
-                                             thread_number = &lt;th&gt;-num
-                                                   jobname = &lt;th&gt;-jobname
-                                                     jobid = &lt;th&gt;-jobcount.
+      RAISE EVENT on_thread_end EXPORTING job_monitoring = me
+                                                     job = &lt;th&gt;.
       DELETE thread_launched.
     ENDIF.
   ENDLOOP.

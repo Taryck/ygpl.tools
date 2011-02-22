@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="721C0DB64BE1A5A4809290EF63B750C5" CODE_SIGNATURE="705EA89E64E4D02443EF021F910971D3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="BF1281769CE0509DD4937BC97214924A" CODE_SIGNATURE="922AAB555F0DE24C58D54A1FF0D3E544" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -19,9 +19,12 @@
    <ITEM CMPNAME="GET_TASK_INFORMATIONS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="GET_TASK_INFORMATIONS"/>
    <ITEM CMPNAME="JOB_MONITORING" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="JOB_MONITORING"/>
    <ITEM CMPNAME="OBJECT_STORE" EXPOSURE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="OBJECT_STORE"/>
+   <ITEM CMPNAME="ON_THREAD_END" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="ON_THREAD_END"/>
+   <ITEM CMPNAME="RECIEVING_SPECIFIC_MESSAGE" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="RECIEVING_SPECIFIC_MESSAGE"/>
    <ITEM CMPNAME="SEND_CONDITIONS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SEND_CONDITIONS"/>
    <ITEM CMPNAME="SET_TASK_CLASSNAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SET_TASK_CLASSNAME"/>
    <ITEM CMPNAME="START_THREADS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="START_THREADS"/>
+   <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SUBMIT_THREAD"/>
    <ITEM CMPNAME="TT_JOBLIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_JOBLIST"/>
    <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="WAIT_PROGRESS"/>
   </ALIASES>
@@ -550,14 +553,21 @@
     &lt;j&gt; LIKE LINE OF t_joblist.
 
   t_joblist = o_job_monitoring-&gt;get_job_list( ).
-  READ TABLE t_joblist ASSIGNING &lt;j&gt;
-       WITH KEY jobname = task_definition-batch_info-jobname
-               jobcount = task_definition-batch_info-jobcount.
-  IF sy-subrc = 0.
-* Thread #&amp;1 - &amp;2(&amp;3) - Job started (&amp;4)
-    MESSAGE s001 WITH &lt;j&gt;-num task_definition-batch_info-jobname task_definition-batch_info-jobcount task_definition-process_id.
-  ELSE.
-    IF task_definition-batch_info-jobname IS NOT INITIAL.
+  IF task_definition-batch_info-jobname IS INITIAL.   &quot; Foreground task
+    READ TABLE task_list ASSIGNING &lt;t&gt; WITH KEY process_id = task_definition-process_id.
+    IF sy-subrc &lt;&gt; 0. &quot; New Task
+* New Foreground Thread (&amp;4) started at &amp;1(&amp;2) by &amp;3
+      MESSAGE s009 WITH task_definition-workprocess-wp_index task_definition-workprocess-wp_server
+&quot;      task_definition-workprocess-username  not working... :-/
+       space task_definition-process_id.
+    ELSE.                                             &quot; Existing one
+
+    ENDIF.
+  ELSE.                                               &quot; Background Task
+    READ TABLE t_joblist ASSIGNING &lt;j&gt;
+         WITH KEY jobname = task_definition-batch_info-jobname
+                 jobcount = task_definition-batch_info-jobcount.
+    IF sy-subrc &lt;&gt; 0.                                 &quot; Unexpected
       o_job_monitoring-&gt;add_thread( jobname = task_definition-batch_info-jobname
                                    jobcount = task_definition-batch_info-jobcount ).
       t_joblist = o_job_monitoring-&gt;get_job_list( ).
@@ -567,29 +577,91 @@
       ASSERT sy-subrc = 0.
 * New Thread #&amp;1 - &amp;2(&amp;3) - started (&amp;4)
       MESSAGE s008 WITH &lt;j&gt;-num &lt;j&gt;-jobname &lt;j&gt;-jobcount task_definition-process_id.
-    ELSE.
-* New Foreground Thread (&amp;4) started at &amp;1(&amp;2) by &amp;3
-      MESSAGE s009 WITH task_definition-workprocess-wp_index task_definition-workprocess-wp_server
-&quot;      task_definition-workprocess-username  not working... :-/
-       space task_definition-process_id.
+    ELSE.                                         &quot; task knowed
+      IF task_definition-stop_r IS INITIAL.       &quot; task started
+* Thread #&amp;1 - &amp;2(&amp;3) - Job started (&amp;4)
+        MESSAGE s001 WITH &lt;j&gt;-num task_definition-batch_info-jobname task_definition-batch_info-jobcount task_definition-process_id.
+      ELSE.           &quot; Existing one
+
+      ENDIF.
     ENDIF.
   ENDIF.
+
   READ TABLE task_list ASSIGNING &lt;t&gt; WITH KEY process_id = task_definition-process_id.
   IF sy-subrc &lt;&gt; 0.
     INSERT task_definition INTO TABLE task_list.
-  ELSEIF &lt;t&gt;-batch_info-jobname IS INITIAL.   &quot; Recieving Stop signal from task
+    READ TABLE task_list ASSIGNING &lt;t&gt; WITH KEY process_id = task_definition-process_id.
+  ENDIF.
+  ASSERT sy-subrc = 0.
+
+* Recieving Stop signal from task
 * Task is foreground. Act as is has already been stoped
 * Task might decide to stop because of : Job priority change or server invalid
 * Check for starting a new one if needed
-    IF &lt;t&gt;-stop_r IS INITIAL.
-      &lt;t&gt;-stop_r = abap_true.
-      task_count = get_task_count( ).
-      IF o_conditions-&gt;threads &gt; task_count.    &quot; Need to add threads
-        task_count = task_count - o_conditions-&gt;threads.
-        o_job_monitoring-&gt;start_threads( task_count ).
-      ENDIF.
+  IF &lt;t&gt;-stop_r IS INITIAL AND task_definition-stop_r IS NOT INITIAL.
+    &lt;t&gt;-stop_r = task_definition-stop_r.
+    task_count = get_task_count( ).
+    IF o_conditions-&gt;threads &gt; task_count.    &quot; Need to add threads
+      task_count = task_count - o_conditions-&gt;threads.
+      o_job_monitoring-&gt;start_threads( task_count ).
     ENDIF.
-  ENDIF.</SOURCE>
+  ENDIF.
+
+***********************************************************
+*
+*  t_joblist = o_job_monitoring-&gt;get_job_list( ).
+*  READ TABLE t_joblist ASSIGNING &lt;j&gt;
+*       WITH KEY jobname = task_definition-batch_info-jobname
+*               jobcount = task_definition-batch_info-jobcount.
+*  IF sy-subrc = 0.
+** Thread #&amp;1 - &amp;2(&amp;3) - Job started (&amp;4)
+*    MESSAGE s001 WITH &lt;j&gt;-num task_definition-batch_info-jobname task_definition-batch_info-jobcount task_definition-process_id.
+*  ELSE.
+*    IF task_definition-batch_info-jobname IS NOT INITIAL.
+*      o_job_monitoring-&gt;add_thread( jobname = task_definition-batch_info-jobname
+*                                   jobcount = task_definition-batch_info-jobcount ).
+*      t_joblist = o_job_monitoring-&gt;get_job_list( ).
+*      READ TABLE t_joblist ASSIGNING &lt;j&gt;
+*           WITH KEY jobname = task_definition-batch_info-jobname
+*                   jobcount = task_definition-batch_info-jobcount.
+*      ASSERT sy-subrc = 0.
+** New Thread #&amp;1 - &amp;2(&amp;3) - started (&amp;4)
+*      MESSAGE s008 WITH &lt;j&gt;-num &lt;j&gt;-jobname &lt;j&gt;-jobcount task_definition-process_id.
+*    ELSE.
+** New Foreground Thread (&amp;4) started at &amp;1(&amp;2) by &amp;3
+*      MESSAGE s009 WITH task_definition-workprocess-wp_index task_definition-workprocess-wp_server
+*&quot;      task_definition-workprocess-username  not working... :-/
+*       space task_definition-process_id.
+*    ENDIF.
+*  ENDIF.
+*  READ TABLE task_list ASSIGNING &lt;t&gt; WITH KEY process_id = task_definition-process_id.
+*  IF sy-subrc &lt;&gt; 0.
+*    INSERT task_definition INTO TABLE task_list.
+*  ELSEIF &lt;t&gt;-batch_info-jobname IS INITIAL.   &quot; Recieving Stop signal from task
+** Task is foreground. Act as is has already been stoped
+** Task might decide to stop because of : Job priority change or server invalid
+** Check for starting a new one if needed
+*    IF &lt;t&gt;-stop_r IS INITIAL.
+*      &lt;t&gt;-stop_r = abap_true.
+*      task_count = get_task_count( ).
+*      IF o_conditions-&gt;threads &gt; task_count.    &quot; Need to add threads
+*        task_count = task_count - o_conditions-&gt;threads.
+*        o_job_monitoring-&gt;start_threads( task_count ).
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="HANDLE_THREAD_END" STATE="1" MTDTYPE="1" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="ON_THREAD_END">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Handle thread end signal"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="JOB" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_JOBLIST"/>
+    </PARAMETERS>
+    <SOURCE>`
+  o_messaging-&gt;handle_messages( ).  &quot; Check for task stop signal
+  RAISE EVENT on_thread_end
+    EXPORTING job = job.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SET_CONDITIONS_HANDLER" STATE="1">
     <TEXTS>

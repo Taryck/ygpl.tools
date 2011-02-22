@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E342C9BE708A37ABF54F2549A5F5312B" CODE_SIGNATURE="E6D08B37244EAFC61CEDA5B2C0E77D8A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="C2E18246FC2FBB3C1242781BF6349BA4" CODE_SIGNATURE="B4B3F4A6691A181E3504B3512B1976E0" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -230,15 +230,38 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  IF status &lt;&gt; system_status-process-in_progress.
-    IF f_has_changed = abap_true.     save( ).      ENDIF.
+  autosave( ).
+  IF status IN status_families-running AND status &lt;&gt; system_status-process-in_progress.
     set_status( system_status-process-in_progress ).
-  ELSE.
-    autosave( ).
   ENDIF.
+*  IF status &lt;&gt; system_status-process-in_progress.
+*    IF f_has_changed = abap_true.     save( ).      ENDIF.
+*    set_status( system_status-process-in_progress ).
+*  ELSE.
+*    autosave( ).
+*  ENDIF.
   _send_task_definition( ).
   handle_messages( ).
+  IF f_stop_requested = abap_true.    confirm_stop( ).      ENDIF.
   COMMIT WORK.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONFIRM_STOP" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Confirm stop"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA s_info TYPE ts_process_definition.
+  s_info-process_id = me-&gt;process_id.
+  s_info-stop_r = abap_true.
+  o_run-&gt;o_messaging-&gt;send_system_message( category = system_categories-task_def
+                                            message = s_info ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
@@ -524,14 +547,9 @@
      </ITEM>
     </EXCEPTIONS>
     <SOURCE>`
-  DATA s_info TYPE ts_process_definition.
   f_stop_requested = abap_true.
 * Task recieve a stop request, finishing current work and stop
   MESSAGE s012.
-  s_info-process_id = me-&gt;process_id.
-  s_info-stop_r = abap_true.
-  o_run-&gt;o_messaging-&gt;send_system_message( category = system_categories-task_def
-                                            message = s_info ).
   set_status( system_status-process-stop_requested ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_INFORMATION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
