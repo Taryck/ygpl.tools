@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="B9034AC937757E03F341DF68468A6D00" CODE_SIGNATURE="E464686F207BF4FEB83798E5E6D6AC75" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="39809DAB59566059AB8528FD41BBECBB" CODE_SIGNATURE="9A3DD00B10102F0925CEC6FD87318DE9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -25,6 +25,8 @@
    <ITEM CMPNAME="SET_TASK_CLASSNAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SET_TASK_CLASSNAME"/>
    <ITEM CMPNAME="START_THREADS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="START_THREADS"/>
    <ITEM CMPNAME="SUBMIT_THREAD" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="SUBMIT_THREAD"/>
+   <ITEM CMPNAME="TI_DATA_BLOC" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_DATA_BLOC"/>
+   <ITEM CMPNAME="TI_TASK" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_TASK"/>
    <ITEM CMPNAME="TT_JOBLIST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TT_JOBLIST"/>
    <ITEM CMPNAME="WAIT_PROGRESS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_RUN" REFCMPNAME="WAIT_PROGRESS"/>
   </ALIASES>
@@ -744,7 +746,9 @@
   o_msg ?= ygpl_mt_factories=&gt;get_messaging_by_id( process_id ).
   o_cond ?= ygpl_mt_factories=&gt;create_new_run_conditions( ).
   o_cond-&gt;set_stop_requested( abap_true ).
-  o_msg-&gt;send_conditions( o_cond ).</SOURCE>
+  o_msg-&gt;send_conditions( o_cond ).
+* Requesting Task &apos;&amp;1&apos; to stop: Message sended !
+  IF NOT sy-batch IS INITIAL.   MESSAGE i018 WITH process_id.   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="THREAD_SCHEDULED" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -896,6 +900,17 @@
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="_DELETE">
     <SOURCE>`
   DATA _key TYPE td_process_id.
+  DATA o_task TYPE ti_task.
+  DATA o_handler TYPE ti_data_bloc.
+  FIELD-SYMBOLS: &lt;t&gt; LIKE LINE OF task_list.
+* Delete task
+  o_handler = ygpl_mt_factories=&gt;get_null_data_handler( ).
+  LOOP AT task_list ASSIGNING &lt;t&gt;.
+    o_task = ygpl_mt_factories=&gt;get_task( id = &lt;t&gt;-process_id
+                              o_data_handler = o_handler ).
+    o_task-&gt;delete( ).
+  ENDLOOP.
+* Then delete run
   o_messaging-&gt;delete_process( ).
   o_informations-&gt;delete_process(  ).
   o_objects-&gt;delete_process( ).
