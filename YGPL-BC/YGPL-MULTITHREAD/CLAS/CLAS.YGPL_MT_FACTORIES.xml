@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="355B76FF6EFA537D5CC21288FE2D08F8" CODE_SIGNATURE="3A65D91CA617A9C4DE310E2A2C6E9303" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_FACTORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="C4128DE7C50E18B39C181D48C0EEECB9" CODE_SIGNATURE="277FE123803DDBF12F165C955ACA4BDB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_FACTORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" WITH_UNIT_TESTS="X">
@@ -124,6 +124,12 @@ ENDCLASS.                    &quot;lcl_DATA_HANDLER
 *
 *----------------------------------------------------------------------*
 CLASS lcl_data_handler IMPLEMENTATION.
+  METHOD ygplimt_data_bloc~process_batch.
+  ENDMETHOD.                    &quot;YGPLIMT_DATA_BLOC~PROCESS_BATCH
+  METHOD ygplimt_data_bloc~new_task_defined.
+  ENDMETHOD.                    &quot;YGPLIMT_DATA_BLOC~NEW_TASK_DEFINED
+  METHOD ygplimt_data_bloc~new_bloc.
+  ENDMETHOD.                    &quot;YGPLIMT_DATA_BLOC~NEW_BLOC
 ENDCLASS.                    &quot;lcl_DATA_HANDLER IMPLEMENTATION
 CLASS abap_unit_testclass DEFINITION DEFERRED.
 CLASS ygpl_mt_factories DEFINITION LOCAL FRIENDS abap_unit_testclass.
@@ -165,16 +171,16 @@ CLASS abap_unit_testclass DEFINITION FOR TESTING   &quot;#AU Duration Medium
 
     METHODS: setup.
     METHODS: teardown.
-    METHODS: global_test FOR TESTING.
-    METHODS: check_run_constencies IMPORTING o_run TYPE ti_run.
-    METHODS: check_task_constencies IMPORTING o_task TYPE ti_task.
-    METHODS: check_process_messaging IMPORTING o_process TYPE ti_process.
+    METHODS: global_test FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: check_run_constencies IMPORTING o_run TYPE ti_run RAISING ygpl_mt_cx.
+    METHODS: check_task_constencies IMPORTING o_task TYPE ti_task RAISING ygpl_mt_cx.
+    METHODS: check_process_messaging IMPORTING o_process TYPE ti_process RAISING ygpl_mt_cx.
 
-    METHODS: create_new_categories FOR TESTING.
-    METHODS: create_new_job_monitoring FOR TESTING.
-    METHODS: create_new_run_conditions FOR TESTING.
-    METHODS: create_new_start_conditions FOR TESTING.
-    METHODS: create_new_status FOR TESTING.
+    METHODS: create_new_categories FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: create_new_job_monitoring FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: create_new_run_conditions FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: create_new_start_conditions FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: create_new_status FOR TESTING RAISING ygpl_mt_cx.
 ENDCLASS.       &quot;Abap_Unit_Testclass
 * ----------------------------------------------------------------------
 CLASS abap_unit_testclass IMPLEMENTATION.
@@ -526,6 +532,33 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
     EXPORTING
       o_conditions           = o_conditions.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="CREATE_NEW_PROCESS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create new Process"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_PROCESS"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA process_id TYPE td_process_id.
+  DATA s_mapping  LIKE LINE OF t_runs.
+  CREATE OBJECT object
+    TYPE
+      ygpl_mt_process_4mt
+    EXPORTING
+      process_id          = process_id.
+  s_mapping-id = object-&gt;process_id.
+  s_mapping-object = object.
+  INSERT s_mapping INTO TABLE t_runs.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="CREATE_NEW_RUN" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create new run from Conditions"/>
@@ -558,7 +591,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
   INSERT s_mapping INTO TABLE t_processes.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CREATE_NEW_RUN_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="CREATE_NEW_RUN_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create new run conditions"/>
     </TEXTS>
@@ -569,10 +602,17 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions_run.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CREATE_NEW_START_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="CREATE_NEW_START_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create new Start conditions"/>
     </TEXTS>
@@ -583,6 +623,13 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions.</SOURCE>
    </ITEM>
@@ -650,7 +697,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
   INSERT s_mapping INTO TABLE t_processes.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CREATE_NEW_TASK_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="CREATE_NEW_TASK_CONDITIONS" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Create new Start conditions"/>
     </TEXTS>
@@ -661,6 +708,13 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions_task.</SOURCE>
    </ITEM>

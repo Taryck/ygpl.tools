@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8619015A11CAC09F04B587D8439A07DD" CODE_SIGNATURE="2E2B9271061ABF6FEC419DDE7D62ACEF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="57BE8662C8571C1BBA0BD7266F4D5028" CODE_SIGNATURE="4F0DA761FA0A5F75BCD77D9EB07591CB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -161,7 +161,7 @@
       o_engine-&gt;conv_raw2data( EXPORTING rawdata = rawdata
                                 CHANGING    data = s_param ).
       s_task = o_engine-&gt;get_task_informations( s_param-process_id ).
-      WRITE:/ &apos;New process&apos;, s_param-process_id, s_task-workprocess-wp_server, s_task-batch_info-jobname, s_task-batch_info-jobcount, s_task-batch_info-jobclass.
+*      WRITE:/ &apos;New process&apos;, s_param-process_id, s_task-workprocess-wp_server, s_task-batch_info-jobname, s_task-batch_info-jobcount, s_task-batch_info-jobclass.
     WHEN OTHERS.
 * Unexcepted case
   ENDCASE.</SOURCE>

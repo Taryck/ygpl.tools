@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="52A5427672041A6D59E81CB8E992B452" CODE_SIGNATURE="717481FB499EE2B992C8417D5D0AD540" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="4322C5805D79BF17B2F90CD0E16A7FC0" CODE_SIGNATURE="C8CA1FA301F6B940AB38259BA8D6F138" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -176,6 +176,16 @@ AT SELECTION-SCREEN.
     PERFORM get_limits IN PROGRAM ygpl_mt_routine_pool USING o_cond-&gt;progression
                                                     CHANGING t_act tp_min tp_max tt_min tt_max.
   ENDIF.
+  IF      o_cond-&gt;stop_requested = p_stop
+     AND  o_cond-&gt;threads = thread
+     AND  o_cond-&gt;servers = s_server[]
+     AND  o_cond-&gt;job_priority = p_job_p
+     AND  o_cond-&gt;batch_rate = p_b_rate
+     AND  o_cond-&gt;maximum_memory = mem_size
+     AND  o_cond-&gt;maximum_batch_size = max_size
+     AND  o_cond-&gt;message_lookup_time = lu_time.
+    MESSAGE &apos;No change&apos;(non) TYPE &apos;E&apos;.
+  ENDIF.
 
 START-OF-SELECTION.
   DATA o_msg TYPE REF TO ygpl_mt_messaging.
@@ -236,9 +246,19 @@ FORM load_task  USING    p_task_id TYPE ygpl_mt_my_task=&gt;td_process_id.
   ENDTRY.
 ENDFORM.                    &quot; LOAD_RUN</SOURCE>
   <TEXTSPOOL>
+   <ITEM ID="I" KEY="MRU">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Progression :" LENGTH="60 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="I" KEY="MTA">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="For tasks :" LENGTH="60 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="NON">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="No change" LENGTH="20 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="I" KEY="OBL">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="EDBEDCC11F15D9ACF93FF4AFB956565B" CODE_SIGNATURE="1CC9A66DBFFD359CE95ACCB07867F49A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CX" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="7EC0989571E4572AD1F75141BF2BE15E" CODE_SIGNATURE="1CC9A66DBFFD359CE95ACCB07867F49A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CX" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="CX_STATIC_CHECK"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
@@ -595,9 +595,11 @@ AS</ITEM>
 
   _key = source-mainprogram. _prog = conv_progname( _key ).
   IF source-mainprogram = source-include.
-    MESSAGE i102 WITH _prog-str source-line INTO str.
+* at &amp;1 line &amp;2
+        MESSAGE i102 WITH _prog-str source-line INTO str.
   ELSE.
     _key = source-include.     _include = conv_progname( object_name = _key   context = _prog-name ).
+* at &amp;2(&amp;1) line &amp;3
     MESSAGE i100 WITH _prog-str _include-str source-line INTO str.
   ENDIF.</SOURCE>
    </ITEM>

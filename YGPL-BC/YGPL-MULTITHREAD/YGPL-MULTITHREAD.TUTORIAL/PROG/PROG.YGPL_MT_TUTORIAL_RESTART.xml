@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="370BDBF31849641C7E2998F42F4F2FE5" CODE_SIGNATURE="C70BE529DF4F3D1878B6BF58AA96835C" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_RESTART" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="3081B34974729E3CADC87BFC45201ED2" CODE_SIGNATURE="0BC09365F0FABE05FFA907AFAAB48EFD" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_RESTART" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -115,9 +115,9 @@ FORM launch_theards_manually .
 
     SUBMIT ygpl_mt_tutorial
       WITH run_id = my_run-&gt;process_id
-      WITH wait_t = wait_t
-      WITH obj_c = obj_c
-      WITH mem_size = mem_size
+*      WITH wait_t = wait_t
+*      WITH obj_c = obj_c
+*      WITH mem_size = mem_size
       VIA JOB _jobname NUMBER _jobcount
       AND RETURN.
     IF sy-subrc &lt;&gt; 0.
@@ -220,6 +220,31 @@ FORM check_insertion .
 
 ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
   <TEXTSPOOL>
+   <ITEM ID="I" KEY="E02">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="JOB_OPEN" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="E03">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="SUBMIT" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="E04">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="JOB_CLOSE" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="I01">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY=" MT N°" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="I03">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="list of missing objects" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="I" KEY="TLP">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="Load simulation parameters :" LENGTH="40 "/>
@@ -238,13 +263,11 @@ ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
    </ITEM>
    <ITEM ID="S" KEY="BLOC_S">
     <TEXTS>
-     <ITEM LANGU="E" ENTRY="        Size of standard bloc" LENGTH="29 "/>
      <ITEM LANGU="F" ENTRY="        Taille des blocs" LENGTH="24 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="CLR_ALL">
     <TEXTS>
-     <ITEM LANGU="E"/>
      <ITEM LANGU="F" ENTRY="        Purge tout les RUN" LENGTH="26 "/>
     </TEXTS>
    </ITEM>

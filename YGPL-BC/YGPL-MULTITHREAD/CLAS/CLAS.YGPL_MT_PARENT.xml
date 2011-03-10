@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="131A7F12FAF844985613B4BF41263940" CODE_SIGNATURE="9FD5C8CE53813132381EC0E9C5EA68EC" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="623AB76833F88445E513029A7F9D20D5" CODE_SIGNATURE="9999ECD2346D57F4BBF9C1D4114B4C82" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -124,11 +124,14 @@
     <SOURCE>`
   DATA d_cond_ser TYPE td_serialized.
   DATA o_cond     TYPE to_conditions.
-  _get_system_information( EXPORTING category = system_categories-condition
-                            CHANGING info = d_cond_ser ).
-*  o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
+  TRY.
+      _get_system_information( EXPORTING category = system_categories-condition
+                                CHANGING info = d_cond_ser ).
 *  o_cond-&gt;deserialize( d_cond_ser ).
-  o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( d_cond_ser ).
+      o_cond ?= ygpl_mt_conditions_task=&gt;deserialize( d_cond_ser ).
+    CATCH ygpl_mt_cx_database.    &quot; Conditions not found
+      o_cond ?= ygpl_mt_factories=&gt;create_new_start_conditions( ).
+  ENDTRY.
   set_conditions( o_cond ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="REFRESH_OBJECT_INFORMATION" EXPOSURE="2" STATE="1">
@@ -556,6 +559,13 @@
   status = _run-status.</SOURCE>
    </ITEM>
   </REDEFINITIONS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="TDS">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="MT Process Data" LENGTH="20 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
   <TYPES>
    <ITEM CMPNAME="TD_CLASSNAME" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="SEOCLSNAME">
     <TEXTS>

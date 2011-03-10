@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="39FCA14359AE529313DC97E6E2E62810" CODE_SIGNATURE="BE593B57A22C60EFE5FC0CD2A281B798" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9C183D61C4B13870FE84D7DD41D68B0D" CODE_SIGNATURE="449E3EC0B54F35AA94B71C2A5529C3E2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -204,6 +204,7 @@
   _process-process_id = process_id.
   _process-status = status.
   _process-workprocess = workprocess.
+  _process-batch = batch_info.
   _process-timestamp = times-start.
   MODIFY ygplmt_process FROM _process.
   ASSERT sy-subrc = 0.
@@ -298,7 +299,7 @@
     me-&gt;process_id = generate_new_process_id( ).
     GET TIME STAMP FIELD times-start.
     workprocess-username = sy-uname.
-    workprocess-main_program = sy-repid.
+    workprocess-main_program = sy-cprog.      &quot; sy-repid.
     status = system_status-process-started.
 
     IF NOT sy-batch IS INITIAL.
@@ -604,5 +605,12 @@
   ENDIF.</SOURCE>
    </ITEM>
   </METHODS>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="TDS">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="MT Process Data" LENGTH="20 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
  </RAW>
 </ZL_OBJECT>

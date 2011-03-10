@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="E9E7BA2022A5F796185638A9194D0382" CODE_SIGNATURE="4FF9F9655A3D33AD0E7C5EDE66B779E4" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="BA2D9B9024000801E9B9945327AC0C00" CODE_SIGNATURE="710A31679F7197D57A291B77F38062DE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -103,6 +103,12 @@ DATA my_run  TYPE REF TO ygpl_mt_my_run.
 DATA it_objects TYPE ygpl_mt_my_run=&gt;tt_data.
 DATA it_dep TYPE ygpl_mt_typespool=&gt;tt_dependencies.
 
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR s_server-low.
+  PERFORM show_target_server IN PROGRAM ygpl_mt_routine_pool CHANGING s_server-low.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR s_server-high.
+  PERFORM show_target_server IN PROGRAM ygpl_mt_routine_pool CHANGING s_server-high.
+
 START-OF-SELECTION.
   DATA o_conditions TYPE ygpl_mt_interfaces=&gt;ti_full_conditions.
   DATA s_param      TYPE ygpl_mt_my_run=&gt;ts_my_run_parameters.
@@ -146,7 +152,7 @@ START-OF-SELECTION.
           dependencies = it_dep.
 
 * Before starting Clear Controle table
-      DELETE FROM ygpl_t100t.
+      DELETE FROM ygpl_t100t.   &quot;#EC CI_NOWHERE
       COMMIT WORK AND WAIT.
 
       CASE abap_true.
@@ -216,9 +222,9 @@ FORM launch_theards_manually .
 
     SUBMIT ygpl_mt_tutorial
       WITH run_id = my_run-&gt;process_id
-      WITH wait_t = wait_t
-      WITH obj_c = obj_c
-      WITH mem_size = mem_size
+*      WITH wait_t = wait_t
+*      WITH obj_c = obj_c
+*      WITH mem_size = mem_size
       VIA JOB _jobname NUMBER _jobcount
       AND RETURN.
     IF sy-subrc &lt;&gt; 0.
@@ -378,6 +384,36 @@ FORM check_insertion .
 
 ENDFORM.                    &quot; CHECK_INSERTION</SOURCE>
   <TEXTSPOOL>
+   <ITEM ID="I" KEY="E02">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="JOB_OPEN" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="E03">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="SUBMIT" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="E04">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="JOB_CLOSE" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="I01">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY=" MT N°" LENGTH="10 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="I03">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="list of missing objects" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="MRU">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Progression :" LENGTH="40 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="I" KEY="MTA">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="For tasks :" LENGTH="60 "/>
