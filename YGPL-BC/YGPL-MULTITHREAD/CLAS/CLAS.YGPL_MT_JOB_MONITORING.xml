@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CFE48EA3ADAD381FB572AFC5276C367C" CODE_SIGNATURE="3D11DF81B7CA001F150A36A5CDEE9106" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="DC74004DB5202B23452473AC550173AF" CODE_SIGNATURE="F797538B2FCCCB932C01EC7C5205F8E4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -358,9 +358,10 @@
 *  btc_stdt_onworkday  LIKE  tbtcstrt-startdttyp VALUE &apos;W&apos;.
   _startparam-startdttyp = &apos;I&apos;.
   LOOP AT thread_launched ASSIGNING &lt;l&gt; TO max
-       WHERE status = job_status-ready
-          OR status = job_status-scheduled
-          OR status IS INITIAL.
+       WHERE status = job_status-scheduled
+*          OR status = job_status-ready     &quot; &lt;=&gt; Starting
+          OR status IS INITIAL.     &quot; &lt;=&gt; New job
+* CALL FUNCTION &apos;BP_JOB_MODIFY&apos; only accept status Scheduled or Released (that we do not use)
     CALL FUNCTION &apos;BP_JOB_MODIFY&apos;
       EXPORTING
         dialog                           = &apos;N&apos;
