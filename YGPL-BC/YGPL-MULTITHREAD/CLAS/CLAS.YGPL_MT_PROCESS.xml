@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7E08DD740B37CFE6CBBC4E12F1142454" CODE_SIGNATURE="CBEEF8E93318A1D9EF300C8957DFAF9E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="05F7547CC143C20DD8E024D413DC1AF3" CODE_SIGNATURE="ED3AE1E6D9EF8717CCF1AAD747D0931D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -401,6 +401,48 @@
     ASSERT sy-subrc = 0.
   ENDIF.
   status = value.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS_AS_FINISHED" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;finished&quot;'/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  set_status( system_status-process-finished ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS_AS_IN_PROGRESS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;in progress&quot;'/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  set_status( system_status-process-in_progress ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_STATUS_AS_STOP_REQUESTED" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;stop requested&quot;'/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  set_status( system_status-process-stop_requested ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
