@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9C183D61C4B13870FE84D7DD41D68B0D" CODE_SIGNATURE="449E3EC0B54F35AA94B71C2A5529C3E2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="7E08DD740B37CFE6CBBC4E12F1142454" CODE_SIGNATURE="CBEEF8E93318A1D9EF300C8957DFAF9E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -48,6 +48,7 @@
    <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_PROGRESSION"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
    <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_WP_INFO"/>
+   <ITEM CMPNAME="USER_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="USER_STATUS"/>
    <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="WORKPROCESS"/>
   </ALIASES>
   <ATTRIBUTS>
@@ -186,8 +187,10 @@
           EXPORTING textid = ygpl_mt_cx_process=&gt;do_not_exists
                 process_id = me-&gt;process_id.
   ENDIF.
-  status = _data-status.
+  status = _data-p_status.
+  user_status = _data-user_status.
   workprocess = _data-workprocess.
+  batch_info = _data-batch.
 
   IF NOT f_is_final IS INITIAL.   unlock_with_share( ).   ENDIF.</SOURCE>
      </ITEM>
@@ -202,7 +205,8 @@
   lock_exclusive( ).
 * Lock release at commit.
   _process-process_id = process_id.
-  _process-status = status.
+  _process-p_status = status.
+  _process-user_status = user_status.
   _process-workprocess = workprocess.
   _process-batch = batch_info.
   _process-timestamp = times-start.
@@ -388,11 +392,11 @@
   SELECT SINGLE p_status INTO t_st
     FROM ygplmt_process
    WHERE process_id = process_id.
-  IF sy-subrc = 0.
+  IF sy-subrc = 0 AND t_st &lt;&gt; value.
     lock_exclusive( ).
 * Lock release at commit.
     UPDATE ygplmt_process
-       SET status = value
+       SET p_status = value
      WHERE process_id = process_id.
     ASSERT sy-subrc = 0.
   ENDIF.
