@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="5B691F5BA59461996FE264F4E2C5C7FE" CODE_SIGNATURE="D9416710C8B6EC76F1DE4D110035EAA6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_ERROR_ANALYSE_ENGINE" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_WF_CASE_ANALYSE">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Error Analyse Engine"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TI_CASE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TI_CASE"/>
+   <ITEM CMPNAME="TI_IMPLEMENTATION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TI_IMPLEMENTATION"/>
+   <ITEM CMPNAME="TO_CONTEXT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TO_CONTEXT"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="BADIS_CALLED" STATE="1" TYPTYPE="1" TYPE="TT_BADIS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="BAdI&apos;s list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="BADI_NAME" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;ANALYSE_PROTOCOL_LOGS&apos;" TYPTYPE="1" TYPE="ENH_BADI_DEF_ALV-BADI_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Badi&apos;s name in enhancement spot"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CASE_HAS_MATCH" STATE="1" TYPTYPE="1" TYPE="ABAP_BOOL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Last call returned a positive match"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="ENH_SPOT_NAME" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;YGPL_WF_ERROR_ANALYSE&apos;" TYPTYPE="1" TYPE="ENHSPOTNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Name (ID) of an Enhancement Spot"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="NO_MATCHS" STATE="1" TYPTYPE="1" TYPE="TT_NO_MATCH">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="WorkItem list with no match"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_CONTEXT" STATE="1" TYPTYPE="1" TYPE="TO_CONTEXT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Analyse Context"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="RANK_FILTER_NAME" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;RANK&apos;" TYPTYPE="1" TYPE="BADI_FILTER_TYPE_ALV-FILTER_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="BAdI : Filtername for Rank"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_WORKFLOW" STATE="1" ATTDECLTYP="1" TYPTYPE="4">
+    r_workflow TYPE RANGE OF hrs1000-objid
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Workflow type with at leat a active BAdI"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_RANK" STATE="1" ATTDECLTYP="1" TYPTYPE="4">
+    t_rank TYPE SORTED TABLE OF zif_wf_analyse=&gt;td_rank WITH UNIQUE KEY table_line
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Rank possible values"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WF_ID_FILTER_NAME" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;WORKFLOW_ID&apos;" TYPTYPE="1" TYPE="BADI_FILTER_TYPE_ALV-FILTER_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="BAdI : Filtername for workflow type"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_WF_DATATYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_WF_IF_FW_COMMUNICATION" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CASE_MATCH">
+      <SOURCE>`
+  case_has_match = abap_true.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_WF_OBJECT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="ADD_BADI" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Ajoute l&apos;implementation de la Badi si nouveau"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="BADI" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_CASE"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA s_badi LIKE LINE OF badis_called.
+
+  ASSERT badi IS BOUND.
+  ASSERT badi-&gt;imp IS BOUND.
+*  CHECK badi-&gt;imp IS BOUND.
+  READ TABLE badis_called TRANSPORTING NO FIELDS
+       WITH TABLE KEY implementation = badi-&gt;imp.
+  CHECK sy-subrc &lt;&gt; 0.
+  s_badi-implementation = badi-&gt;imp.
+  INSERT s_badi INTO TABLE badis_called.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ANALYSE_BATCH" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Analyse Bloc de WF en erreur"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="WF_LIST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_WF_LIST"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="ZCX_WF_ANALYSE" LANGU="E"/>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA o_case TYPE REF TO analyse_protocol_logs.
+  DATA t_steps TYPE zif_wf_analyse=&gt;tt_steps.
+  DATA t_actions TYPE zif_wf_analyse=&gt;tt_actions.
+  DATA v_wf_id TYPE zif_wf_analyse=&gt;td_wf_id.
+  DATA o_cx TYPE REF TO zcx_wf_analyse.
+  DATA msg TYPE string.
+  DATA o_obj     TYPE REF TO cl_abap_classdescr.
+  DATA s_no_match LIKE LINE OF no_matchs.
+  DATA t_msgs TYPE swf_plog_errors_t.
+  FIELD-SYMBOLS:
+   &lt;msg&gt; LIKE LINE OF t_msgs,
+   &lt;r&gt; LIKE LINE OF t_rank,
+   &lt;obj&gt; LIKE LINE OF wf_list.
+
+  LOOP AT wf_list ASSIGNING &lt;obj&gt;.
+    v_wf_id = &lt;obj&gt;-wi_rh_task+2.
+    IF v_wf_id NOT IN r_workflow.
+* Le Workflow &amp;1 (WorkItem &amp;2) n&apos;a aucun cas d&apos;analyse (BAdI) actif.
+      MESSAGE i000 WITH &lt;obj&gt;-wi_rh_task &lt;obj&gt;-wi_id INTO msg.
+      WRITE:/ icon_incomplete AS ICON, msg.
+      CONTINUE.
+    ENDIF.
+
+    REFRESH: t_steps, t_actions.  &quot;Ne se fait pas en auto dans le MF
+
+
+    CALL FUNCTION &apos;SWL_GET_PROTOCOL_EXTERN&apos;
+      EXPORTING
+        wi_id                         = &lt;obj&gt;-wi_id
+*       LANGUAGE                      = SY-LANGU
+        with_techdetails              = &apos;X&apos;
+        with_errors                   = &apos;X&apos;
+        with_task_data                = &apos;X&apos;
+        with_format_messages          = &apos;X&apos;
+      TABLES
+        steps                         = t_steps
+        actions_on_workitems          = t_actions
+      EXCEPTIONS
+        workflow_does_not_exist       = 1
+        error_reading_wfm_log         = 2
+        error_reading_wim_log         = 3
+        error_formatting_log          = 4
+        OTHERS                        = 5.
+    CASE sy-subrc.
+      WHEN 0.
+        CLEAR case_has_match.
+        LOOP AT t_rank ASSIGNING &lt;r&gt;.
+          GET BADI o_case
+            FILTERS
+              rank        = &lt;r&gt;
+              workflow_id = v_wf_id.
+          TRY.
+              CALL BADI o_case-&gt;analyse_workflow
+                EXPORTING
+                  rank        = &lt;r&gt;
+                  workflow_id = v_wf_id
+                  workitem_id = &lt;obj&gt;-wi_id
+                  steps       = t_steps
+                  actions     = t_actions
+                  o_comm      = me.
+              add_badi( o_case ).
+            CATCH zcx_wf_analyse INTO o_cx.
+              o_obj ?= cl_abap_classdescr=&gt;describe_by_object_ref( p_object_ref = o_case ).
+* Erreur lors de l&apos;analyse de cas pour WorkItem &amp;1, Badi &amp;2 &amp; Rank &amp;3 !
+              MESSAGE i003 WITH &lt;obj&gt;-wi_id o_obj-&gt;absolute_name &lt;r&gt; INTO msg.
+              WRITE:/ icon_failure AS ICON, msg.
+              msg = o_cx-&gt;get_longtext( ).     &quot; faute de mieux
+              WRITE:/ icon_message_error AS ICON, msg.
+          ENDTRY.
+* Cas détecté
+          IF NOT case_has_match IS INITIAL.   EXIT.   ENDIF.
+        ENDLOOP.
+        IF case_has_match IS INITIAL.
+          CLEAR s_no_match.
+          MOVE-CORRESPONDING &lt;obj&gt; TO s_no_match.
+          CALL FUNCTION &apos;SWI_ERROR_ANALYSIS&apos;
+            EXPORTING
+              wi_id                             = &lt;obj&gt;-wi_id
+              popup                             = space
+*       LOG_TREE                          =
+            IMPORTING
+              t_errors                          = t_msgs
+            EXCEPTIONS
+              workitem_does_not_exist           = 1
+              workitem_not_in_error_state       = 2
+              no_diagnostic_possible            = 3
+              OTHERS                            = 4.
+          IF sy-subrc &lt;&gt; 0.
+            MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                    WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 INTO s_no_match-msg.
+            CONCATENATE &apos;Aucune erreur n&apos;&apos;a pu être trouvée lors de l&apos;&apos;appel à &quot;SWI_ERROR_ANALYSIS&quot; message retourné :&apos;(ean) s_no_match-msg INTO s_no_match-msg.
+          ELSEIF t_msgs IS NOT INITIAL.
+            SORT t_msgs BY timestamp DESCENDING.
+            READ TABLE t_msgs ASSIGNING &lt;msg&gt; INDEX 1.
+            IF &lt;msg&gt;-method = &apos;SWP_EXCEPTION_CAUGHT&apos;.
+              READ TABLE t_msgs ASSIGNING &lt;msg&gt;
+                   WITH KEY errortype = 2.    &quot; system error
+            ENDIF.
+            IF &lt;msg&gt; IS ASSIGNED.
+              MESSAGE ID &lt;msg&gt;-workarea TYPE &apos;I&apos; NUMBER &lt;msg&gt;-message WITH &lt;msg&gt;-variable1 &lt;msg&gt;-variable2 &lt;msg&gt;-variable3 &lt;msg&gt;-variable4 INTO s_no_match-msg.
+            ENDIF.
+          ENDIF.
+
+          APPEND s_no_match TO no_matchs.
+        ENDIF.
+      WHEN 1.
+* Le WorkItem &amp;1 bien que présent dans &quot;SWWWIHEAD&quot;, n&apos;a pas été trouvé !
+        MESSAGE i001 WITH &lt;obj&gt;-wi_id INTO msg.
+        WRITE:/ icon_failure AS ICON, msg.
+      WHEN OTHERS.
+* Erreur lors de la lecture du protocole du WorkItem &amp;1 !
+        MESSAGE i002 WITH &lt;obj&gt;-wi_id INTO msg.
+        WRITE:/ icon_failure AS ICON, msg.
+    ENDCASE.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ANALYSE_WF" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Analyse WF en erreur"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="ZCX_WF_ANALYSE" LANGU="E"/>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA t_list TYPE tt_wf_list.
+
+*  SELECT *          &quot;H~WI_ID H~WI_RH_TASK &quot; H.WI_TEXT, H.WI_AAGENT, H.WI_CD, H.WI_CT
+*    INTO CORRESPONDING FIELDS OF TABLE t_list PACKAGE SIZE 1000
+*    FROM swwwihead AS h
+*    WHERE h~wi_type = &apos;F&apos;
+*      AND h~wi_stat = &apos;ERROR&apos;
+*      AND h~wi_id IN o_context-&gt;wi_ids
+*      AND h~wi_rh_task IN o_context-&gt;wf_ids
+*  &quot;    AND h~wi_rh_task IN r_workflow
+*      AND h~wi_cd IN o_context-&gt;wf_dates
+*      %_HINTS ORACLE &apos;index(SWWWIHEAD SWWWIHEAD~C)&apos;.
+*
+*    analyse_batch( t_list ).
+*
+*  ENDSELECT.
+* a cause DUMP CX_SY_OPEN_SQL_DB / DBIF_RSQL_INVALID_CURSOR
+  SELECT *          &quot;H~WI_ID H~WI_RH_TASK &quot; H.WI_TEXT, H.WI_AAGENT, H.WI_CD, H.WI_CT
+    INTO CORRESPONDING FIELDS OF TABLE t_list     &quot;  PACKAGE SIZE 1000
+    FROM swwwihead AS h
+    WHERE h~wi_type = &apos;F&apos;
+      AND h~wi_stat = &apos;ERROR&apos;
+      AND h~wi_id IN o_context-&gt;wi_ids
+      AND h~wi_rh_task IN o_context-&gt;wf_ids
+  &quot;    AND h~wi_rh_task IN r_workflow
+      AND h~wi_cd IN o_context-&gt;wf_dates
+      %_HINTS ORACLE &apos;index(SWWWIHEAD SWWWIHEAD~C)&apos;.
+
+  analyse_batch( t_list ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+*  DATA o_enh TYPE REF TO cl_enh_tool_badi_def.      &quot;if_enh_spot_tool.
+*  DATA o_plugin TYPE REF TO if_enh_spot_plugin.
+*  DATA t_badis TYPE enh_badi_data_it.
+*  DATA t_badis TYPE enh_badi_overview_it.
+  DATA o_badi TYPE REF TO cl_enh_tool_badi_impl.
+  DATA s_workflow LIKE LINE OF r_workflow.
+  DATA v_rank LIKE LINE OF t_rank.
+  DATA t_implementations TYPE enh_badi_impl_data_it.
+  DATA t_filters TYPE enh_badi_filter_impl_it.
+  DATA l_obj_name TYPE trobj_name.
+  DATA it_enhname TYPE enhname_it.
+  DATA l_wf_id TYPE zwf_hr_sobjid.
+  DATA l_compare TYPE tvarv_opti.
+  DATA l_high TYPE i.
+  FIELD-SYMBOLS:
+    &lt;enh&gt; LIKE LINE OF it_enhname,
+    &lt;filter&gt; LIKE LINE OF t_filters,
+    &lt;impl&gt; LIKE LINE OF t_implementations.
+
+  l_obj_name = enh_spot_name.
+  it_enhname = cl_r3standard_persistence=&gt;find_enhancements_by_obj( obj_type = &apos;ENHS&apos;
+                                                                    obj_name = l_obj_name ).
+*  o_enh ?= cl_enh_factory=&gt;get_enhancement_spot( spot_name = enh_spot_name ).
+*  o_plugin = o_enh-&gt;if_enh_spot_tool~get_plugin_ui( version = o_enh-&gt;if_enh_spot_tool~state ).    &quot; Active
+  LOOP AT it_enhname ASSIGNING &lt;enh&gt;.
+    o_badi ?= cl_enh_factory=&gt;get_enhancement( enhancement_id = &lt;enh&gt; ).
+    t_implementations = o_badi-&gt;get_implementations( ).
+    DELETE t_implementations
+           WHERE badi_name &lt;&gt; badi_name
+              OR active IS INITIAL.
+
+    LOOP AT t_implementations ASSIGNING &lt;impl&gt;.
+*       WHERE badi_name = BADI_NAME.
+      INSERT LINES OF &lt;impl&gt;-filters INTO TABLE t_filters.
+    ENDLOOP.
+
+    DELETE t_filters WHERE filter_name &lt;&gt; rank_filter_name
+                       AND filter_name &lt;&gt; wf_id_filter_name.
+    SORT t_filters BY filter_name compare
+                      filter_char_value1 filter_char_value2
+                      filter_int_value1 filter_int_value2
+                      filter_numeric_value1 filter_numeric_value2
+                      filter_packed_value1 filter_packed_value2
+                      filter_string_value1 filter_string_value2.
+    DELETE ADJACENT DUPLICATES FROM t_filters COMPARING filter_name compare
+                                                        filter_char_value1 filter_char_value2
+                                                        filter_int_value1 filter_int_value2
+                                                        filter_numeric_value1 filter_numeric_value2
+                                                        filter_packed_value1 filter_packed_value2
+                                                        filter_string_value1 filter_string_value2.
+    s_workflow-sign = &apos;I&apos;.
+    LOOP AT t_filters ASSIGNING &lt;filter&gt;
+      WHERE filter_name = wf_id_filter_name.
+      convert_filter( EXPORTING
+                        value = &lt;filter&gt;
+                      IMPORTING
+                       option = s_workflow-option
+                       CHANGING
+                          low = s_workflow-low
+                         high = s_workflow-high ).
+* Recupéré de : LENH_EDT_BADIP06
+      APPEND s_workflow TO r_workflow.
+    ENDLOOP.
+
+    LOOP AT t_filters ASSIGNING &lt;filter&gt;
+      WHERE filter_name = rank_filter_name.
+      convert_filter( EXPORTING
+                        value = &lt;filter&gt;
+                      IMPORTING
+                       option = l_compare
+                       CHANGING
+                          low = v_rank
+                         high = l_high ).
+      ASSERT l_compare = &apos;EQ&apos;.
+      APPEND v_rank TO t_rank.
+    ENDLOOP.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CONTEXT" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_CONTEXT" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Contexte d&apos;analyse"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  IF context IS BOUND.
+    o_context = context.
+  ELSE.
+    CREATE OBJECT o_context.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONVERT_FILTER" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convertis le filtre au format d&apos;affichage"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="HIGH" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY" PAROPTIONL="X"/>
+     <ITEM SCONAME="LOW" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY" PAROPTIONL="X"/>
+     <ITEM SCONAME="OPTION" CMPTYPE="1" PARDECLTYP="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TVARV_OPTI">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="ABAP : option de sélection (EQ/BT/CP/...)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="VALUE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ENH_BADI_FILTER_IMPL">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Vue d&apos;extension pour données de filtre BAdI"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA temp(1024) TYPE c.
+* Recupéré de : LENH_EDT_BADIP06
+* DEFINE fill_outtab in METHOD lif_tree~build_filter_nodes.
+  CONSTANTS:
+    c_integer       TYPE badi_filter_type VALUE &apos;I&apos;,
+    c_character     TYPE badi_filter_type VALUE &apos;C&apos;,
+    c_string        TYPE badi_filter_type VALUE &apos;S&apos;,
+    c_packed        TYPE badi_filter_type VALUE &apos;P&apos;,
+    c_numeric       TYPE badi_filter_type VALUE &apos;N&apos;.
+
+  CASE value-compare.
+    WHEN &apos;=&apos;.   option = &apos;EQ&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;&lt;&gt;&apos;.  option = &apos;NE&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;&lt;&apos;.   option = &apos;LT&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;&lt;=&apos;.  option = &apos;LE&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;&gt;&apos;.   option = &apos;GT&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;&gt;=&apos;.  option = &apos;GE&apos;.                              &quot;#EC NOTEXT
+    WHEN &apos;CS&apos; OR &apos;NP&apos; OR &apos;CP&apos; OR &apos;NS&apos;.                      &quot;#EC NOTEXT
+      option = value-compare.
+    WHEN &apos;&lt; &lt;&apos; OR &apos;&lt;=&lt;&apos; OR &apos;&lt; &lt;=&apos;.                          &quot;#EC NOTEXT
+* Conversion imposible
+    WHEN &apos;&lt;=&lt;=&apos;.  option = &apos;BT&apos;.                            &quot;#EC NOTEXT
+    WHEN OTHERS.
+      RAISE EXCEPTION TYPE cx_enh_badi_fltr_value_invalid
+            EXPORTING comparator = value-compare.
+  ENDCASE.
+
+  CASE value-filter_type.
+    WHEN c_integer.
+      WRITE value-filter_int_value1 TO temp     LEFT-JUSTIFIED. low = temp.
+      WRITE value-filter_int_value2 TO temp     LEFT-JUSTIFIED. high = temp.
+    WHEN c_character.
+      low = value-filter_char_value1.
+      high = value-filter_char_value2.
+    WHEN c_string.
+      low = value-filter_string_value1.
+      high = value-filter_string_value2.
+    WHEN c_packed.
+      WRITE value-filter_packed_value1 TO temp  LEFT-JUSTIFIED. low = temp.
+      WRITE value-filter_packed_value2 TO temp  LEFT-JUSTIFIED. high = temp.
+    WHEN c_numeric.
+      WRITE value-filter_numeric_value1 TO temp NO-ZERO LEFT-JUSTIFIED. low = temp.
+      WRITE value-filter_numeric_value2 TO temp NO-ZERO LEFT-JUSTIFIED. high = temp.
+    WHEN OTHERS.
+  ENDCASE.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DISPLAY_NOT_MATCH_RESULTS" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Affiche les WF en erreur sans analyse"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA msg TYPE string.
+  DATA t_msgs TYPE swf_plog_errors_t.
+  FIELD-SYMBOLS &lt;case&gt; LIKE LINE OF no_matchs.
+
+  CHECK NOT no_matchs IS INITIAL.
+  WRITE:/ &apos;Liste des WorkItems sans cas valide :&apos;(nom).
+  LOOP AT no_matchs ASSIGNING &lt;case&gt;.
+* Le WorkItem &amp;1 (Workflow &amp;2) n&apos;a pas donné d&apos;analyse positive
+    MESSAGE i004 WITH &lt;case&gt;-wi_id &lt;case&gt;-wi_rh_task INTO msg.
+    WRITE:/ icon_yellow_light AS ICON, msg, &apos;Motif :&apos;(rea), &lt;case&gt;-msg.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DISPLAY_RESULT" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Affichage des résultats"/>
+    </TEXTS>
+    <SOURCE>`
+  FIELD-SYMBOLS &lt;badi&gt; LIKE LINE OF badis_called.
+  display_not_match_results( ).
+  LOOP AT badis_called ASSIGNING &lt;badi&gt;.
+    NEW-PAGE.
+    CALL METHOD &lt;badi&gt;-implementation-&gt;display_match_results.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
+   <ITEM TYPEGROUP="ICON" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TS_BADI" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    BEGIN OF ts_badi,
+    implementation TYPE ti_implementation,
+  END OF ts_badi
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="BAdI definition"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_NO_MATCH" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    BEGIN OF ts_no_match,
+    wi_id       TYPE swwwihead-wi_id,
+    wi_rh_task  TYPE swwwihead-wi_rh_task,
+    msg         TYPE msg,
+  END OF ts_no_match
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Information for Workitem without any match"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_WF_DEF" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="SWWWIHEAD">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Workflow Runtime: Header Table for All Work Item Types"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_BADIS" STATE="1" EDITORDER="4 " TYPTYPE="4">
+    tt_badis TYPE SORTED TABLE OF ts_badi WITH UNIQUE KEY implementation
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="BAdI&apos;s list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_NO_MATCH" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    tt_no_match TYPE STANDARD TABLE OF ts_no_match WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="WorkItem list with no match"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_WF_LIST" STATE="1" EDITORDER="2 " TYPTYPE="4">
+    tt_wf_list TYPE STANDARD TABLE OF ts_wf_def WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Workflow list"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

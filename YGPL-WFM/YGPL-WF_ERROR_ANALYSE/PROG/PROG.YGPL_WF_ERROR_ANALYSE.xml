@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="125B34C751B0FD47E6462D3BF7A89C90" CODE_SIGNATURE="F3818194FC38B1870B7C5C8F57A4D91C" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_ERROR_ANALYSE" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="1" RMAND="220" RLOAD="F" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZWF_ANALYSE_ERREURS
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ygpl_wf_error_analyse LINE-SIZE 1023.
+
+TABLES: swwwihead, ygpl_wf_shr_sobjid.
+
+SELECT-OPTIONS:
+  s_wiid FOR swwwihead-wi_id,
+  s_wfid FOR ygpl_wf_shr_sobjid-objid,    &quot; swwwihead-wi_rh_task,
+  s_date FOR swwwihead-wi_cd.
+
+START-OF-SELECTION.
+  DATA o_context TYPE REF TO ygpl_wf_analyse_context.
+  DATA o_engine TYPE REF TO ygpl_wf_error_analyse_engine.
+
+*  CHECK p_conf IS NOT INITIAL.
+  CREATE OBJECT o_context.
+  o_context-&gt;define_wi_id_range( s_wiid[] ).
+  o_context-&gt;define_wf_id_range( s_wfid[] ).
+  o_context-&gt;define_wf_date_range( s_date[] ).
+  CREATE OBJECT o_engine
+    EXPORTING
+    context
+      =
+      o_context.
+
+  o_engine-&gt;analyse_wf( ).
+
+END-OF-SELECTION.
+  o_engine-&gt;display_result( ).</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="Analyse des erreurs WF" LENGTH="22 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="S_DATE">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="S_WFID">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="S_WIID">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

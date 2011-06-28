@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="D6A795C03A7549E39BDC9AB2666E3F46" CONNECTOR="1FAC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_CASE_ANALYSE" TYPE="MSAG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA MASTERLANG="F" RESPUSER="TBENSIAL"/>
+  <MESSAGES>
+   <ITEM MSGNR="000" APPLICATION="DOKU" TYP="E" DOKFORM="S_DOCU_SHOW" DOKSTYLE="S_DOCUS1">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Workflow &amp;1 (WorkItem &amp;2) do not have any analyse case (BAdI) active !">
+      <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;CAUSE&amp;
+ASThe framework do not find any BAdI active that accept this workflow
+  type.
+U1&amp;SYSTEM_RESPONSE&amp;
+AS
+U1&amp;WHAT_TO_DO&amp;
+ASCreate a new BAdI implementation that handle this type of workflow (and
+  this kind of error)
+U1&amp;SYS_ADMIN&amp;
+AS</LONG_TXT>
+     </ITEM>
+    </TEXTS>
+   </ITEM>
+   <ITEM MSGNR="001" SELFDEF="3">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Despite WorkItem &amp;1 is present in &quot;SWWWIHEAD&quot;, it can&apos;t be found !"/>
+     <ITEM LANGU="F" SHORT_TXT="Le WorkItem &amp;1 bien que présent dans &quot;SWWWIHEAD&quot;, n&apos;a pas été trouvé !"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM MSGNR="002" SELFDEF="3">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Error while reading log for WorkItem &amp;1 in database !"/>
+     <ITEM LANGU="F" SHORT_TXT="Erreur lors de la lecture du protocole du WorkItem &amp;1 !"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM MSGNR="003" SELFDEF="3">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="Error while analysing case for WorkItem &amp;1, Badi &amp;2 &amp; Rank &amp;3 !"/>
+     <ITEM LANGU="F" SHORT_TXT="Erreur lors de l&apos;analyse de cas pour WorkItem &amp;1, Badi &amp;2 &amp; Rank &amp;3 !"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM MSGNR="004" APPLICATION="DOKU" TYP="E" DOKFORM="S_DOCU_SHOW" DOKSTYLE="S_DOCUS1">
+    <TEXTS>
+     <ITEM LANGU="E" SHORT_TXT="WorkItem &amp;1 (Workflow &amp;2) do not have any positive match !">
+      <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;CAUSE&amp;
+ASDespite BAdI are actives for the Workflow type, this kind of error
+  doesn&apos;t match nay case.
+U1&amp;SYSTEM_RESPONSE&amp;
+AS
+U1&amp;WHAT_TO_DO&amp;
+ASCheck for all BAdI for this Workflow type that in method
+  YGPL_WF_IF_4_CASE_ANALYSE~ANALYSE_WORKFLOW, in case of a positive match
+  the method CASE_MATCH of the communication object
+  (YGPL_WF_IF_FW_COMMUNICATION) is called.
+U1&amp;SYS_ADMIN&amp;
+AS</LONG_TXT>
+     </ITEM>
+     <ITEM LANGU="F" SHORT_TXT="Le WorkItem &amp;1 (Workflow &amp;2) n&apos;a pas donné d&apos;analyse positive"/>
+    </TEXTS>
+   </ITEM>
+  </MESSAGES>
+  <TEXTS>
+   <ITEM LANGU="E" SHORT_TXT="Message pour analyse du WorkFlow"/>
+   <ITEM LANGU="F" SHORT_TXT="Message pour analyse du WorkFlow"/>
+  </TEXTS>
+ </RAW>
+</ZL_OBJECT>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="05650607559A22A23E1D5EB405A0F9A7" CODE_SIGNATURE="31E2413D385297C2270A51AC7E6999CB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_ANALYSE_CONTEXT" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="WF Analyse Area definition"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_WF_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WF_ID"/>
+   <ITEM CMPNAME="TD_WI_RH_TASK" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WI_RH_TASK"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="WF_DATES" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="R_WF_DATE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Date de création d&apos;un work item"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WF_IDS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="R_WF_RH_TASK">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Identification de la tâche"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="WI_IDS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="R_WI_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ID du work item"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_WF_ERROR_ANALYSE_ENGINE" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_WF_DATATYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONV_WF_ID_TO_TASK" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convert Workflow ID to RH_Task"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_WI_RH_TASK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Task ID"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="VALUE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_WF_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Copy of Data Element HR_SOBJID with new Search Help"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK NOT value IS INITIAL.
+  CONCATENATE &apos;WS&apos; value INTO result.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DEFINE_WF_DATE_RANGE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define Workflow&apos;s creation date range"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RANGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="R_WF_DATE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Workflow creation date"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  wf_dates = range.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DEFINE_WF_ID_RANGE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define WorkFlow Range"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RANGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="R_WF_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Workflow Type (without WS)"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS &lt;r&gt; LIKE LINE OF range.
+  DATA s_task LIKE LINE OF wf_ids.
+
+  CLEAR wf_ids.
+  LOOP AT range ASSIGNING &lt;r&gt;.
+    MOVE-CORRESPONDING &lt;r&gt; TO s_task.
+    s_task-low = conv_wf_id_to_task( &lt;r&gt;-low ).
+    s_task-high = conv_wf_id_to_task( &lt;r&gt;-high ).
+    APPEND s_task TO wf_ids.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DEFINE_WI_ID_RANGE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define Workitem Range"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RANGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="R_WI_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of workitem Ientifier"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  wi_ids = range.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="R_WF_DATE" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    r_wf_date TYPE RANGE OF swwwihead-wi_cd
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Workflow creation date"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_WF_ID" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">
+    r_wf_id TYPE RANGE OF td_wf_id
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Workflow Type (without WS)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_WF_RH_TASK" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    r_wf_rh_task TYPE RANGE OF td_wi_rh_task
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Workflow Type : RH_TASK"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="R_WI_ID" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    r_wi_id TYPE RANGE OF swwwihead-wi_id
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of workitem Ientifier"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
