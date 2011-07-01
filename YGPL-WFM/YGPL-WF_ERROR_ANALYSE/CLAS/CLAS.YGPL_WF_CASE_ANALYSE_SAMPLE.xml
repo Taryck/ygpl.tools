@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="2F7908BFD85F74E6F83A8A9E8BEF4531" CODE_SIGNATURE="61B8CA92571C356E8AB5E30904325A6B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_CASE_ANALYSE_SAMPLE" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_WF_CASE_ANALYSE">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Case Analyse Sample"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_WF_ID" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WF_ID"/>
+   <ITEM CMPNAME="TD_WI_ID" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WI_ID"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="RESULTS" STATE="1" TYPTYPE="1" TYPE="TT_RESULT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="All positive match"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_WF_IF_4_CASE_ANALYSE" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ANALYSE_WORKFLOW">
+      <SOURCE>`
+* This method is a sample for case analyse
+* In this sample only WF that have no log will be considered as positive match
+  DATA s_result LIKE LINE OF results.
+
+* General model :
+* 1) Check if we are in the case we want to detect
+* 2) Inform Framework of a positive match
+* 3) Store information required by DISPLAY_MATCH_RESULTS
+
+* This case is when no actions and no steps are provided
+* (this case can&apos;t happend but you can simulate in debug)
+  CHECK actions[] IS INITIAL.
+  CHECK steps[] IS INITIAL.
+
+* If it has match the conditions then inform the framework :
+  o_comm-&gt;case_match( ).
+* Store required information for future reporting
+  s_result-wi_id = workitem_id.
+  s_result-wf_id = workflow_id.
+  APPEND s_result TO results.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="DISPLAY_MATCH_RESULTS">
+      <SOURCE>`
+* This method is a sample of DISPLAY_MATCH_RESULTS
+* For each results that has been stored in ANALYSE_WORKFLOW (positive match) display information to user
+* Note : In this example we detecting only one case within this class.
+*        If you plan to detect more than one case you should have more than one result table.
+  DATA msg TYPE string.
+  DATA count TYPE i.
+  FIELD-SYMBOLS &lt;r&gt; LIKE LINE OF results.
+
+  CHECK NOT results IS INITIAL.           &quot; To prevent diplays the first write without any result
+  count = LINES( results ).
+  msg = count.
+  WRITE:/ .
+  WRITE:/ &apos;Case dectected by the sample implementation class :&apos;(tit), msg.
+  LOOP AT results ASSIGNING &lt;r&gt;.
+* WorkItem &amp;1 (Workflow &amp;2) has been detected as a positive match
+    MESSAGE i005 WITH &lt;r&gt;-wi_id &lt;r&gt;-wf_id INTO msg.
+    WRITE:/ icon_arrow_right AS ICON, msg.
+  ENDLOOP.
+  WRITE:/ sy-uline.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="TIT">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Case dectected by the sample implementation class :" LENGTH="70 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ICON" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TS_RESULT" STATE="1" EDITORDER="1 " TYPTYPE="4">
+    BEGIN OF ts_result,
+      wi_id TYPE td_wi_id,
+      wf_id TYPE td_wf_id,
+    END OF ts_result
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Information stored when positive match"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_RESULT" STATE="1" EDITORDER="2 " TYPTYPE="4">
+    tt_result TYPE STANDARD TABLE OF ts_result WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of positive match"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
