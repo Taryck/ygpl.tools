@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="DC74004DB5202B23452473AC550173AF" CODE_SIGNATURE="F797538B2FCCCB932C01EC7C5205F8E4" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B4A8DCB5779253B2168D22C0CAB916FA" CODE_SIGNATURE="1C1464A991CE0DCF881C168EF8E44CE2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -508,6 +508,30 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="CHECK_AS_CONDITION" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check Application Server condition are OK"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="AS_CONDITIONS" CMPTYPE="1" TYPTYPE="1" TYPE="TR_AS_NAME"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA my_as_list TYPE  tt_as.
+
+  my_as_list = all_as_list.
+  DELETE my_as_list WHERE name NOT IN as_conditions.
+  IF my_as_list IS INITIAL.   &quot; No server
+    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
+          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;no_server.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
@@ -565,7 +589,11 @@
   me-&gt;o_conditions = o_conditions.
   ASSERT me-&gt;o_conditions IS BOUND.
   my_as_list = all_as_list.
-  DELETE my_as_list WHERE name NOT IN me-&gt;o_conditions-&gt;servers.</SOURCE>
+  DELETE my_as_list WHERE name NOT IN me-&gt;o_conditions-&gt;servers.
+  IF my_as_list IS INITIAL.   &quot; No server
+    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
+          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;no_server.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DELETE_THREAD" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>

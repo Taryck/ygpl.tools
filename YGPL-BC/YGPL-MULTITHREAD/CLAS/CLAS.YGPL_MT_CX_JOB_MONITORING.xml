@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="90C41E95258436E6C0BC7E6D257B84BA" CODE_SIGNATURE="777BBCC11934936B0036769D5280E67B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6DBEB262B153BCE60CB7C54CBADEF60E" CODE_SIGNATURE="EFFA3D6E362950C347FA28B52DB14FA6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX"/>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_JOB_MONITORING"/>
@@ -66,6 +66,15 @@ AS</ITEM>
       attr3 type scx_attrname value &apos;&apos;,
       attr4 type scx_attrname value &apos;&apos;,
     end of NOT_PREPARED
+`</ITEM>
+   <ITEM CMPNAME="NO_SERVER" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NO_SERVER,
+      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
+      msgno type symsgno value &apos;023&apos;,
+      attr1 type scx_attrname value &apos;&apos;,
+      attr2 type scx_attrname value &apos;&apos;,
+      attr3 type scx_attrname value &apos;&apos;,
+      attr4 type scx_attrname value &apos;&apos;,
+    end of NO_SERVER
 `</ITEM>
    <ITEM CMPNAME="YGPL_MT_CX_JOB_MONITORING" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_JOB_MONITORING,
       msgid type symsgid value &apos;YGPL_CX&apos;,
