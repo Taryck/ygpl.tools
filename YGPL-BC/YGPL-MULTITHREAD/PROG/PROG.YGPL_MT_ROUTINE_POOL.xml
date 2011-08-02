@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="57EC11D7A2AD7533482C4ABE09A4DECB" CODE_SIGNATURE="EC05CC4B3578FBDFCA556668BD3844B0" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_ROUTINE_POOL" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="54DC4FACECAC61C51AA41230D6450127" CODE_SIGNATURE="C6E86CADE2DB493A6C9C84B15A7070BF" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_ROUTINE_POOL" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="S" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -95,22 +95,20 @@ FORM show_target_server CHANGING server.  &quot; TYPE btctgtsrvr-srvname.
 
 * server groups are in the list now: &lt;GRP_NAME&gt;
 
-  FREE fieldtbl.
-  CLEAR fieldtbl.
-  fieldtbl-tabname    = &apos;BTCTGTSRVR&apos;.
-  fieldtbl-fieldname  = &apos;SRVNAME&apos;.
-  APPEND fieldtbl.
+*  FREE fieldtbl.
+*  CLEAR fieldtbl.     fieldtbl-tabname    = &apos;MSXXLIST&apos;.       fieldtbl-fieldname  = &apos;NAME&apos;.        APPEND fieldtbl.
 
   CALL FUNCTION &apos;F4IF_INT_TABLE_VALUE_REQUEST&apos;
     EXPORTING
+      ddic_structure  = &apos;MSXXLIST&apos;
       retfield        = &apos;NAME&apos;
-      dynpprog        = &apos;YGPL_MT_ROUTINE_POOL&apos;
+*      dynpprog        = &apos;YGPL_MT_ROUTINE_POOL&apos;
 *      dynpnr          = sy-dynnr
 *      dynprofield     = scrnfield_svr
-      value_org       = &apos;C&apos;
+      value_org       = &apos;S&apos;             &quot; Source is a Structure : thanks NAN
     TABLES
       value_tab       = btc_sys_srv_tbl
-      field_tab       = fieldtbl
+*      field_tab       = fieldtbl
       return_tab      = t_return
     EXCEPTIONS
       parameter_error = 1
