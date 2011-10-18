@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="EE249B6A46CA792DD050D01AADF7F669" CODE_SIGNATURE="FE1CEA63CCA7FF26D798F5AF89CD9F73" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_DATA_DEFINITION" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8D9287CF2577803F1A684F33E75103A4" CODE_SIGNATURE="FD697191B551F458EE24864F0B39A7BA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_DATA_DEFINITION" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -19,9 +19,9 @@
    </ITEM>
    <ITEM CMPNAME="MY_STATUS" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">
     BEGIN OF my_status,
-      ok        TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;O&apos;, &quot;#EC NOTEXT
-      ko        TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;K&apos;, &quot;#EC NOTEXT
-      error     TYPE ygpl_mt_typespool=&gt;td_status VALUE &apos;E&apos;, &quot;#EC NOTEXT
+      ok        TYPE ygpl_mt_typespool=&gt;td_user_status VALUE &apos;O&apos;, &quot;#EC NOTEXT
+      ko        TYPE ygpl_mt_typespool=&gt;td_user_status VALUE &apos;K&apos;, &quot;#EC NOTEXT
+      error     TYPE ygpl_mt_typespool=&gt;td_user_status VALUE &apos;E&apos;, &quot;#EC NOTEXT
     END OF my_status
 `
     <TEXTS>

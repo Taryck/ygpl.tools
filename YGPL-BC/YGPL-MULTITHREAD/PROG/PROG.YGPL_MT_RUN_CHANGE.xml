@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4322C5805D79BF17B2F90CD0E16A7FC0" CODE_SIGNATURE="C8CA1FA301F6B940AB38259BA8D6F138" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="35A34640D54EB21F214EA423FE5909FA" CODE_SIGNATURE="1D4F15AFBF13B263475D3B2FC270D333" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -203,7 +203,7 @@ START-OF-SELECTION.
 *&amp;---------------------------------------------------------------------*
 *&amp;      Form  LOAD_RUN
 *&amp;---------------------------------------------------------------------*
-FORM load_run  USING    p_run_id TYPE ygpl_mt_my_task=&gt;td_process_id.
+FORM load_run  USING    p_run_id TYPE ygpl_mt_task=&gt;td_process_id.
   DATA o_cx TYPE REF TO ygpl_mt_cx.
   DATA msg  TYPE string.
   TRY.
@@ -227,7 +227,7 @@ ENDFORM.                    &quot; LOAD_RUN
 *----------------------------------------------------------------------*
 *      --&gt;P_TASK_ID  text
 *----------------------------------------------------------------------*
-FORM load_task  USING    p_task_id TYPE ygpl_mt_my_task=&gt;td_process_id.
+FORM load_task  USING    p_task_id TYPE ygpl_mt_task=&gt;td_process_id.
   DATA o_cx TYPE REF TO ygpl_mt_cx.
   DATA msg  TYPE string.
   TRY.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="205F5BF5F08158BCECD226178B9892D1" CODE_SIGNATURE="65DC553C83E2D26C44442672441B3CD1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6E0E434A762E862060E540A4A11100E4" CODE_SIGNATURE="0A45FDEE059EF1C09E980521D119CC2C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -199,7 +199,7 @@
   f_waiting_for_thread = abap_true.
   o_job_monitoring-&gt;wait_progress( ).
   o_messaging-&gt;handle_messages( ).
-  set_status( system_status-process-finished ).</SOURCE>
+  set_int_status( system_status-process-finished ).</SOURCE>
      </ITEM>
     </COMPONENTS>
    </ITEM>
@@ -258,7 +258,7 @@
     IF NOT o_cond-&gt;stop_requested IS INITIAL.
 * Task recieve a stop request, finishing current work and stop
       MESSAGE s012.
-      set_status( system_status-process-stop_requested ).
+      set_int_status( system_status-process-stop_requested ).
 * Let condition progration stop task and then stop run
     ELSE.
       task_count = get_task_count( ).
@@ -764,7 +764,7 @@
     <SOURCE>`
   IF status &lt;&gt; system_status-process-in_progress.
     IF f_has_changed = abap_true.     save( ).      ENDIF.
-    set_status( system_status-process-in_progress ).
+    set_int_status( system_status-process-in_progress ).
   ELSE.
     autosave( ).
   ENDIF.</SOURCE>
@@ -825,6 +825,26 @@
   super-&gt;set_informations( object ).
   set_informations_handler( ).</SOURCE>
    </ITEM>
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_INT_STATUS">
+    <SOURCE>`
+  DATA t_st TYPE TD_PROCESS_STATUS.
+
+  SELECT SINGLE int_status INTO t_st
+    FROM ygplmt_runs
+   WHERE run_id = process_id.
+  IF sy-subrc = 0 AND t_st &lt;&gt; value.    t_st = abap_true.   ENDIF.
+
+  IF t_st = abap_true.    lock_exclusive( ).    ENDIF.
+  super-&gt;set_int_status( value ).
+  IF t_st = abap_true.
+* Lock release at commit.
+    UPDATE ygplmt_runs
+       SET int_status = value
+     WHERE run_id = process_id.
+    ASSERT sy-subrc = 0.
+  ENDIF.
+*  status = value.</SOURCE>
+   </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_MESSAGING">
     <SOURCE>`
   super-&gt;set_messaging( object ).
@@ -834,26 +854,6 @@
     <SOURCE>`
   super-&gt;set_messaging_handler( ).
   SET HANDLER handle_new_conditions handle_task_definition handle_specific_message FOR me-&gt;o_messaging.</SOURCE>
-   </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_STATUS">
-    <SOURCE>`
-  DATA t_st TYPE td_status.
-
-  SELECT SINGLE status INTO t_st
-    FROM ygplmt_runs
-   WHERE run_id = process_id.
-  IF sy-subrc = 0 AND t_st &lt;&gt; value.    t_st = abap_true.   ENDIF.
-
-  IF t_st = abap_true.    lock_exclusive( ).    ENDIF.
-  super-&gt;set_status( value ).
-  IF t_st = abap_true.
-* Lock release at commit.
-    UPDATE ygplmt_runs
-       SET status = value
-     WHERE run_id = process_id.
-    ASSERT sy-subrc = 0.
-  ENDIF.
-*  status = value.</SOURCE>
    </ITEM>
    <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">
     <SOURCE>`
@@ -873,7 +873,8 @@
 
   super-&gt;ygplimt_process~save( ).
   _run-run_id = process_id.
-  _run-status = status.
+  _run-int_status = status.
+  _run-usr_status = user_status.
   _run-threads = o_conditions-&gt;threads.
   _run-objects = _run-obj_left = o_objects-&gt;total_objects.
   _run-bloc_size = o_conditions-&gt;bloc_size.
@@ -882,10 +883,11 @@
   INSERT ygplmt_runs FROM _run.
   IF sy-subrc &lt;&gt; 0.
     UPDATE ygplmt_runs
-       SET status = _run-status
-          threads = _run-threads
-        bloc_size = _run-bloc_size
-          objects = _run-objects
+       SET int_status = _run-int_status
+           usr_status = _run-usr_status
+              threads = _run-threads
+            bloc_size = _run-bloc_size
+              objects = _run-objects
      WHERE run_id = _run-run_id.
     IF status = system_status-process-started.
       UPDATE ygplmt_runs

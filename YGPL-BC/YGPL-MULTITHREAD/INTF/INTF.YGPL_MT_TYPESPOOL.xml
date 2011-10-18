@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D2B61ED178F12F3DFEFEA6745DD22DF7" CODE_SIGNATURE="6518E274CE654F079E6AA383DC00EC68" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPESPOOL" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F334EFDCAE1574D7A7A834961AB87F00" CODE_SIGNATURE="749F60CC662634E14610010F0C16D778" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPESPOOL" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -41,6 +41,11 @@
    <ITEM CMPNAME="TD_BLOC_SIZE" EXPOSURE="2" STATE="1" EDITORDER="11 " TYPTYPE="1" TYPE="YGPLMT_OBJECTS-BLOC_SIZE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Bloc size (smallest qty of object)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_BLOC_STATUS" EXPOSURE="2" STATE="1" EDITORDER="27 " TYPTYPE="1" TYPE="YGPL_MT_BLOC_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Bloc Status"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TD_BOOLEAN" EXPOSURE="2" STATE="1" EDITORDER="12 " TYPTYPE="1" TYPE="ABAP_BOOL">
@@ -118,6 +123,11 @@
      <ITEM LANG="E" TEXT="Process ID (Either Run or Job) in raw format"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TD_PROCESS_STATUS" EXPOSURE="2" STATE="1" EDITORDER="28 " TYPTYPE="1" TYPE="YGPL_MT_PROCESS_STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Process Status"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TD_PROGRESS" EXPOSURE="2" STATE="1" EDITORDER="25 " TYPTYPE="4">
     td_progress(6) TYPE p DECIMALS 3
 `
@@ -140,53 +150,53 @@
      <ITEM LANG="E" TEXT="Object serialized"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_STATUS" EXPOSURE="2" STATE="1" EDITORDER="27 " TYPTYPE="1" TYPE="YGPLMT_STATUS-STATUS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Object&apos;s status"/>
-    </TEXTS>
-   </ITEM>
-   <ITEM CMPNAME="TD_THREAD_COUNT" EXPOSURE="2" STATE="1" EDITORDER="28 " TYPTYPE="1" TYPE="INT4">
+   <ITEM CMPNAME="TD_THREAD_COUNT" EXPOSURE="2" STATE="1" EDITORDER="30 " TYPTYPE="1" TYPE="INT4">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number of thread"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" STATE="1" EDITORDER="29 " TYPTYPE="1" TYPE="INT4">
+   <ITEM CMPNAME="TD_TIME" EXPOSURE="2" STATE="1" EDITORDER="31 " TYPTYPE="1" TYPE="INT4">
     <TEXTS>
      <ITEM LANG="E" TEXT="Time in second"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" STATE="1" EDITORDER="30 " TYPTYPE="1" TYPE="TIMESTAMPL">
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" STATE="1" EDITORDER="32 " TYPTYPE="1" TYPE="TIMESTAMPL">
     <TEXTS>
      <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_WP_COUNT" EXPOSURE="2" STATE="1" EDITORDER="31 " TYPTYPE="1" TYPE="INT4">
+   <ITEM CMPNAME="TD_USER_STATUS" EXPOSURE="2" STATE="1" EDITORDER="29 " TYPTYPE="1" TYPE="YGPLMT_STATUS-STATUS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User Status (Process)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_WP_COUNT" EXPOSURE="2" STATE="1" EDITORDER="33 " TYPTYPE="1" TYPE="INT4">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number of the Work Process on the Application Server"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TR_AS_NAME" EXPOSURE="2" STATE="1" EDITORDER="32 " TYPTYPE="4">
+   <ITEM CMPNAME="TR_AS_NAME" EXPOSURE="2" STATE="1" EDITORDER="34 " TYPTYPE="4">
     tr_as_name TYPE RANGE OF td_as_name
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of Application Server Name"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" STATE="1" EDITORDER="33 " TYPTYPE="4">
+   <ITEM CMPNAME="TR_CATEGORIES" EXPOSURE="2" STATE="1" EDITORDER="35 " TYPTYPE="4">
     tr_categories TYPE RANGE OF td_category
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of category"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TR_STATUS" EXPOSURE="2" STATE="1" EDITORDER="34 " TYPTYPE="4">
-    tr_status TYPE RANGE OF td_status
+   <ITEM CMPNAME="TR_STATUS" EXPOSURE="2" STATE="1" EDITORDER="36 " TYPTYPE="4">
+    tr_status TYPE RANGE OF td_process_status
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of Status"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_AS" EXPOSURE="2" STATE="1" EDITORDER="35 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_AS" EXPOSURE="2" STATE="1" EDITORDER="37 " TYPTYPE="4">
     BEGIN OF ts_as,
         name     TYPE td_as_name,
         wp       TYPE td_wp_count,
@@ -197,12 +207,12 @@
      <ITEM LANG="E" TEXT="Application Server informations"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_BATCH_INFO" EXPOSURE="2" STATE="1" EDITORDER="36 " TYPTYPE="1" TYPE="TBTCM">
+   <ITEM CMPNAME="TS_BATCH_INFO" EXPOSURE="2" STATE="1" EDITORDER="38 " TYPTYPE="1" TYPE="TBTCM">
     <TEXTS>
      <ITEM LANG="E" TEXT="Batch informations"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_BLOC_NFO" EXPOSURE="2" STATE="1" EDITORDER="39 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_BLOC_NFO" EXPOSURE="2" STATE="1" EDITORDER="41 " TYPTYPE="4">
     BEGIN OF ts_bloc_nfo,  &quot; acces by line number
       id    TYPE td_num_key,
       size  TYPE td_bloc_size,
@@ -213,12 +223,12 @@
      <ITEM LANG="E" TEXT="Bloc information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" STATE="1" EDITORDER="40 " TYPTYPE="4">BEGIN OF ts_chrono,
+   <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" STATE="1" EDITORDER="42 " TYPTYPE="4">BEGIN OF ts_chrono,
       start   TYPE td_timestamp,
       end     TYPE td_timestamp,
     END OF ts_chrono
 `</ITEM>
-   <ITEM CMPNAME="TS_DEPENDENCY" EXPOSURE="2" STATE="1" EDITORDER="41 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_DEPENDENCY" EXPOSURE="2" STATE="1" EDITORDER="43 " TYPTYPE="4">
     BEGIN OF ts_dependency,
         obj1 TYPE td_num_key,
         obj2 TYPE td_num_key,
@@ -228,7 +238,7 @@
      <ITEM LANG="E" TEXT="Define dependency relation between 2 object"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_IDLST_NFO" EXPOSURE="2" STATE="1" EDITORDER="37 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_IDLST_NFO" EXPOSURE="2" STATE="1" EDITORDER="39 " TYPTYPE="4">
     BEGIN OF ts_idlst_nfo,
        id TYPE td_num_key,
      END OF ts_idlst_nfo
@@ -237,7 +247,7 @@
      <ITEM LANG="E" TEXT="Object ID"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_JOBLIST" EXPOSURE="2" STATE="1" EDITORDER="55 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_JOBLIST" EXPOSURE="2" STATE="1" EDITORDER="57 " TYPTYPE="4">
     BEGIN OF ts_joblist,
         num       TYPE td_thread_count,
         jobname   TYPE td_jobname,
@@ -251,7 +261,7 @@
      <ITEM LANG="E" TEXT="Job IDs"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_JOB_KEY" EXPOSURE="2" STATE="1" EDITORDER="42 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_JOB_KEY" EXPOSURE="2" STATE="1" EDITORDER="44 " TYPTYPE="4">
     BEGIN OF ts_job_key,
          name   TYPE td_jobname,
          id     TYPE td_jobid,
@@ -261,7 +271,7 @@
      <ITEM LANG="E" TEXT="Job key (Name &amp; ID)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_LIMITS" EXPOSURE="2" STATE="1" EDITORDER="45 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_LIMITS" EXPOSURE="2" STATE="1" EDITORDER="47 " TYPTYPE="4">
     BEGIN OF ts_limits,
       active  TYPE td_boolean,    &quot; communication is active
       BEGIN OF time,
@@ -278,7 +288,7 @@
      <ITEM LANG="E" TEXT="Limits (time and progression) to respect"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_LINE_NFO" EXPOSURE="2" STATE="1" EDITORDER="43 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_LINE_NFO" EXPOSURE="2" STATE="1" EDITORDER="45 " TYPTYPE="4">
     BEGIN OF ts_line_nfo,
       key TYPE td_num_key,
       val TYPE td_num_key,
@@ -288,7 +298,7 @@
      <ITEM LANG="E" TEXT="Relation structure Bloc &lt;=&gt; Object"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_MODE" EXPOSURE="2" STATE="1" EDITORDER="57 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_MODE" EXPOSURE="2" STATE="1" EDITORDER="59 " TYPTYPE="4">
     BEGIN OF ts_mode,
       lock              TYPE td_lock_mode,
       scope             TYPE td_scope,
@@ -299,7 +309,7 @@
      <ITEM LANG="E" TEXT="Lock, Scope &amp; Release"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" STATE="1" EDITORDER="47 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" STATE="1" EDITORDER="49 " TYPTYPE="4">
     BEGIN OF ts_process_definition,
       process_id    TYPE  td_process_id,
       batch_info    TYPE  ts_batch_info,
@@ -311,12 +321,12 @@
      <ITEM LANG="E" TEXT="Definition of a process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" STATE="1" EDITORDER="54 " TYPTYPE="4">BEGIN OF ts_progression,
+   <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" STATE="1" EDITORDER="56 " TYPTYPE="4">BEGIN OF ts_progression,
       processed_objects   TYPE td_count,
       global_status       TYPE tt_status_list,
     END OF ts_progression
 `</ITEM>
-   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" EDITORDER="44 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_RUN" EXPOSURE="2" STATE="1" EDITORDER="46 " TYPTYPE="4">
     BEGIN OF ts_run,
       run_id    TYPE  ygplmt_runs-run_id.
   INCLUDE TYPE ygpl_mt_run_info.
@@ -327,9 +337,9 @@
      <ITEM LANG="E" TEXT="Run information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_STATUS_INFO" EXPOSURE="2" STATE="1" EDITORDER="46 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_STATUS_INFO" EXPOSURE="2" STATE="1" EDITORDER="48 " TYPTYPE="4">
     BEGIN OF ts_status_info,
-      status  TYPE td_status,
+      status  TYPE td_user_status,
       count   TYPE td_count,
     END OF ts_status_info
 `
@@ -342,56 +352,56 @@
      <ITEM LANG="E" TEXT="WorkProcess Information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_AS" EXPOSURE="2" STATE="1" EDITORDER="49 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_AS" EXPOSURE="2" STATE="1" EDITORDER="51 " TYPTYPE="4">
     tt_as TYPE STANDARD TABLE OF ts_as WITH KEY name
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="List of Application Server with load"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" STATE="1" EDITORDER="50 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_BLOCS_NFO" EXPOSURE="2" STATE="1" EDITORDER="52 " TYPTYPE="4">
     tt_blocs_nfo TYPE SORTED TABLE OF ts_bloc_nfo WITH UNIQUE KEY id
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of bloc information"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" STATE="1" EDITORDER="51 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_DEPENDENCIES" EXPOSURE="2" STATE="1" EDITORDER="53 " TYPTYPE="4">
     tt_dependencies TYPE SORTED TABLE OF ts_dependency WITH UNIQUE KEY obj1 obj2
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="List of dependencies for an object batch"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_IDLST_NFO" EXPOSURE="2" STATE="1" EDITORDER="38 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_IDLST_NFO" EXPOSURE="2" STATE="1" EDITORDER="40 " TYPTYPE="4">
     tt_idlst_nfo TYPE STANDARD TABLE OF ts_idlst_nfo WITH DEFAULT KEY
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of object ID"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_JOBLIST" EXPOSURE="2" STATE="1" EDITORDER="56 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_JOBLIST" EXPOSURE="2" STATE="1" EDITORDER="58 " TYPTYPE="4">
     tt_joblist TYPE STANDARD TABLE OF ts_joblist WITH KEY num
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="List of job"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" STATE="1" EDITORDER="52 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_LINES_NFO" EXPOSURE="2" STATE="1" EDITORDER="54 " TYPTYPE="4">
     tt_lines_nfo TYPE SORTED TABLE OF ts_line_nfo WITH UNIQUE KEY KEY
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Relation list Bloc &lt;=&gt; Object"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" STATE="1" EDITORDER="48 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_PROCESS_LIST" EXPOSURE="2" STATE="1" EDITORDER="50 " TYPTYPE="4">
     tt_process_list TYPE SORTED TABLE OF ts_process_definition WITH UNIQUE KEY process_id
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Set of process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" STATE="1" EDITORDER="53 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_STATUS_LIST" EXPOSURE="2" STATE="1" EDITORDER="55 " TYPTYPE="4">
     tt_status_list TYPE SORTED TABLE OF ts_status_info WITH UNIQUE KEY status
 `
     <TEXTS>

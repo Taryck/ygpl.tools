@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9099CAFDF56416E3CA2271BD9651987D" CODE_SIGNATURE="4B69BFF88A97A055EE47F46BE0D39E47" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_DATABASE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="18C9E804F8A2F05A31E264BF6841AC9C" CODE_SIGNATURE="4B69BFF88A97A055EE47F46BE0D39E47" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_CX_DATABASE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX"/>
   <ITEM TYPE="INTF" NAME="IF_T100_MESSAGE"/>
@@ -27,67 +27,39 @@ AS</ITEM>
    <ITEM CMPNAME="TD_DB_TABLE_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_DB_TABLE_NAME"/>
   </ALIASES>
   <ATTRIBUTS>
-   <ITEM CMPNAME="DELETE_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of DELETE_FAILED,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;053&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of DELETE_FAILED
-`</ITEM>
-   <ITEM CMPNAME="INSERT_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of INSERT_FAILED,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;051&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of INSERT_FAILED
-`</ITEM>
    <ITEM CMPNAME="KEY_VALUE" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
     <TEXTS>
      <ITEM LANG="E" TEXT="Value of the key for the record"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="NOT_FOUND" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of NOT_FOUND,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;050&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of NOT_FOUND
-`</ITEM>
    <ITEM CMPNAME="TABLENAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TD_DB_TABLE_NAME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Name of the table"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="UPDATE_FAILED" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of UPDATE_FAILED,
-      msgid type symsgid value &apos;YGPL_MT_CX&apos;,
-      msgno type symsgno value &apos;052&apos;,
-      attr1 type scx_attrname value &apos;TABLENAME&apos;,
-      attr2 type scx_attrname value &apos;KEY_VALUE&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of UPDATE_FAILED
-`</ITEM>
-   <ITEM CMPNAME="YGPL_MT_CX_DATABASE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4" LOCKED="X">begin of YGPL_MT_CX_DATABASE,
-      msgid type symsgid value &apos;YGPL_CX&apos;,
-      msgno type symsgno value &apos;001&apos;,
-      attr1 type scx_attrname value &apos;CX_NAME&apos;,
-      attr2 type scx_attrname value &apos;&apos;,
-      attr3 type scx_attrname value &apos;&apos;,
-      attr4 type scx_attrname value &apos;&apos;,
-    end of YGPL_MT_CX_DATABASE
-`</ITEM>
   </ATTRIBUTS>
   <DEFERRED>
    <INTERFACES>
     <ITEM TYPEGROUP="IF_T100_MESSAGE" TPUTYPE="2" EXPLICIT="X"/>
    </INTERFACES>
   </DEFERRED>
+  <EXCEPTIONS_TEXTS>
+   <ITEM CMPNAME="DELETE_FAILED" EDITORDER="7 ">
+    <MESSAGE CLASS="YGPL_MT_CX" NUMBER="053" ATTRIBUT_1="TABLENAME" ATTRIBUT_2="KEY_VALUE"/>
+   </ITEM>
+   <ITEM CMPNAME="INSERT_FAILED" EDITORDER="5 ">
+    <MESSAGE CLASS="YGPL_MT_CX" NUMBER="051" ATTRIBUT_1="TABLENAME" ATTRIBUT_2="KEY_VALUE"/>
+   </ITEM>
+   <ITEM CMPNAME="NOT_FOUND" EDITORDER="2 ">
+    <MESSAGE CLASS="YGPL_MT_CX" NUMBER="050" ATTRIBUT_1="TABLENAME" ATTRIBUT_2="KEY_VALUE"/>
+   </ITEM>
+   <ITEM CMPNAME="UPDATE_FAILED" EDITORDER="6 ">
+    <MESSAGE CLASS="YGPL_MT_CX" NUMBER="052" ATTRIBUT_1="TABLENAME" ATTRIBUT_2="KEY_VALUE"/>
+   </ITEM>
+   <ITEM CMPNAME="YGPL_MT_CX_DATABASE" EDITORDER="1 ">
+    <MESSAGE CLASS="YGPL_CX" NUMBER="001" ATTRIBUT_1="CX_NAME"/>
+   </ITEM>
+  </EXCEPTIONS_TEXTS>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPL_MT_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
   </INTERFACES>
