@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="989B13FB30B81FE7EDFBB77B6390998D" CODE_SIGNATURE="70BF310A1599259C15289B71F1F54902" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_ENGINE" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Data Store : Engine"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_STORE_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DS_TYPESPOOL" REFCMPNAME="TD_STORE_ID"/>
+  </ALIASES>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPLIDS_STORE" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="IF_SERIALIZABLE_OBJECT" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_DS_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="GET_STORE" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Retrieve a existing store from DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STORE_ID"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_STORE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Data Store Interface"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA s_xml      TYPE string.
+  DATA s_data     TYPE ygplds_storage.
+  DATA o_cx       TYPE REF TO cx_root.
+
+  SELECT SINGLE * INTO s_data
+    FROM ygplds_storage
+    WHERE id = id.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_ds_cx_not_found
+          EXPORTING textid = ygpl_ds_cx_not_found=&gt;store_not_found
+                        id = id.
+  ENDIF.
+
+* Authority check
+  IF s_data-confidential IS NOT INITIAL AND
+     s_data-owner &lt;&gt; sy-uname.
+    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
+          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+  ENDIF.
+
+  s_xml = unzip_string( s_data-raw_data ).
+
+    TRY.
+      CALL TRANSFORMATION id SOURCE XML s_xml
+           RESULT store = result.
+    CATCH cx_xslt_serialization_error INTO o_cx.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+        EXPORTING
+          textid = ygpl_ds_cx_serialize=&gt;xslt_serialization_error
+          previous = o_cx.
+    CATCH cx_transformation_error INTO o_cx.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+        EXPORTING
+          textid = ygpl_ds_cx_serialize=&gt;transformation_error
+          previous = o_cx.
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="NEW_STORE" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create a new store"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_STORE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Data Store Interface"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CREATE OBJECT result TYPE ygpl_ds_store.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SAVE_STORE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Save Store object to database"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_STORE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_STORE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Data Store Interface"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA o_cx       TYPE REF TO cx_root.
+  DATA s_xml      TYPE string.
+  DATA s_data     TYPE ygplds_storage.
+
+  SELECT SINGLE * INTO s_data
+    FROM ygplds_storage
+    WHERE id = o_store-&gt;id.
+  IF sy-subrc = 0.
+    IF s_data-confidential IS NOT INITIAL AND s_data-owner &lt;&gt; sy-uname.
+* RAISE EXCEPTION
+    ENDIF.
+  ENDIF.
+  s_data-id = o_store-&gt;id.
+  GET TIME STAMP FIELD s_data-timestamp.
+  s_data-owner = sy-uname.
+  s_data-cprog = sy-cprog.
+*  s_data-CONFIDENTIAL =
+*  s_data-HOLD =
+  s_data-mem_size = o_store-&gt;memory_size.
+
+  TRY.
+      CALL TRANSFORMATION id SOURCE store = o_store
+           RESULT XML s_xml.
+    CATCH cx_xslt_serialization_error INTO o_cx.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+        EXPORTING
+          textid = ygpl_ds_cx_serialize=&gt;xslt_serialization_error
+          previous = o_cx.
+    CATCH cx_transformation_error INTO o_cx.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+        EXPORTING
+          textid = ygpl_ds_cx_serialize=&gt;transformation_error
+          previous = o_cx.
+  ENDTRY.
+
+  s_data-raw_data = zip_string( s_xml ).
+  s_data-db_size = XSTRLEN( s_data-raw_data ).
+  MODIFY ygplds_storage FROM s_data.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UNZIP_STRING" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="unGZIP String"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="XSTRING"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING"/>
+    </PARAMETERS>
+    <SOURCE>`
+  TRY.
+      CALL METHOD cl_abap_gzip=&gt;decompress_text
+        EXPORTING
+          gzip_in      = data
+*          gzip_in_len  = -1
+          conversion   = &apos;DEFAULT&apos;
+        IMPORTING
+*          text_out_len =
+          text_out     = result.
+    CATCH cx_parameter_invalid_range.
+      result = data.
+    CATCH cx_sy_buffer_overflow.
+      result = data.
+    CATCH cx_sy_conversion_codepage.
+      result = data.
+    CATCH cx_sy_compression_error.
+      result = data.
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ZIP_STRING" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="GZIP String"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="XSTRING"/>
+    </PARAMETERS>
+    <SOURCE>`
+  TRY.
+      CALL METHOD cl_abap_gzip=&gt;compress_text
+        EXPORTING
+          text_in        = data
+*      text_in_len    = -1
+          compress_level = 9
+          conversion     = &apos;DEFAULT&apos;
+        IMPORTING
+*      gzip_out_len   =
+          gzip_out       = result.
+    CATCH cx_parameter_invalid_range.
+      result = data.
+    CATCH cx_sy_buffer_overflow.
+      result = data.
+    CATCH cx_sy_conversion_codepage.
+      result = data.
+  ENDTRY.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TO_STORE" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLIDS_STORE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Data Store Interface"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
