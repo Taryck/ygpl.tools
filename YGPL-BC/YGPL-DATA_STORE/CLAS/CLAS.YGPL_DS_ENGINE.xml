@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="989B13FB30B81FE7EDFBB77B6390998D" CODE_SIGNATURE="70BF310A1599259C15289B71F1F54902" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="253C6E185DFEFCF81A780556BF6473D2" CODE_SIGNATURE="87A516DBE6DF4804134E8EA4169B7C51" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -10,6 +10,13 @@
   <ALIASES>
    <ITEM CMPNAME="TD_STORE_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DS_TYPESPOOL" REFCMPNAME="TD_STORE_ID"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="FLAG_CLEANUP" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Is cleanup already done"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
   <FRIENDS>
    <ITEM REFCLSNAME="YGPLIDS_STORE" STATE="1"/>
   </FRIENDS>
@@ -31,6 +38,93 @@
 *&quot;* in the implementation part of the class</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="CHECK_IS_CHANGEABLE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Raise exception if store can&apos;t be changed"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_DATA"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  CHECK data IS NOT INITIAL.
+* Authority check
+  IF data-confidential IS NOT INITIAL AND
+     data-owner &lt;&gt; sy-uname.
+    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
+          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  cleanup( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CLEANUP" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Cleanup process : Remove out of date store"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_data TYPE ygplds_storage.
+
+  CHECK flag_cleanup IS INITIAL.    &quot; cleanup once for each &quot;session&quot;
+  flag_cleanup = abap_true.         &quot; Mark cleanup as done
+
+* Check that cleanup have not been done today
+  SELECT SINGLE hold
+    INTO s_data-hold
+    FROM ygplds_storage
+    WHERE id = s_data-id.
+  CHECK s_data-hold &lt; sy-datum OR s_data-hold IS INITIAL.
+
+* Update last check date in DB
+  s_data-hold = sy-datum.
+  MODIFY ygplds_storage FROM s_data.
+  ASSERT sy-subrc = 0.
+
+* Do the cleanup
+  clear s_data.
+  DELETE FROM ygplds_storage
+    WHERE hold &lt;&gt; s_data-hold   &quot; initial
+      AND hold &lt; sy-datum.
+  ASSERT sy-subrc = 0 OR  sy-dbcnt = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DELETE_STORE" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delete a existinf store from DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STORE_ID"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA d_key TYPE string.
+
+  read_store( id ).
+  DELETE FROM ygplds_storage
+    WHERE id = id.
+  IF sy-dbcnt = 0 OR sy-subrc &lt;&gt; 0.
+    d_key = id.
+    RAISE EXCEPTION TYPE ygpl_ds_cx_database
+      EXPORTING
+        textid = ygpl_ds_cx_database=&gt;delete_error
+           key = d_key.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="GET_STORE" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Retrieve a existing store from DB"/>
@@ -55,25 +149,11 @@
   DATA s_data     TYPE ygplds_storage.
   DATA o_cx       TYPE REF TO cx_root.
 
-  SELECT SINGLE * INTO s_data
-    FROM ygplds_storage
-    WHERE id = id.
-  IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_not_found
-          EXPORTING textid = ygpl_ds_cx_not_found=&gt;store_not_found
-                        id = id.
-  ENDIF.
-
-* Authority check
-  IF s_data-confidential IS NOT INITIAL AND
-     s_data-owner &lt;&gt; sy-uname.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
-          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
-  ENDIF.
+  s_data = read_store( id ).
 
   s_xml = unzip_string( s_data-raw_data ).
 
-    TRY.
+  TRY.
       CALL TRANSFORMATION id SOURCE XML s_xml
            RESULT store = result.
     CATCH cx_xslt_serialization_error INTO o_cx.
@@ -109,6 +189,37 @@
     <SOURCE>`
   CREATE OBJECT result TYPE ygpl_ds_store.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="READ_STORE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Retrieve a existing store from DB"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STORE_ID"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_DATA">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Storage of information as Store object in database"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  SELECT SINGLE * INTO result
+    FROM ygplds_storage
+    WHERE id = id.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_ds_cx_not_found
+          EXPORTING textid = ygpl_ds_cx_not_found=&gt;store_not_found
+                        id = id.
+  ENDIF.
+
+  check_is_changeable( result ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="SAVE_STORE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Save Store object to database"/>
@@ -131,21 +242,25 @@
   DATA o_cx       TYPE REF TO cx_root.
   DATA s_xml      TYPE string.
   DATA s_data     TYPE ygplds_storage.
+  DATA f_exists   TYPE abap_bool.
+  DATA d_key      TYPE string.
 
+* Check if exists preious one
   SELECT SINGLE * INTO s_data
-    FROM ygplds_storage
-    WHERE id = o_store-&gt;id.
+  FROM ygplds_storage
+  WHERE id = o_store-&gt;id.
   IF sy-subrc = 0.
-    IF s_data-confidential IS NOT INITIAL AND s_data-owner &lt;&gt; sy-uname.
-* RAISE EXCEPTION
-    ENDIF.
+    f_exists = abap_true.
+    check_is_changeable( s_data ).
   ENDIF.
+
+* Create new alue to store
   s_data-id = o_store-&gt;id.
   GET TIME STAMP FIELD s_data-timestamp.
-  s_data-owner = sy-uname.
-  s_data-cprog = sy-cprog.
-*  s_data-CONFIDENTIAL =
-*  s_data-HOLD =
+  s_data-owner = o_store-&gt;owner.
+  s_data-cprog = o_store-&gt;calling_program.
+  s_data-confidential = o_store-&gt;confidential.
+  s_data-hold = o_store-&gt;hold_date.
   s_data-mem_size = o_store-&gt;memory_size.
 
   TRY.
@@ -166,7 +281,20 @@
   s_data-raw_data = zip_string( s_xml ).
   s_data-db_size = XSTRLEN( s_data-raw_data ).
   MODIFY ygplds_storage FROM s_data.
-  ASSERT sy-subrc = 0.</SOURCE>
+  IF sy-subrc &lt;&gt; 0.
+    d_key = o_store-&gt;id.
+    IF f_exists = abap_true.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_database
+        EXPORTING
+          textid = ygpl_ds_cx_database=&gt;update_error
+             key = d_key.
+    ELSE.
+      RAISE EXCEPTION TYPE ygpl_ds_cx_database
+        EXPORTING
+          textid = ygpl_ds_cx_database=&gt;insert_error
+             key = d_key.
+    ENDIF.
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UNZIP_STRING" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -224,10 +352,18 @@
   ENDTRY.</SOURCE>
    </ITEM>
   </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
+  </TYPEGROUPS>
   <TYPES>
    <ITEM CMPNAME="TO_STORE" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLIDS_STORE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Data Store Interface"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_DATA" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPLDS_STORAGE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Storage of information as Store object in database"/>
     </TEXTS>
    </ITEM>
   </TYPES>
