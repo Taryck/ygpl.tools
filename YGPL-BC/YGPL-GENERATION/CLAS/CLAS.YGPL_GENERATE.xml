@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BA1C39C55869008DE9B0E64E76B269BE" CODE_SIGNATURE="57FB3C517BF32C0C011CCBD3DE0033AE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F789FDD4334610D50FBD092863F08700" CODE_SIGNATURE="50BFEE751CBBC68BFC0BD36C1EAAC362" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-GENERATION" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -953,7 +953,27 @@ AS</ITEM>
 *    s_obj-component
     APPEND s_obj TO result.
   ENDLOOP.
+  SORT result BY object objname.
 * determine the program names on the basis of the TADIR keys *
+* Form is not suppose to get only :
+*    CASE lv_tadirobject.
+**----------------------------programs--------------------------------
+*      WHEN &apos;PROG&apos;.
+**----------------------------function groups ------------------------
+*      WHEN &apos;FUGR&apos;.
+**-----------------function groups with customer include ----------------
+** if FUGX exists then also FUGS exists
+** Since the prognames of FUGX and FUGS are identical, FUGX needn&apos;t be
+** considered here.
+*      WHEN &apos;FUGS&apos;.
+**---------------------------logical database, 2 programs---------------
+*      WHEN &apos;LDBA&apos;.
+**-----------------------classes and interfaces--------------------------
+*      WHEN &apos;CLAS&apos; OR &apos;INTF&apos;.
+**------------------------------type-pool--------------------------------
+*      WHEN &apos;TYPE&apos;.
+*    ENDCASE.
+* It gereata wrong program name.
   PERFORM tadir_2_trdir IN PROGRAM rsparagenlod
           CHANGING result.</SOURCE>
    </ITEM>
@@ -1081,7 +1101,10 @@ AS</ITEM>
   ENDIF.
 
   SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
-  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.</SOURCE>
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+  IF result IS INITIAL.     &quot; NO result
+    result = packages.      &quot; set backrange to prevent no result being range with no values =&gt; all values
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GENERATE" EXPOSURE="2" STATE="1">
     <TEXTS>
@@ -1104,9 +1127,6 @@ AS</ITEM>
 
   t_genset = compkeys_2_genset( component_list ).
 
-* Clean list
-  SORT t_genset BY name.
-  DELETE ADJACENT DUPLICATES FROM t_genset COMPARING name.
 * Remove component type that can&apos;t be generated
 * FROM RSPARAGENLOD(3496) FORM get_component_objects
   DELETE t_genset WHERE name IS INITIAL
@@ -1118,7 +1138,11 @@ AS</ITEM>
                              object = &apos;TYPE&apos; OR
                              object = &apos;LDBA&apos; )
                    OR NOT pgmid = &apos;R3TR&apos;.
+* Clean list
+  SORT t_genset BY name.
+  DELETE ADJACENT DUPLICATES FROM t_genset COMPARING name.
 
+  CHECK t_genset IS NOT INITIAL.
 * Remove programs that can&apos;t be generated : Include, ....
 *      PERFORM trdir_check IN PROGRAM rsparagenlod
   SELECT * INTO TABLE t_trdir
@@ -1131,7 +1155,7 @@ AS</ITEM>
     READ TABLE t_trdir ASSIGNING &lt;dir&gt;
          WITH TABLE KEY name = &lt;obj&gt;-name.
     CHECK sy-subrc = 0.
-    If not &lt;dir&gt;-subc CA gc_gen_types.    Clear &lt;obj&gt;-name.     endif.
+    IF NOT &lt;dir&gt;-subc CA gc_gen_types.    CLEAR &lt;obj&gt;-name.     ENDIF.
   ENDLOOP.
   DELETE t_genset WHERE name IS INITIAL.
 
