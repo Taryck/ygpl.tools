@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0418E5CEA5488ED062A01012FF2C8446" CODE_SIGNATURE="708AEC5C2F7B23AC69D64F8FA7A6B6C9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="473FAF196BD436759D3083145960202C" CODE_SIGNATURE="F7B840EF32ACF154F5D757E18FDBE380" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -33,19 +33,34 @@
     <COMPONENTS>
      <ITEM MTDNAME="ADD_INFO">
       <SOURCE>`
-  DATA s_info LIKE LINE OF me-&gt;informations.
+  DATA _desc      TYPE REF TO cl_abap_typedescr.
+  DATA s_info     LIKE LINE OF me-&gt;informations.
   FIELD-SYMBOLS &lt;a&gt; TYPE ANY.
+  DATA o_ref      TYPE REF TO cl_abap_refdescr.
 
   s_info-name = name.
+  _desc = cl_abap_typedescr=&gt;describe_by_data( p_data = value ).
+  IF _desc-&gt;kind = cl_abap_datadescr=&gt;kind_ref.
+    o_ref ?= _desc.
+    _desc = o_ref-&gt;get_referenced_type( ).
+  ENDIF.
+  CASE _desc-&gt;kind.
+    WHEN cl_abap_datadescr=&gt;kind_ref.
+* Unexpected =&gt; Ignored
+    WHEN cl_abap_datadescr=&gt;kind_elem OR cl_abap_datadescr=&gt;kind_struct OR cl_abap_datadescr=&gt;kind_table.
 *  IF NOT by_ref IS INITIAL.      &quot; do not works when object is serialize referenced data seems to by out of the scope
 *    GET REFERENCE OF value INTO s_info-data.    &quot; Point to the data =&gt; If data change it change into the store also
 *  ELSE.                                         &quot; Data is duplicate (do not work on ref like onject)
-  CREATE DATA s_info-data LIKE value.
-  ASSERT sy-subrc = 0.
-  ASSIGN s_info-data-&gt;* TO &lt;a&gt;.
-  &lt;a&gt; = value.
-  s_info-size = get_mem_size( &lt;a&gt; ).
+      CREATE DATA s_info-data LIKE value.
+      ASSERT sy-subrc = 0.
+      ASSIGN s_info-data-&gt;* TO &lt;a&gt;.
+      &lt;a&gt; = value.
+*      s_info-size = get_mem_size( &lt;a&gt; ).
 *  ENDIF.
+    WHEN cl_abap_datadescr=&gt;kind_class OR cl_abap_datadescr=&gt;kind_intf.
+      s_info-object = value.
+  ENDCASE.
+  s_info-size = get_mem_size( value ).
   INSERT s_info INTO TABLE me-&gt;informations.
   IF sy-subrc &lt;&gt; 0.
     RAISE EXCEPTION TYPE ygpl_ds_cx_already_exists
@@ -59,6 +74,14 @@
   FIELD-SYMBOLS:
     &lt;a&gt; TYPE ANY,
     &lt;i&gt; LIKE LINE OF me-&gt;informations.
+  DATA _desc      TYPE REF TO cl_abap_typedescr.
+  DATA o_ref      TYPE REF TO cl_abap_refdescr.
+
+  _desc = cl_abap_typedescr=&gt;describe_by_data( p_data = value ).
+  IF _desc-&gt;kind = cl_abap_datadescr=&gt;kind_ref.
+    o_ref ?= _desc.
+    _desc = o_ref-&gt;get_referenced_type( ).
+  ENDIF.
 
   READ TABLE me-&gt;informations ASSIGNING &lt;i&gt;
       WITH TABLE KEY name = name.
@@ -67,9 +90,18 @@
           EXPORTING textid = ygpl_ds_cx_not_found=&gt;value_not_found
                  info_name = name.
   ENDIF.
-  ASSIGN &lt;i&gt;-data-&gt;* TO &lt;a&gt;.
-  ASSERT sy-subrc = 0.
-  value = &lt;a&gt;.</SOURCE>
+  CASE _desc-&gt;kind.
+    WHEN cl_abap_datadescr=&gt;kind_ref.
+* Unexpected =&gt; Ignored
+    WHEN cl_abap_datadescr=&gt;kind_elem OR cl_abap_datadescr=&gt;kind_struct OR cl_abap_datadescr=&gt;kind_table.
+      ASSERT &lt;i&gt;-object IS INITIAL.
+      ASSIGN &lt;i&gt;-data-&gt;* TO &lt;a&gt;.
+      ASSERT sy-subrc = 0.
+      value = &lt;a&gt;.
+    WHEN cl_abap_datadescr=&gt;kind_class OR cl_abap_datadescr=&gt;kind_intf.
+      ASSERT &lt;i&gt;-data IS INITIAL.
+      value = &lt;i&gt;-object.
+  ENDCASE.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_INFO_LIST">
       <SOURCE>`
@@ -232,6 +264,7 @@
       name    TYPE td_info_name,
       size    TYPE td_memory_size,
       data    TYPE REF TO data,
+      object  type REF TO object,
     END OF ts_info
 `</ITEM>
    <ITEM CMPNAME="TT_INFOS" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="4">tt_infos TYPE SORTED TABLE OF ts_info WITH UNIQUE KEY name
