@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="6701599B0102C1F288B1905D51D1F428" CODE_SIGNATURE="A729D146B8972A2ECC46701BF88D952F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_INDEXES" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Activate components">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CHECK_LOG" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_INDEXES_CHECK_LOG"/>
+   <ITEM CMPNAME="COMPONENT_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_TABLES_SIZE" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X" IMPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COMP_LIST" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="List of component keys"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
+    </PARAMETERS>
+    <SOURCE>`
+  TYPES:
+    BEGIN OF ts_tablelist,
+      name TYPE ygpl_dba_indexes-tabname,
+    END OF ts_tablelist.
+  DATA t_tablelist TYPE STANDARD TABLE OF ts_tablelist WITH DEFAULT KEY.
+  DATA s_table     LIKE LINE OF t_tablelist.
+  FIELD-SYMBOLS:
+    &lt;t&gt; LIKE LINE OF component_list,
+    &lt;i&gt; LIKE LINE OF check_log.
+
+  component_list = ygpl_tables_size=&gt;filter_table( comp_list ).
+  component_list = ygpl_tables_size=&gt;filter_by_table_size( list = component_list
+                                                    size_filter = r_size_filter ).
+  LOOP AT component_list ASSIGNING &lt;t&gt;.
+    CLEAR s_table.
+    s_table-name = &lt;t&gt;-name.
+    APPEND s_table TO t_tablelist.
+  ENDLOOP.
+  SORT t_tablelist.   DELETE ADJACENT DUPLICATES FROM t_tablelist.
+
+* Process list
+  SELECT i~tabname i~fieldname i~indexname i~domname i~uniqueflag i~as4user i~as4date i~as4time f~position
+    INTO TABLE check_log
+    FROM ygpl_dba_indexes AS i
+         LEFT OUTER JOIN dd17s AS f
+              ON f~sqltab = i~tabname
+             AND f~indexname = i~indexname
+             AND f~fieldname = i~fieldname
+    FOR ALL ENTRIES IN t_tablelist
+    WHERE i~tabname = t_tablelist-name
+*      AND f~sqltab IS NULL     &quot; No fields from the right-hand table of a LEFT OUTER JOIN may appear in
+      %_HINTS ORACLE &apos;&amp;max_in_blocking_factor 500&amp;&apos;.
+  DELETE check_log WHERE size IS NOT INITIAL.
+
+  LOOP AT check_log ASSIGNING &lt;i&gt;.
+    &lt;i&gt;-size = ygpl_tables_size=&gt;get_index_size( table_name = &lt;i&gt;-tabname
+                                                 index_name = &lt;i&gt;-indexname ).
+  ENDLOOP.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_INDEXES_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_indexes_check_log TYPE STANDARD TABLE OF ygpl_indexes_check_result WITH DEFAULT KEY
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

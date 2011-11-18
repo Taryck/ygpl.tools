@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="C40520F6AAC835C559B412359B348FBD" CODE_SIGNATURE="C6A138D9B704415FB6211A053524DDF3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Activate components">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CHECK_LOG" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_TABLES_CHECK_LOG"/>
+   <ITEM CMPNAME="COMPONENT_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Component list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TABLE_ENQ_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="RSDEO-OBJTYPE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ABAP/4 Dictionary object type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TABLE_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;T&apos;" TYPTYPE="1" TYPE="RSEDD0-DDOBJTYPE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="DD object type in DE management system"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_TABLES_SIZE" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  CALL FUNCTION &apos;INTERN_TRANSL_EUTYPE&apos; &quot;Sperrtyp
+       EXPORTING
+            eutype       = table_type
+       IMPORTING
+            enqueue_type = table_enq_type.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COMP_LIST" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="List of component keys"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA d_name   TYPE td_table_name.
+  DATA d_tname  TYPE ygpl_tables_size=&gt;td_table_name.
+  DATA t_log    TYPE tt_check_log.
+  DATA s_line   LIKE LINE OF check_log.
+  FIELD-SYMBOLS:
+    &lt;l&gt; LIKE LINE OF t_log,
+    &lt;t&gt; LIKE LINE OF component_list.
+
+  component_list = ygpl_tables_size=&gt;filter_table( comp_list ).
+  component_list = ygpl_tables_size=&gt;filter_by_table_size( list = component_list
+                                                    size_filter = r_size_filter ).
+* Process list
+  LOOP AT component_list ASSIGNING &lt;t&gt;.
+    d_name = &lt;t&gt;-name.
+    t_log = get_table_check_protocol( d_name ).
+    DELETE t_log
+           WHERE NOT (
+                      ( ag = &apos;DT&apos; AND msgnr = &apos;510&apos; )    &quot;  Index &amp;-&amp; completely contains the fields of index &amp;
+           ) .
+    CHECK NOT t_log IS INITIAL.
+    LOOP AT t_log ASSIGNING &lt;l&gt;.
+      CLEAR s_line.
+      d_tname = s_line-table_name = &lt;t&gt;-name.
+      s_line-index_name = &lt;l&gt;-var2.
+      s_line-subindex_name = &lt;l&gt;-var3.
+      MESSAGE ID &lt;l&gt;-ag TYPE &apos;I&apos; NUMBER &lt;l&gt;-msgnr WITH &lt;l&gt;-var1 &lt;l&gt;-var2 &lt;l&gt;-var3 &lt;l&gt;-var4 INTO s_line-message.
+      s_line-size = ygpl_tables_size=&gt;get_index_size( table_name = d_tname
+                                                      index_name = s_line-subindex_name ).
+      s_line-size = s_line-size / 1024.     &quot; Ko =&gt; Mo
+      APPEND s_line TO check_log.
+    ENDLOOP.
+  ENDLOOP.
+  SORT check_log BY table_name subindex_name index_name.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_TABLE_CHECK_PROTOCOL" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Table&apos;s Check protocol"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table name, 16 characters"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_CHECK_LOG"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA objname  TYPE rsedd0-ddobjname.
+  DATA protid   TYPE sy-tabix.
+  DATA actmode  TYPE ddrefstruc-mode.
+  DATA subrc    TYPE sy-subrc.
+  DATA s_memid  TYPE tstrf01-filename.
+
+  objname = name.
+  CALL FUNCTION &apos;INTERN_DD_CHECK_EXIST&apos;&quot;Existenz-/Objektklasseprüfung
+         EXPORTING
+              objname            = objname
+              objtype            = table_type
+              err_message        = &apos; &apos;
+              objstate           = &apos;M&apos;
+              exists             = &apos;X&apos;
+         EXCEPTIONS
+              OTHERS             = 01.
+  CHECK sy-subrc = 0.
+
+  CALL FUNCTION &apos;DD_OBJ_PROT_OPEN&apos;
+    EXPORTING
+      objectname = objname
+      objecttype = table_enq_type
+      level      = 1
+      device     = &apos;M&apos;
+      ddfunc     = &apos;CHE&apos;
+    IMPORTING
+      prid       = protid
+    EXCEPTIONS
+      OTHERS     = 01.
+  ASSERT sy-subrc = 0.
+
+  PERFORM stdo_set_format IN PROGRAM radbtout USING protid &apos;S&apos;.
+  actmode = 9.                       &quot;Prüfen
+  CALL FUNCTION &apos;DD_TABL_ACT&apos;
+    EXPORTING
+      device      = &apos;M&apos;
+      path        = &apos; &apos;
+      protname    = &apos; &apos;
+      tabname     = objname
+      timer_on    = &apos; &apos;
+      prid        = protid
+      act_mode    = actmode
+*     AUTH_CHK                = &apos;X&apos;
+*     EXCOMMIT                = &apos;X&apos;
+    IMPORTING
+      act_result  = subrc
+*   TABLES
+*     ACT_RES_TAB             =
+    EXCEPTIONS
+      actok_failure           = 1
+      dbchange_failure        = 2
+      lockact_failure         = 3
+      ntab_gen_failure        = 4
+      put_failure             = 5
+      read_failure            = 6
+      unlockact_failure       = 7
+      access_failure          = 8
+      OTHERS                  = 9.
+  CHECK sy-subrc = 0.   &quot; Generation Failure
+  CHECK subrc &lt;= 4.     &quot; Warning
+
+  CONCATENATE &apos;CHE&apos; table_enq_type objname INTO s_memid.
+  CALL FUNCTION &apos;TRINT_READ_LOG_FROM_MEMORY&apos;
+    EXPORTING
+      iv_logname_memory = s_memid
+      iv_free_memory    = &apos;X&apos;
+    TABLES
+      et_log            = result
+    EXCEPTIONS
+      log_not_found     = 1
+      OTHERS            = 2.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TD_TABLE_NAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="DD02D-DBTABNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table name, 16 characters"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
+   <ITEM CMPNAME="TT_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_check_log TYPE STANDARD TABLE OF trlogm WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_TABLES_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">tt_tables_check_log TYPE STANDARD TABLE OF ygpl_tables_check_result WITH DEFAULT KEY
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
