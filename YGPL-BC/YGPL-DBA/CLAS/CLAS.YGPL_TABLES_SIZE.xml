@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="236FD320924D7975519A90FAE1D6B5FE" CODE_SIGNATURE="343FF35DA86EDF7E558E0059640E93BF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6481B45ED139F9E01F4DBC11A391A798" CODE_SIGNATURE="29C853F854A1D6F98523AF69F4E6D024" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
@@ -98,6 +98,9 @@ AS</ITEM>
 * Table size
   compute_table_list( ).
 
+* Table size
+  compute_index_list( ).
+
   s_cache-tables = tables_list.
   s_cache-indexes = indexes_list.
   TRY.
@@ -121,16 +124,13 @@ AS</ITEM>
   EXEC SQL.
     OPEN dbcur for
     select
-      substr( s.segment_name, 1, instr( s.segment_name, &apos;~&apos; ) - 1 ) as table_name,
-      substr( s.segment_name, instr( s.segment_name, &apos;~&apos; ) - length( s.segment_name ) ) as Index_name,
+      s.segment_name,
       sum( s.bytes/1024 ) mb
     from dba_segments s
     where s.owner like &apos;%SAP%&apos;
       and s.SEGMENT_TYPE like &apos;%INDEX%&apos;
       and s.segment_name like &apos;%~%&apos;
-    group by
-      substr( s.segment_name, 1, instr( s.segment_name, &apos;~&apos; ) - 1 ),
-      substr( s.segment_name, instr( s.segment_name, &apos;~&apos; ) - length( s.segment_name ) )
+    group by s.segment_name
   ENDEXEC.
   DO.
     CLEAR s_data.
@@ -405,7 +405,7 @@ AS</ITEM>
     end of ts_cache
 `</ITEM>
    <ITEM CMPNAME="TS_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">BEGIN OF ts_table_size,
-        table_name    TYPE td_table_name,
+        table_name    TYPE string,      &quot; td_table_name,
         size          TYPE td_size,
       END OF ts_table_size
 `</ITEM>
