@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="6876FFAEDE39B4EC05AC05111E5D879D" CODE_SIGNATURE="F24EE33DE3F77245F241B9C2262B3750" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TADIR_SEARCH" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Tools for TADIR query">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="MAX_ORDER" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;999999&apos;" TYPTYPE="1" TYPE="TD_TYPEORDER">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Max (and default) Rank for type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SAPTYPES" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_SAPTYPES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of SAP Types"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA t_types    TYPE STANDARD TABLE OF ko100 WITH DEFAULT KEY.
+  DATA s_saptypes LIKE LINE OF saptypes.
+  DATA t_saptypes TYPE STANDARD TABLE OF ts_saptypes.
+  FIELD-SYMBOLS:
+    &lt;t&gt; LIKE LINE OF t_types.
+
+  CALL FUNCTION &apos;TR_OBJECT_TABLE&apos;
+*   IMPORTING
+*     WE_TABLE_LINES       =
+    TABLES
+      wt_object_text       = t_types.
+
+  SORT t_types BY object.
+  DELETE ADJACENT DUPLICATES FROM t_types COMPARING object.
+
+  LOOP AT t_types ASSIGNING &lt;t&gt;.
+    CLEAR s_saptypes. s_saptypes-hdr = &lt;t&gt;.
+    s_saptypes-order = max_order.
+    APPEND s_saptypes TO t_saptypes.
+  ENDLOOP.
+
+  saptypes = t_saptypes.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="EXTEND_PACKAGE" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Extend Package list to sub packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_PACK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package list"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_PACK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tt_pack.
+
+  t_level = result = packages .
+  WHILE NOT t_level[] IS INITIAL.
+    SORT t_level.
+    DELETE ADJACENT DUPLICATES FROM t_level.
+
+    SELECT devclass
+        FROM tdevc
+        INTO TABLE t_level
+           FOR ALL ENTRIES IN t_level
+        WHERE parentcl = t_level-table_line.
+
+    APPEND LINES OF t_level TO result.
+  ENDWHILE.
+
+  SORT result.
+  DELETE ADJACENT DUPLICATES FROM result.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="EXTEND_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Extend Package to sub_packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  CHECK NOT packages IS INITIAL.
+  r_exclu = packages.   DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+* Package selection
+  result = get_sub_packages( packages ).
+
+  IF NOT r_exclu IS INITIAL.
+    s_pack-sign = &apos;I&apos;.   MODIFY r_exclu FROM s_pack TRANSPORTING sign WHERE sign &lt;&gt; s_pack-sign.
+    r_exclu = get_sub_packages( r_exclu ).
+    DELETE result WHERE low IN r_exclu.
+  ENDIF.
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+  IF result IS INITIAL.     &quot; NO result
+    result = packages.      &quot; set backrange to prevent no result being range with no values =&gt; all values
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_KEYS_FROM_TADIR" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get object list from TADIR : Package, type, author,..."/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="AUTHOR" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AUTHOR" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of author (person reponsible of the component)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="EXT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PARVALUE="ABAP_TRUE" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Extend to sub package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPNAME" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of component name"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_COMPKEYS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="List of component keys"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SOFTCOMP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SOFTCOMP" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Software Component"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SRCSYSTEM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SRCSYSTEM" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of source system"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_COMPTYPE" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of component types"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  TYPES tt_pack TYPE STANDARD TABLE OF tdevc-devclass.
+  DATA r_exclu TYPE tr_packages.
+  DATA t_devc  TYPE tt_pack.
+  DATA t_exclu TYPE tt_pack.
+  FIELD-SYMBOLS: &lt;p&gt; LIKE LINE OF t_exclu.
+  DATA t_ext_pack TYPE tr_packages.
+
+  t_ext_pack = limit_packages( softcomp = softcomp
+                               packages = packages ).
+  IF t_ext_pack IS INITIAL.
+    CHECK srcsystem IS NOT INITIAL OR type IS NOT INITIAL OR name IS NOT INITIAL OR author IS NOT INITIAL. &quot; to prevent extracting all tadir
+    SELECT object obj_name
+      INTO TABLE result
+      FROM tadir
+      WHERE srcsystem IN srcsystem
+        AND object IN type
+        AND obj_name IN name
+        AND author IN author.
+    EXIT.
+  ENDIF.
+
+  IF ext = abap_true.   t_ext_pack = extend_packages( t_ext_pack ).    ENDIF.
+
+  r_exclu = t_ext_pack.     DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+* Package selection
+  SELECT devclass
+      FROM tdevc
+      INTO TABLE t_devc
+      WHERE devclass IN t_ext_pack.
+
+  IF NOT ext IS INITIAL.
+    t_devc = extend_package( t_devc ).
+  ENDIF.
+
+* Package selection
+  IF NOT r_exclu IS INITIAL.
+    SELECT devclass
+        FROM tdevc
+        INTO TABLE t_exclu
+        WHERE NOT devclass IN r_exclu.
+
+    t_exclu = extend_package( t_exclu ).
+    LOOP AT t_exclu ASSIGNING &lt;p&gt;.
+      DELETE TABLE t_devc FROM &lt;p&gt;.
+    ENDLOOP.
+  ENDIF.
+
+  IF NOT t_devc IS INITIAL.
+    SELECT object obj_name
+      INTO TABLE result
+      FROM tadir
+        FOR ALL ENTRIES IN t_devc
+      WHERE devclass = t_devc-table_line
+        AND srcsystem IN srcsystem
+        AND object IN type
+        AND obj_name IN name
+        AND author IN author.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_SUB_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Sub Package of packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  CHECK NOT packages IS INITIAL.
+
+* Package selection
+  SELECT devclass AS low
+      FROM tdevc
+      INTO CORRESPONDING FIELDS OF TABLE result
+      WHERE devclass in packages.
+
+* Package extention
+  t_level = result.
+  WHILE NOT t_level[] IS INITIAL.
+    SORT t_level.
+    DELETE ADJACENT DUPLICATES FROM t_level.
+
+    SELECT devclass AS low
+        FROM tdevc
+        INTO CORRESPONDING FIELDS OF TABLE t_level
+           FOR ALL ENTRIES IN t_level
+        WHERE parentcl = t_level-low.
+
+    APPEND LINES OF t_level TO result.
+  ENDWHILE.
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_TYPEKIND" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Program ID of object type"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COMPTYPE"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_TRANSPORT_KIND"/>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS &lt;t&gt; LIKE LINE OF saptypes.
+
+  READ TABLE saptypes ASSIGNING &lt;t&gt;
+       WITH TABLE KEY object = data.
+  IF sy-subrc = 0.    result = &lt;t&gt;-pgmid.   ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="LIMIT_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Limit/extend packages to Software component"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SOFTCOMP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SOFTCOMP">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Software Component"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  result = packages.
+  CHECK NOT softcomp IS INITIAL.
+
+* Package selection
+  SELECT devclass AS low
+      FROM tdevc
+      INTO CORRESPONDING FIELDS OF TABLE result
+      WHERE devclass IN packages
+        AND dlvunit IN softcomp.
+
+  r_exclu = packages.   DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+
+  APPEND LINES OF r_exclu TO result.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_COMPNAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="STRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_COMPTYPE" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="TADIR-OBJECT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Object Type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TRANSPORT_KIND" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="KO100-PGMID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Program ID in Requests and Tasks"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TYPEORDER" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Order/Rank of component type"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_AUTHOR" EXPOSURE="2" STATE="1" EDITORDER="8 " TYPTYPE="4">
+    tr_author TYPE RANGE OF tadir-author
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of author (person reponsible of the component)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_COMPNAME" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">
+    tr_compname TYPE RANGE OF tadir-obj_name
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of component name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_COMPTYPE" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    tr_comptype TYPE RANGE OF td_comptype
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of component types"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_PACKAGES" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    tr_packages TYPE RANGE OF tadir-devclass
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of package"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_SOFTCOMP" EXPOSURE="2" STATE="1" EDITORDER="10 " TYPTYPE="4">
+    tr_softcomp TYPE RANGE OF tdevc-DLVUNIT
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Software Component"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TR_SRCSYSTEM" EXPOSURE="2" STATE="1" EDITORDER="9 " TYPTYPE="4">
+    tr_srcsystem TYPE RANGE OF tadir-srcsystem
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of source system"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_COMPKEY" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    BEGIN OF ts_compkey,
+      type TYPE td_comptype,
+      name TYPE td_compname,
+    END OF ts_compkey
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Component Key (unique)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_SAPTYPES" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="4">BEGIN OF ts_saptypes.
+  INCLUDE TYPE ko100 AS hdr.
+  TYPES:
+      order TYPE td_typeorder,     &quot; order of prefered load
+    END OF ts_saptypes
+`</ITEM>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">
+    tt_compkeys TYPE STANDARD TABLE OF ts_compkey WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_PACK" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_pack TYPE STANDARD TABLE OF tdevc-devclass with DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_SAPTYPES" EXPOSURE="1" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    tt_saptypes TYPE HASHED TABLE OF ts_saptypes WITH UNIQUE KEY object
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of SAP CTS Types"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
