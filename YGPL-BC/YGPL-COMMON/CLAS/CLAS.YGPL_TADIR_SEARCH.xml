@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6876FFAEDE39B4EC05AC05111E5D879D" CODE_SIGNATURE="F24EE33DE3F77245F241B9C2262B3750" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TADIR_SEARCH" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8ADCF09E3D968BF9229E52265D77D411" CODE_SIGNATURE="9A37F0B26BCCAB9F3303EB4AC1440DCD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TADIR_SEARCH" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
@@ -253,6 +253,53 @@ AS</ITEM>
         AND author IN author.
   ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_OBJECT_INFORMATION" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get object information"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="KIND" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TRANSPORT_KIND" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Program ID in Requests and Tasks"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COMPNAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object Name"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_TADIR_INFORMATION">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="TADIR Information"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COMPTYPE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object Type"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA lv_kind TYPE td_transport_kind.
+  IF NOT kind IS INITIAL.
+    lv_kind = kind.
+  ELSE.
+    lv_kind = get_typekind( type ).
+  ENDIF.
+  SELECT SINGLE *
+    INTO CORRESPONDING FIELDS OF result
+    FROM tadir
+    WHERE pgmid = lv_kind
+      AND object = type
+      AND obj_name = name.
+  CHECK sy-subrc = 0.
+  IF result-component IS INITIAL AND result-devclass IS NOT INITIAL.
+    SELECT SINGLE dlvunit
+      INTO result-component
+      FROM tdevc
+      WHERE devclass = result-devclass.
+  ENDIF.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="GET_SUB_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get Sub Package of packages"/>
@@ -442,6 +489,11 @@ AS</ITEM>
       order TYPE td_typeorder,     &quot; order of prefered load
     END OF ts_saptypes
 `</ITEM>
+   <ITEM CMPNAME="TS_TADIR_INFORMATION" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_TADIR_INFO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="TADIR Information"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">
     tt_compkeys TYPE STANDARD TABLE OF ts_compkey WITH DEFAULT KEY
 `

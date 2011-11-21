@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D7EF46D845D332BBBE3826347A17F1CD" CODE_SIGNATURE="E8FC95C0744808387403E44865D47FAF" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="72F3EE265CBA3F1978DF7E6C7E1572B0" CODE_SIGNATURE="E8087608A8E7EB319EF98C5789D1BCEE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -75,6 +75,8 @@ START-OF-SELECTION.
     s_result-name = d_table_name = &lt;i&gt;-name.
     d_table_size = ygpl_tables_size=&gt;get_table_size( d_table_name ).
     s_result-size = d_table_size * 1000 / 1024.   &quot; 3 decimals
+    s_result-tadir_info = ygpl_tadir_search=&gt;get_object_information( type = ygpl_tables_size=&gt;c_table_comptype
+                                                                     name = &lt;i&gt;-name ).
     APPEND s_result TO t_results.
   ENDLOOP.
 
@@ -92,7 +94,7 @@ END-OF-SELECTION.
 *     I_CALLBACK_TOP_OF_PAGE            = &apos; &apos;
 *     I_CALLBACK_HTML_TOP_OF_PAGE       = &apos; &apos;
 *     I_CALLBACK_HTML_END_OF_LIST       = &apos; &apos;
-      i_structure_name                  = &apos;YGL_TABLES_SIZE&apos;
+      i_structure_name                  = &apos;YGPL_TABLES_SIZE_RESULT&apos;
 *     I_BACKGROUND_ID                   = &apos; &apos;
 *     I_GRID_TITLE                      =
 *     I_GRID_SETTINGS                   =
