@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="72F3EE265CBA3F1978DF7E6C7E1572B0" CODE_SIGNATURE="E8087608A8E7EB319EF98C5789D1BCEE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="C97AA2AA62C4EEA100606CA0EEF70257" CODE_SIGNATURE="167D5263D9A3FC3D29C4FEEFCDD34BB7" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
   <SOURCE>`
 *---------------------------------------------------------------------*
-* Report  YGPL_ADVANCED_SGEN
+* Report  YGPL_TABLES_SIZE
 *---------------------------------------------------------------------*
 
 REPORT ygpl_tables_size LINE-SIZE 256.
@@ -74,6 +74,9 @@ START-OF-SELECTION.
     CLEAR s_result.
     s_result-name = d_table_name = &lt;i&gt;-name.
     d_table_size = ygpl_tables_size=&gt;get_table_size( d_table_name ).
+    s_result-percent = 100 *      &quot; Percent
+                       100 *      &quot; 2 decimals
+                       d_table_size / ygpl_tables_size=&gt;db_size.
     s_result-size = d_table_size * 1000 / 1024.   &quot; 3 decimals
     s_result-tadir_info = ygpl_tadir_search=&gt;get_object_information( type = ygpl_tables_size=&gt;c_table_comptype
                                                                      name = &lt;i&gt;-name ).
@@ -135,6 +138,29 @@ END-OF-SELECTION.
     MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
   ENDIF.</SOURCE>
+  <TEXTS>
+   <ITEM LANGU="E">
+    <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+ASThis program returns the table size in Database including Indexes and
+  BLOB. The DB02 only returns table without indexes and BLOB (binary data)
+U1&amp;INTEGRATION&amp;
+ASUntil now this program work only on Oracle.
+U1&amp;PREREQUISITES&amp;
+AS
+U1&amp;FEATURES&amp;
+AS
+U2&amp;SELECTION&amp;
+AS
+U2&amp;STANDARD_VARIANTS&amp;
+AS
+U2&amp;OUTPUT&amp;
+AS
+U1&amp;ACTIVITIES&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS</LONG_TXT>
+   </ITEM>
+  </TEXTS>
   <TEXTSPOOL>
    <ITEM ID="I" KEY="CPL">
     <TEXTS>
@@ -156,7 +182,7 @@ END-OF-SELECTION.
    </ITEM>
    <ITEM ID="S" KEY="P_SIZE">
     <TEXTS>
-     <ITEM LANGU="E" ENTRY="D       ." LENGTH="9 "/>
+     <ITEM LANGU="E" ENTRY="D       ." LENGTH="23 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_AUTHOR">
@@ -167,7 +193,7 @@ END-OF-SELECTION.
    </ITEM>
    <ITEM ID="S" KEY="S_NAME">
     <TEXTS>
-     <ITEM LANGU="E" ENTRY="D       ." LENGTH="19 "/>
+     <ITEM LANGU="E" ENTRY="        Table Name" LENGTH="19 "/>
      <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>

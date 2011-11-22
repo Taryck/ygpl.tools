@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="A21E2908255CAB12993393A335A00CB8" CODE_SIGNATURE="E1625CC1F25F76C1CC3CBA2C960417CE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="7A72300358729DA8305027E391C7CBBD" CODE_SIGNATURE="E1625CC1F25F76C1CC3CBA2C960417CE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
   <SOURCE>`
 *---------------------------------------------------------------------*
-* Report  YGPL_ADVANCED_SGEN
+* Report  YGPL_INDEXES_CHECK
 *---------------------------------------------------------------------*
 
 REPORT  ygpl_indexes_check LINE-SIZE 256.
@@ -122,6 +122,42 @@ END-OF-SELECTION.
     MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
   ENDIF.</SOURCE>
+  <TEXTS>
+   <ITEM LANGU="E">
+    <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+ASCheck that tables with a client field as part of the primary key also
+  have this client field in every indexes of the table.
+U1&amp;INTEGRATION&amp;
+AS
+U1&amp;PREREQUISITES&amp;
+AS
+U1&amp;FEATURES&amp;
+AS
+U2&amp;SELECTION&amp;
+AS
+U2&amp;STANDARD_VARIANTS&amp;
+AS
+U2&amp;OUTPUT&amp;
+AS
+U1&amp;ACTIVITIES&amp;
+ASTables with a client field as part of the primary key should always have
+  this client field in each index. Sometime this field is forgotten. This
+  should not have a large impact on productive system with only one client
+  (see transaction SCC4), but could have an important impact on system
+  with 5 clients or more.
+ASTo prevent from having any trouble please fix the index =&gt; add the
+  client flied in the index :
+B1If this index is a SAP one, please search for an existing SAP notes with
+  corrections for this index and/or open an OSS message to ask for a SAP
+  note with correction on this index. We suggested to do not make change
+  yourself as a reparation request because this will cause small trouble
+  on system upgrades
+B1If this index is a customer one, please fix this issue by add the client
+  field.
+U1&amp;EXAMPLE&amp;
+AS</LONG_TXT>
+   </ITEM>
+  </TEXTS>
   <TEXTSPOOL>
    <ITEM ID="I" KEY="CPL">
     <TEXTS>

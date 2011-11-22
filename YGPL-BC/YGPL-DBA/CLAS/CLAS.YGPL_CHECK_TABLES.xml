@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="0FFEFE9EEE1E7C9539197B6E222D3295" CODE_SIGNATURE="54CECF18372E8D4D971BF66C4059BB9B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8F39927027AE1AEAD84C254335B7E542" CODE_SIGNATURE="583B3C47F7227B033A11B6E1F203039E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
@@ -110,7 +110,10 @@ AS</ITEM>
       MESSAGE ID &lt;l&gt;-ag TYPE &apos;I&apos; NUMBER &lt;l&gt;-msgnr WITH &lt;l&gt;-var1 &lt;l&gt;-var2 &lt;l&gt;-var3 &lt;l&gt;-var4 INTO s_line-message.
       s_line-size = ygpl_tables_size=&gt;get_index_size( table_name = d_tname
                                                       index_name = s_line-subindex_name ).
-      s_line-size = s_line-size / 1024.     &quot; Ko =&gt; Mo
+      s_line-percent = s_line-size / ygpl_tables_size=&gt;db_size.
+      s_line-size = 100 *      &quot; Percent
+                    100 *      &quot; 2 decimals
+                    s_line-size / 1024.     &quot; Ko =&gt; Mo
       s_line-tadir_info = ygpl_tables_size=&gt;get_index_information( table_name = d_tname
                                                                    index_name = s_line-subindex_name ).
       APPEND s_line TO check_log.
