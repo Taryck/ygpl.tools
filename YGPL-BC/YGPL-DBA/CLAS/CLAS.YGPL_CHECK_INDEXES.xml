@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="D9DF4BF25F135849F97EAC96E60D42A9" CODE_SIGNATURE="49EE9B7B9B6908250036D5906BC5E0B6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_INDEXES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6F5B617AEB4444FBA62A5C9017EB927D" CODE_SIGNATURE="B15586C88942EA3E2AED4C38BB4B39FD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_INDEXES" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
@@ -98,10 +98,10 @@ AS</ITEM>
   LOOP AT check_log ASSIGNING &lt;i&gt;.
     &lt;i&gt;-size = ygpl_tables_size=&gt;get_index_size( table_name = &lt;i&gt;-tabname
                                                  index_name = &lt;i&gt;-indexname ).
-    &lt;i&gt;-percent = &lt;i&gt;-size / ygpl_tables_size=&gt;db_size.
-    &lt;i&gt;-size = 100 *      &quot; Percent
-               100 *      &quot; 2 decimals
-               &lt;i&gt;-size / 1024.     &quot; Ko =&gt; Mo
+    &lt;i&gt;-percent = 100 *      &quot; Percent
+                  100 *      &quot; 2 decimals
+                  &lt;i&gt;-size / ygpl_tables_size=&gt;db_size.
+    &lt;i&gt;-size = &lt;i&gt;-size / 1024.     &quot; Ko =&gt; Mo
     &lt;i&gt;-tadir_info = ygpl_tables_size=&gt;get_index_information( table_name = &lt;i&gt;-tabname
                                                               index_name = &lt;i&gt;-indexname ).
   ENDLOOP.</SOURCE>
