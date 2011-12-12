@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="2544320E8E9E48EC56903C4D9B016FF3" CODE_SIGNATURE="9C9400A4BAB72D25300A21C87060C35D" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MEMORY_SURVEY" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-MEMORY" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YGPL_MEMORY_SURVEY
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  YGPL_MEMORY_SURVEY.
+
+PARAMETERS:
+  p_time TYPE i DEFAULT 30 OBLIGATORY,
+  p_index TYPE wpinfo-wp_index OBLIGATORY.
+
+DATA:
+  g_wpinfo    TYPE wpinfo,
+  f_with_cpu  TYPE tskh_dummy-with_cpu,
+  f_wp_no     TYPE wpinfo-wp_no,
+  g_prog      TYPE sy-cprog.
+
+INITIALIZATION.
+  f_with_cpu = &apos;10&apos;.
+  f_wp_no = &apos;XX&apos;.
+
+START-OF-SELECTION.
+  DATA:
+    p_maxmem(12)  TYPE p,
+    l_mem(12)     TYPE p,
+    l_prog        TYPE sy-cprog,
+    s_wpinfo      TYPE wpinfo,
+    s_pfdiarec    TYPE pfdiarec,
+    s_pfdiarec64  TYPE pfdiarec64,
+    l_ts          TYPE timestamp.
+
+  CALL FUNCTION &apos;TH_WP_DETAIL_INFO64&apos;
+    EXPORTING
+      wp                     = f_wp_no
+      with_cpu               = f_with_cpu
+      wp_index               = p_index
+    IMPORTING
+      wpinfo                 = g_wpinfo
+      diarec                 = s_pfdiarec
+      diarec64               = s_pfdiarec64
+      mainprog               = g_prog
+    EXCEPTIONS
+      th_bad_paramter_length = 1
+      th_no_parameter        = 2
+      th_bad_parameter_value = 3
+      th_list_error          = 4
+      th_internal_error      = 5
+      OTHERS                 = 6.
+  ASSERT sy-subrc = 0.
+  WRITE:/ g_wpinfo-wp_server, g_wpinfo-wp_index, g_wpinfo-wp_pid, g_wpinfo-wp_bname, g_prog.
+  DO.
+    WAIT UP TO p_time SECONDS.
+    GET TIME STAMP FIELD l_ts.
+    CALL FUNCTION &apos;TH_WP_DETAIL_INFO64&apos;
+      EXPORTING
+        wp                     = f_wp_no
+        with_cpu               = f_with_cpu
+        wp_index               = p_index
+      IMPORTING
+        wpinfo                 = s_wpinfo
+        diarec                 = s_pfdiarec
+        diarec64               = s_pfdiarec64
+        mainprog               = l_prog
+      EXCEPTIONS
+        th_bad_paramter_length = 1
+        th_no_parameter        = 2
+        th_bad_parameter_value = 3
+        th_list_error          = 4
+        th_internal_error      = 5
+        OTHERS                 = 6.
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ENDIF.
+    IF g_wpinfo-wp_bname &lt;&gt; s_wpinfo-wp_bname OR g_prog &lt;&gt; l_prog.
+      EXIT.
+    ENDIF.
+    l_mem = s_pfdiarec64-privsum + s_pfdiarec64-memsum.
+    IF l_mem &gt; p_maxmem.
+      p_maxmem = l_mem.
+    ENDIF.
+    WRITE:/ sy-uzeit, l_mem.
+    COMMIT WORK.
+  ENDDO.
+
+END-OF-SELECTION.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Memory survey daemon" LENGTH="20 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
