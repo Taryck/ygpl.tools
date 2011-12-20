@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="DD4F71A326A0E2B8140EAECE5C9FAE16" CODE_SIGNATURE="F3EC003D377EA51A8F185F1A8F613F75" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COMMON_ENGINE" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Table Size for All DB Kind">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="CREATE_FILTER_FROM_LOWER_LIMIT" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="CREATE_FILTER_FROM_LOWER_LIMIT"/>
+   <ITEM CMPNAME="C_TABLE_COMPTYPE" EXPOSURE="2" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="C_TABLE_COMPTYPE"/>
+   <ITEM CMPNAME="DB_SIZE" EXPOSURE="2" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="DB_SIZE"/>
+   <ITEM CMPNAME="FILTER_BY_TABLE_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="FILTER_BY_TABLE_SIZE"/>
+   <ITEM CMPNAME="FILTER_TABLE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="FILTER_TABLE"/>
+   <ITEM CMPNAME="GET_INDEX_INFORMATION" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="GET_INDEX_INFORMATION"/>
+   <ITEM CMPNAME="GET_INDEX_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="GET_INDEX_SIZE"/>
+   <ITEM CMPNAME="GET_TABLE_SIZE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="GET_TABLE_SIZE"/>
+   <ITEM CMPNAME="INDEXES_LIST" EXPOSURE="2" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="INDEXES_LIST"/>
+   <ITEM CMPNAME="TABLES_LIST" EXPOSURE="2" REFCLSNAME="YGPLITABLES_SIZE" REFCMPNAME="TABLES_LIST"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CACHE_ID" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;88D9C44E0EA4270EE1000000AC1201D6&apos;" TYPTYPE="1" TYPE="YGPL_DS_ENGINE=&gt;TD_STORE_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table&apos;s Size Cache ID"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CACHE_VALIDITY" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="7200" TYPTYPE="1" TYPE="YGPL_DS_ENGINE=&gt;TD_VALIDITY">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Cache validity Time (in sec) of cache : 2 heures"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="INDEXES_TADIR_INFO" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_INDEX_TADIR_INFO"/>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_DS_ENGINE" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLITABLES_SIZE" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CREATE_FILTER_FROM_LOWER_LIMIT">
+      <SOURCE>`
+  DATA s_size         LIKE LINE OF result.
+
+  CHECK size &gt; 0.
+  s_size-sign = &apos;I&apos;.
+  s_size-option = &apos;GE&apos;.
+  s_size-low = size.
+  APPEND s_size TO result.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="FILTER_BY_TABLE_SIZE">
+      <SOURCE>`
+  DATA d_table_name   TYPE td_table_name.
+  DATA d_table_size   TYPE td_size.
+  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF list.
+
+  IF size_filter IS INITIAL.
+    result = list.
+  ELSE.
+    LOOP AT list ASSIGNING &lt;i&gt;.
+      IF &lt;i&gt;-type = c_table_comptype.
+        d_table_name = &lt;i&gt;-name.
+        d_table_size = get_table_size( d_table_name ).
+        CHECK d_table_size IN size_filter.
+      ENDIF.
+      APPEND &lt;i&gt; TO result.
+    ENDLOOP.
+  ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="FILTER_TABLE">
+      <SOURCE>`
+  TYPES:
+    BEGIN OF ts_table,
+      name TYPE td_table_name,
+    END OF ts_table.
+  DATA t_tables       TYPE STANDARD TABLE OF ts_table WITH DEFAULT KEY.
+  DATA s_table        LIKE LINE OF t_tables.
+  DATA s_line         LIKE LINE OF result.
+  FIELD-SYMBOLS:
+    &lt;i&gt; LIKE LINE OF list.
+
+  LOOP AT list ASSIGNING &lt;i&gt;
+       WHERE type = c_table_comptype.
+    CLEAR s_table.
+    s_table-name = &lt;i&gt;-name.
+    APPEND s_table TO t_tables.
+  ENDLOOP.
+
+* Get tables only (remove structures)
+  SELECT tabname AS name
+    INTO CORRESPONDING FIELDS OF TABLE result
+    FROM dd02l
+    FOR ALL ENTRIES IN t_tables
+    WHERE tabname = t_tables-name
+      AND tabclass = &apos;TRANSP&apos;
+    %_HINTS ORACLE &apos;&amp;max_in_blocking_factor 200&amp;&apos; .
+
+  s_line-type = c_table_comptype.
+  MODIFY result FROM s_line TRANSPORTING type WHERE type IS INITIAL.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_INDEX_INFORMATION">
+      <SOURCE>`
+  DATA v_name       TYPE ygpl_tadir_search=&gt;td_compname.
+  DATA s_data       LIKE LINE OF indexes_tadir_info.
+  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF indexes_tadir_info.
+
+  READ TABLE indexes_tadir_info ASSIGNING &lt;i&gt;
+       WITH TABLE KEY table_name = table_name
+                      index_name = index_name.
+  IF sy-subrc = 0.
+    result = &lt;i&gt;-info.
+    EXIT.
+  ENDIF.
+  s_data-table_name = table_name.
+  s_data-index_name = index_name.
+  s_data-info = _get_index_information( type = &apos;XINX&apos;         &quot; Extention index
+                                  table_name = table_name
+                                  index_name = index_name ).
+*  IF s_data-info IS INITIAL.
+*    s_data-info = _get_index_information( type = &apos;INDX&apos;       &quot; index =&gt; TADIR of the table
+*                                    table_name = table_name
+*                                    index_name = index_name ).
+*  ENDIF.
+  IF s_data-info IS INITIAL.
+    v_name = table_name.
+    s_data-info = ygpl_tadir_search=&gt;get_object_information( type = c_table_comptype
+                                                             name = v_name ).
+  ENDIF.
+  INSERT s_data INTO TABLE indexes_tadir_info.
+  ASSERT sy-subrc = 0.
+
+  result = s_data-info.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_INDEX_SIZE">
+      <SOURCE>`
+  DATA s_idxdb_name TYPE dd12l-dbindex.
+  DATA s_subrc      TYPE sy-subrc.
+  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF indexes_list.
+
+  CALL FUNCTION &apos;DB_EXISTS_INDEX&apos;
+    EXPORTING
+*      DBINDEX               =
+      tabname               = table_name
+      indexname             = index_name
+    IMPORTING
+*     CONSTRAINT            =
+      realname              = s_idxdb_name
+      subrc                 = s_subrc
+*     UNIQUE                =
+    EXCEPTIONS
+      parameter_error       = 1
+      OTHERS                = 2.
+  ASSERT sy-subrc = 0.
+  CHECK s_subrc = 0.
+
+  READ TABLE indexes_list ASSIGNING &lt;i&gt;
+       WITH TABLE KEY table_name = s_idxdb_name.
+  CHECK sy-subrc = 0.
+  result = &lt;i&gt;-size.
+*  EXEC SQL.
+*    SELECT bytes / 1024 into :result
+*      FROM dba_segments
+*      where segment_name = :s_idxdb_name
+*  ENDEXEC.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_TABLE_SIZE">
+      <SOURCE>`
+  FIELD-SYMBOLS &lt;s&gt; LIKE LINE OF tables_list.
+  READ TABLE tables_list ASSIGNING &lt;s&gt;
+       WITH TABLE KEY table_name = table_name.
+  CHECK sy-subrc = 0.
+  result = &lt;s&gt;-size.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="_GET_INDEX_INFORMATION" EXPOSURE="1" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Index Tadir information"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="INDEX_NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_INDEX_NAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Unique Index ID in a Table"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TS_TADIR_INFORMATION"/>
+     <ITEM SCONAME="TABLE_NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME"/>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="DCOBJBEZ-TYPE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Object type of an ABAP Dictionary object"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA v_kind       TYPE ygpl_tadir_search=&gt;td_transport_kind.
+  DATA v_type       TYPE ygpl_tadir_search=&gt;td_comptype.
+  DATA v_objname    TYPE e071-obj_name.
+  DATA v_name       TYPE ygpl_tadir_search=&gt;td_compname.
+
+  CALL FUNCTION &apos;DD_DD_TO_E071&apos;
+    EXPORTING
+      type          = type
+      name          = table_name
+      id            = index_name
+    IMPORTING
+      pgmid         = v_kind
+      object        = v_type
+      obj_name      = v_objname
+    EXCEPTIONS
+      illegal_input = 1
+      OTHERS        = 2.
+  CHECK sy-subrc = 0.
+  v_name = v_objname.
+  result = ygpl_tadir_search=&gt;get_object_information( kind = v_kind
+                                                      type = v_type
+                                                      name = v_name ).</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_COMPTYPE" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TD_COMPTYPE"/>
+   <ITEM CMPNAME="TD_INDEX_NAME" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="INDEXID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unique Index ID in a Table"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_SIZE" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Size in Ko"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TABLE_NAME" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">td_table_name(30) TYPE c
+`</ITEM>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" STATE="1" EDITORDER="8 " TYPTYPE="4">
+    tr_size TYPE RANGE OF td_size
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Size in KO"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_CACHE" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">begin of ts_cache,
+      tables    type tt_table_size,
+      indexes   type tt_table_size,
+    end of ts_cache
+`</ITEM>
+   <ITEM CMPNAME="TS_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">BEGIN OF ts_index_tadir_info,
+          table_name    TYPE string,      &quot; td_table_name,
+          index_name    TYPE td_index_name,
+          info          TYPE ygpl_tadir_search=&gt;ts_tadir_information,
+        END OF ts_index_tadir_info
+`</ITEM>
+   <ITEM CMPNAME="TS_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="9 " TYPTYPE="4">BEGIN OF ts_table_size,
+          table_name    TYPE string,      &quot; td_table_name,
+          size          TYPE td_size,
+        END OF ts_table_size
+`</ITEM>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">tt_index_tadir_info TYPE SORTED TABLE OF ts_index_tadir_info WITH UNIQUE KEY table_name index_name
+`</ITEM>
+   <ITEM CMPNAME="TT_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="10 " TYPTYPE="4">tt_table_size TYPE HASHED TABLE OF ts_table_size WITH UNIQUE KEY table_name
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

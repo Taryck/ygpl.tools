@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="37E7D5DF386CE05A973645CE7F50333E" CODE_SIGNATURE="E1587E53C58C0EACBECF223E3AD2A8C2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
+  <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_DBA_COMMON_ENGINE" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Table Size for Oracle">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="RELEASE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="ORACLE_RELEASE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Oracle release"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_DS_ENGINE" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_td110  TYPE td110_stru.
+  DATA s_cache  TYPE ts_cache.
+
+  ASSERT sy-dbsys(3) = &apos;ORA&apos;.
+
+* Oracle Release
+  CALL FUNCTION &apos;GET_DB_ORA_RELEASE&apos;
+    IMPORTING
+      oracle_release = release.
+
+* DB Size
+  CALL FUNCTION &apos;DB02_ORA_FILL_TD110&apos;
+    IMPORTING
+      td110 = s_td110.
+  db_size = s_td110-tssi.
+
+  TRY.
+      CALL METHOD ygpl_ds_engine=&gt;get_from_cache
+        EXPORTING
+          id    = cache_id
+        CHANGING
+          value = s_cache.
+      tables_list = s_cache-tables.
+      indexes_list = s_cache-indexes.
+      EXIT.
+    CATCH ygpl_ds_cx_memory.
+    CATCH ygpl_ds_cx_obsolete.
+  ENDTRY.
+
+* Table size
+  compute_table_list( ).
+
+* Table size
+  compute_index_list( ).
+
+  s_cache-tables = tables_list.
+  s_cache-indexes = indexes_list.
+  TRY.
+      CALL METHOD ygpl_ds_engine=&gt;save_to_cache
+        EXPORTING
+          id       = cache_id
+          value    = s_cache
+          validity = cache_validity.
+    CATCH ygpl_ds_cx_memory.
+* Can&apos;t be saved in shared memory : too big ??
+  ENDTRY.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="COMPUTE_INDEX_LIST" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Compute Index_list from Oracle DB"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_data   LIKE LINE OF indexes_list.
+  DATA t_data   TYPE STANDARD TABLE OF ts_table_size WITH DEFAULT KEY.
+
+  EXEC SQL.
+    OPEN dbcur for
+    select
+      s.segment_name,
+      sum( s.bytes/1024 ) mb
+    from dba_segments s
+    where s.owner like &apos;%SAP%&apos;
+      and s.SEGMENT_TYPE like &apos;%INDEX%&apos;
+      and s.segment_name like &apos;%~%&apos;
+    group by s.segment_name
+  ENDEXEC.
+  DO.
+    CLEAR s_data.
+    EXEC SQL.
+      FETCH NEXT dbcur INTO :s_data-table_name, :s_data-size
+    ENDEXEC.
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ELSE.
+      APPEND s_data TO t_data.
+    ENDIF.
+  ENDDO.
+
+  EXEC SQL.
+    CLOSE dbcur
+  ENDEXEC.
+
+  indexes_list = t_data.     &quot; standard table to hashed table</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="COMPUTE_TABLE_LIST" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Compute table_list from Oracle DB"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_data   LIKE LINE OF tables_list.
+  DATA t_data   TYPE STANDARD TABLE OF ts_table_size WITH DEFAULT KEY.
+
+  EXEC SQL.
+    OPEN dbcur for
+    select
+/*      S.Owner,    */
+      case
+        when l.table_name is not null then l.table_name
+        when i.table_name is not null then i.table_name
+        when instr( s.segment_name, &apos;~&apos; ) = 0 then s.segment_name
+        else substr( s.segment_name, 1, instr( s.segment_name, &apos;~&apos; ) - 1 )
+      end Table_name
+      , sum( s.bytes/1024 ) mb
+    from dba_segments s, dba_lobs l, dba_lobs i
+    where s.owner like &apos;%SAP%&apos;
+      and l.owner(+) = s.owner
+      and l.segment_name(+) = s.segment_name
+      and i.owner(+) = s.owner
+      and i.index_name(+) = s.segment_name
+    group by
+/*    S.Owner, */
+      case
+        when l.table_name is not null then l.table_name
+        when i.table_name is not null then i.table_name
+        when instr( s.segment_name, &apos;~&apos; ) = 0 then s.segment_name
+        else substr( s.segment_name, 1, instr( s.segment_name, &apos;~&apos; ) - 1 )
+      end
+/*    order by sum( s.bytes/1024 ) desc*/
+  ENDEXEC.
+  DO.
+    CLEAR s_data.
+    EXEC SQL.
+      FETCH NEXT dbcur INTO :s_data-table_name, :s_data-size
+    ENDEXEC.
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ELSE.
+      APPEND s_data TO t_data.
+    ENDIF.
+  ENDDO.
+
+  EXEC SQL.
+    CLOSE dbcur
+  ENDEXEC.
+
+  tables_list = t_data.     &quot; standard table to hashed table</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
+  </TYPEGROUPS>
+ </RAW>
+</ZL_OBJECT>
