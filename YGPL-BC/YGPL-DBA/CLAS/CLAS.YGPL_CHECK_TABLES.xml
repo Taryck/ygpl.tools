@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F6D535B0EA5F5F50A94AE70389165D6F" CODE_SIGNATURE="0B544840A5BCD32AF594E9CE71B727AF" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9A26B841CB34FFA14C7DA67691C7E053" CODE_SIGNATURE="E169C67FC3B2A894077F0F03027040D1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
@@ -20,6 +19,11 @@ U1&amp;FURTHER_SOURCES_OF_INF&amp;
 AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TI_OBJECT_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_INTERFACES" REFCMPNAME="TI_OBJECT_SIZE"/>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TR_SIZE"/>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
+  </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="CHECK_LOG" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_TABLES_CHECK_LOG"/>
    <ITEM CMPNAME="COMPONENT_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
@@ -27,6 +31,7 @@ AS</ITEM>
      <ITEM LANG="E" TEXT="Component list"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="O_OBJ_SIZE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
    <ITEM CMPNAME="TABLE_ENQ_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="RSDEO-OBJTYPE">
     <TEXTS>
      <ITEM LANG="E" TEXT="ABAP/4 Dictionary object type"/>
@@ -40,10 +45,13 @@ AS</ITEM>
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
-    <ITEM TYPEGROUP="YGPL_TABLES_SIZE" TPUTYPE="1" EXPLICIT="X"/>
     <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_DBA_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
   <LOCAL>
    <TYPES>`
 *&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
@@ -67,7 +75,8 @@ AS</ITEM>
        EXPORTING
             eutype       = table_type
        IMPORTING
-            enqueue_type = table_enq_type.</SOURCE>
+            enqueue_type = table_enq_type.
+  o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
@@ -79,20 +88,20 @@ AS</ITEM>
        <ITEM LANG="E" TEXT="List of component keys"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
+     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SIZE"/>
     </PARAMETERS>
     <SOURCE>`
   DATA d_name   TYPE td_table_name.
-  DATA d_tname  TYPE ygpl_tables_size=&gt;td_table_name.
+  DATA d_tname  TYPE o_obj_size-&gt;td_table_name.
   DATA t_log    TYPE tt_check_log.
   DATA s_line   LIKE LINE OF check_log.
   FIELD-SYMBOLS:
     &lt;l&gt; LIKE LINE OF t_log,
     &lt;t&gt; LIKE LINE OF component_list.
 
-  component_list = ygpl_tables_size=&gt;filter_table( comp_list ).
-  component_list = ygpl_tables_size=&gt;filter_by_table_size( list = component_list
-                                                    size_filter = r_size_filter ).
+  component_list = o_obj_size-&gt;filter_table( comp_list ).
+  component_list = o_obj_size-&gt;filter_by_table_size( list = component_list
+                                              size_filter = r_size_filter ).
 * Process list
   LOOP AT component_list ASSIGNING &lt;t&gt;.
     d_name = &lt;t&gt;-name.
@@ -108,14 +117,14 @@ AS</ITEM>
       s_line-index_name = &lt;l&gt;-var2.
       s_line-subindex_name = &lt;l&gt;-var3.
       MESSAGE ID &lt;l&gt;-ag TYPE &apos;I&apos; NUMBER &lt;l&gt;-msgnr WITH &lt;l&gt;-var1 &lt;l&gt;-var2 &lt;l&gt;-var3 &lt;l&gt;-var4 INTO s_line-message.
-      s_line-size = ygpl_tables_size=&gt;get_index_size( table_name = d_tname
-                                                      index_name = s_line-subindex_name ).
+      s_line-size = o_obj_size-&gt;get_index_size( table_name = d_tname
+                                                index_name = s_line-subindex_name ).
       s_line-percent = 100 *      &quot; Percent
                        100 *      &quot; 2 decimals
-                       s_line-size / ygpl_tables_size=&gt;db_size.
+                       s_line-size / o_obj_size-&gt;db_size.
       s_line-size = s_line-size / 1024.     &quot; Ko =&gt; Mo
-      s_line-tadir_info = ygpl_tables_size=&gt;get_index_information( table_name = d_tname
-                                                                   index_name = s_line-subindex_name ).
+      s_line-tadir_info = o_obj_size-&gt;get_index_information( table_name = d_tname
+                                                             index_name = s_line-subindex_name ).
       APPEND s_line TO check_log.
     ENDLOOP.
   ENDLOOP.
@@ -214,14 +223,8 @@ AS</ITEM>
      <ITEM LANG="E" TEXT="Table name, 16 characters"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
    <ITEM CMPNAME="TT_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_check_log TYPE STANDARD TABLE OF trlogm WITH DEFAULT KEY
 `</ITEM>
-   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="List of component keys"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="TT_TABLES_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">tt_tables_check_log TYPE STANDARD TABLE OF ygpl_tables_check_result WITH DEFAULT KEY
 `</ITEM>
   </TYPES>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="3F058FB97CD62FC5E1A2571E4E113711" CODE_SIGNATURE="4FBE480AB1DBBE4EED799ADEE8CE3A82" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_FACTORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8BB35330127A5AA23BF11BEFAEF9296F" CODE_SIGNATURE="6DBE0FBDAF7CEF21B0B3905FD89CABB1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_FACTORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" WITH_UNIT_TESTS="X">
@@ -35,6 +35,11 @@
      <ITEM LANG="E" TEXT="Create Object size for the Current DB type"/>
     </TEXTS>
     <PARAMETERS>
+     <ITEM SCONAME="KIND" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="DBCON_DBMS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Database system"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
     </PARAMETERS>
     <EXCEPTIONS>
@@ -47,14 +52,11 @@
     <SOURCE>`
   DATA dbms TYPE dbcon_dbms.
 
-*  IF con_name IN initial.
-*    dbms = sy-dbsys(3).
-*  ELSE.
-*    SELECT SINGLE dbms INTO dbms FROM dbcon WHERE con_name = con_name.
-*    IF dbms &lt;&gt; &apos;ADA&apos; AND dbms &lt;&gt; &apos;ORA&apos;.
-*      dbms = sy-dbsys(3).
-*    ENDIF.
-*  ENDIF.
+  IF kind IS INITIAL.
+    dbms = sy-dbsys(3).
+  ELSE.
+    dbms = kind.
+  ENDIF.
 
   CASE dbms.
     WHEN &apos;MSS&apos;.       &quot; MS SQL Server
@@ -67,7 +69,8 @@
     WHEN &apos;DB6&apos;.
   ENDCASE.
   IF object IS NOT BOUND.
-    RAISE EXCEPTION ygpl_dba_cx.
+    RAISE EXCEPTION TYPE ygpl_dba_cx_no_engine
+        EXPORTING db_kind = dbms.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_OBJECT_SIZE" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">

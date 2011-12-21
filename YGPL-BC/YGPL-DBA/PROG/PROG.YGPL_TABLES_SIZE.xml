@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C97AA2AA62C4EEA100606CA0EEF70257" CODE_SIGNATURE="167D5263D9A3FC3D29C4FEEFCDD34BB7" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="DCE2655E3905CE1E6F053BD091F86693" CODE_SIGNATURE="47E7D4113AAAC6D153C2CC73862F0CA5" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -27,33 +27,36 @@ SELECT-OPTIONS:
 PARAMETERS:
   p_size TYPE ygpl_table_size.
 
-DATA
-  r_type TYPE ygpl_tadir_search=&gt;tr_comptype.
+DATA r_type     TYPE ygpl_tadir_search=&gt;tr_comptype.
+DATA o_obj_size TYPE ygpl_dba_interfaces=&gt;ti_object_size.
 
 INITIALIZATION.
   DATA s_type LIKE LINE OF r_type.
-  DATA d_size TYPE ygpl_tables_size=&gt;td_size.
+  DATA d_size TYPE ygplitables_size=&gt;td_size.
+
+  o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).
+
   s_type-sign = &apos;I&apos;.
   s_type-option = &apos;EQ&apos;.
   s_type-low = &apos;TABL&apos;.
   APPEND s_type TO r_type.
 
-  d_size = ygpl_tables_size=&gt;db_size / 1024.    &quot; DB Size (ko) =&gt; (Mo)
+  d_size = o_obj_size-&gt;db_size / 1024.          &quot; DB Size (ko) =&gt; (Mo)
   d_size = d_size / 1000.                       &quot; 0,1% of db_size
   p_size = d_size * 1000.                       &quot; 3 decimals
 
 START-OF-SELECTION.
   DATA t_list         TYPE ygpl_tadir_search=&gt;tt_compkeys.
-  DATA d_table_name   TYPE ygpl_tables_size=&gt;td_table_name.
-  DATA d_table_size   TYPE ygpl_tables_size=&gt;td_size.
+  DATA d_table_name   TYPE ygplitables_size=&gt;td_table_name.
+  DATA d_table_size   TYPE ygplitables_size=&gt;td_size.
   FIELD-SYMBOLS:
     &lt;i&gt; LIKE LINE OF t_list.
   DATA t_results      TYPE STANDARD TABLE OF ygpl_tables_size_result WITH DEFAULT KEY.
   DATA s_result       LIKE LINE OF t_results.
-  DATA r_size_filter  TYPE ygpl_tables_size=&gt;tr_size.
+  DATA r_size_filter  TYPE ygplitables_size=&gt;tr_size.
 
   d_table_size = p_size * 1024.   &quot; Mo =&gt; Ko
-  r_size_filter = ygpl_tables_size=&gt;create_filter_from_lower_limit( d_table_size ).
+  r_size_filter = o_obj_size-&gt;create_filter_from_lower_limit( d_table_size ).
 
   t_list = ygpl_tadir_search=&gt;get_keys_from_tadir(          &quot; Issue 1
                       srcsystem  = s_srcs[]
@@ -64,21 +67,21 @@ START-OF-SELECTION.
                       ext        = p_ext
                       author     = s_author[] ).
 
-  t_list = ygpl_tables_size=&gt;filter_table( t_list ).
+  t_list = o_obj_size-&gt;filter_table( t_list ).
 
-  t_list = ygpl_tables_size=&gt;filter_by_table_size( list = t_list
-                                            size_filter = r_size_filter ).
+  t_list = o_obj_size-&gt;filter_by_table_size( list = t_list
+                                      size_filter = r_size_filter ).
 
 * Convert list
   LOOP AT t_list ASSIGNING &lt;i&gt;.
     CLEAR s_result.
     s_result-name = d_table_name = &lt;i&gt;-name.
-    d_table_size = ygpl_tables_size=&gt;get_table_size( d_table_name ).
+    d_table_size = o_obj_size-&gt;get_table_size( d_table_name ).
     s_result-percent = 100 *      &quot; Percent
                        100 *      &quot; 2 decimals
-                       d_table_size / ygpl_tables_size=&gt;db_size.
+                       d_table_size / o_obj_size-&gt;db_size.
     s_result-size = d_table_size * 1000 / 1024.   &quot; 3 decimals
-    s_result-tadir_info = ygpl_tadir_search=&gt;get_object_information( type = ygpl_tables_size=&gt;c_table_comptype
+    s_result-tadir_info = ygpl_tadir_search=&gt;get_object_information( type = ygpl_dba_constants=&gt;c_table_comptype
                                                                      name = &lt;i&gt;-name ).
     APPEND s_result TO t_results.
   ENDLOOP.

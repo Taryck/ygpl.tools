@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="1ED9B73BE45E204589769D7569F5F979" CODE_SIGNATURE="8FAD13EFEBC7CDEF80114EAD740EE4F7" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TYPESPOOL" TYPE="INTF" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Table Size for Oracle">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_DS_ENGINE" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_COMPTYPE" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TD_COMPTYPE"/>
+   <ITEM CMPNAME="TD_INDEX_NAME" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="INDEXID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Unique Index ID in a Table"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_SIZE" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Size in Ko"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TABLE_NAME" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">td_table_name(30) TYPE c
+`</ITEM>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" STATE="1" EDITORDER="8 " TYPTYPE="4">
+    tr_size TYPE RANGE OF td_size
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Range of Size in KO"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">BEGIN OF ts_index_tadir_info,
+          table_name    TYPE string,      &quot; td_table_name,
+          index_name    TYPE td_index_name,
+          info          TYPE ygpl_tadir_search=&gt;ts_tadir_information,
+        END OF ts_index_tadir_info
+`</ITEM>
+   <ITEM CMPNAME="TS_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="9 " TYPTYPE="4">BEGIN OF ts_table_size,
+          table_name    TYPE string,      &quot; td_table_name,
+          size          TYPE td_size,
+        END OF ts_table_size
+`</ITEM>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of component keys"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">tt_index_tadir_info TYPE SORTED TABLE OF ts_index_tadir_info WITH UNIQUE KEY table_name index_name
+`</ITEM>
+   <ITEM CMPNAME="TT_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="10 " TYPTYPE="4">tt_table_size TYPE HASHED TABLE OF ts_table_size WITH UNIQUE KEY table_name
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

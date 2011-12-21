@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6F5B617AEB4444FBA62A5C9017EB927D" CODE_SIGNATURE="B15586C88942EA3E2AED4C38BB4B39FD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_INDEXES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9F1C9C30810B21FC3FE0CB3A40BF5E9E" CODE_SIGNATURE="4463304C5E286B9BFCEEC1B70B585C67" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_INDEXES" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_TABLES_SIZE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
@@ -20,6 +19,11 @@ U1&amp;FURTHER_SOURCES_OF_INF&amp;
 AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TI_OBJECT_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_INTERFACES" REFCMPNAME="TI_OBJECT_SIZE"/>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TR_SIZE"/>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
+  </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="CHECK_LOG" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_INDEXES_CHECK_LOG"/>
    <ITEM CMPNAME="COMPONENT_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
@@ -27,13 +31,17 @@ AS</ITEM>
      <ITEM LANG="E" TEXT="List of component keys"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="O_OBJ_SIZE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
-    <ITEM TYPEGROUP="YGPL_TABLES_SIZE" TPUTYPE="1" EXPLICIT="X"/>
     <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X" IMPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_DBA_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
   <LOCAL>
    <TYPES>`
 *&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
@@ -48,6 +56,13 @@ AS</ITEM>
 *&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
   </LOCAL>
   <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
@@ -58,7 +73,7 @@ AS</ITEM>
        <ITEM LANG="E" TEXT="List of component keys"/>
       </TEXTS>
      </ITEM>
-     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="YGPL_TABLES_SIZE=&gt;TR_SIZE"/>
+     <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SIZE"/>
     </PARAMETERS>
     <SOURCE>`
   TYPES:
@@ -71,9 +86,9 @@ AS</ITEM>
     &lt;t&gt; LIKE LINE OF component_list,
     &lt;i&gt; LIKE LINE OF check_log.
 
-  component_list = ygpl_tables_size=&gt;filter_table( comp_list ).
-  component_list = ygpl_tables_size=&gt;filter_by_table_size( list = component_list
-                                                    size_filter = r_size_filter ).
+  component_list = o_obj_size-&gt;filter_table( comp_list ).
+  component_list = o_obj_size-&gt;filter_by_table_size( list = component_list
+                                              size_filter = r_size_filter ).
   LOOP AT component_list ASSIGNING &lt;t&gt;.
     CLEAR s_table.
     s_table-name = &lt;t&gt;-name.
@@ -96,23 +111,18 @@ AS</ITEM>
   DELETE check_log WHERE srcsystem IS NOT INITIAL.      &quot; stand for position
 
   LOOP AT check_log ASSIGNING &lt;i&gt;.
-    &lt;i&gt;-size = ygpl_tables_size=&gt;get_index_size( table_name = &lt;i&gt;-tabname
-                                                 index_name = &lt;i&gt;-indexname ).
+    &lt;i&gt;-size = o_obj_size-&gt;get_index_size( table_name = &lt;i&gt;-tabname
+                                           index_name = &lt;i&gt;-indexname ).
     &lt;i&gt;-percent = 100 *      &quot; Percent
                   100 *      &quot; 2 decimals
-                  &lt;i&gt;-size / ygpl_tables_size=&gt;db_size.
+                  &lt;i&gt;-size / o_obj_size-&gt;db_size.
     &lt;i&gt;-size = &lt;i&gt;-size / 1024.     &quot; Ko =&gt; Mo
-    &lt;i&gt;-tadir_info = ygpl_tables_size=&gt;get_index_information( table_name = &lt;i&gt;-tabname
-                                                              index_name = &lt;i&gt;-indexname ).
+    &lt;i&gt;-tadir_info = o_obj_size-&gt;get_index_information( table_name = &lt;i&gt;-tabname
+                                                        index_name = &lt;i&gt;-indexname ).
   ENDLOOP.</SOURCE>
    </ITEM>
   </METHODS>
   <TYPES>
-   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="List of component keys"/>
-    </TEXTS>
-   </ITEM>
    <ITEM CMPNAME="TT_INDEXES_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_indexes_check_log TYPE STANDARD TABLE OF ygpl_indexes_check_result WITH DEFAULT KEY
 `</ITEM>
   </TYPES>
