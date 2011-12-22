@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2535D118316F74406AA13906AF77DCF1" CODE_SIGNATURE="7B0E5D2A2D93E33BA4E5B6996056BE25" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLITABLES_SIZE" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="E4444086BA92240A1F7080E036E84054" CODE_SIGNATURE="B253978E623E1E271299A535AE4CE13A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLITABLES_SIZE" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -17,7 +17,6 @@ AS</ITEM>
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
-   <ITEM CMPNAME="C_TABLE_COMPTYPE" EXPOSURE="2" REFCLSNAME="YGPL_DBA_CONSTANTS" REFCMPNAME="C_TABLE_COMPTYPE"/>
    <ITEM CMPNAME="TD_COMPTYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TD_COMPTYPE"/>
    <ITEM CMPNAME="TD_INDEX_NAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TD_INDEX_NAME"/>
    <ITEM CMPNAME="TD_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TD_SIZE"/>
@@ -29,11 +28,10 @@ AS</ITEM>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="DB_SIZE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_SIZE"/>
-   <ITEM CMPNAME="INDEXES_LIST" EXPOSURE="2" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_TABLE_SIZE"/>
+   <ITEM CMPNAME="INDEXES_LIST" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_TABLE_SIZE"/>
    <ITEM CMPNAME="TABLES_LIST" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_TABLE_SIZE"/>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_DBA_CONSTANTS" STATE="1"/>
    <ITEM REFCLSNAME="YGPL_DBA_TYPESPOOL" STATE="1"/>
   </INTERFACES>
   <METHODS>
@@ -134,5 +132,71 @@ AS</ITEM>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
   </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_COUNT" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="4">td_count(16) TYPE p DECIMALS 0
+`</ITEM>
+   <ITEM CMPNAME="TS_COL_STATS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">
+    BEGIN OF ts_col_stats,       &quot; copy of t_index_column IN PROGRAM RSXPLORA
+         column_name     TYPE fieldname,
+         num_distinct    TYPE td_count,
+       END OF ts_col_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Colomn Information"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_IDX_ONLY_STATS" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="4">BEGIN OF ts_idx_only_stats,
+         index_name       TYPE indexid,
+         uniqueness       TYPE uniqueflag,
+         distinct_keys    TYPE td_count,
+         sample_size      TYPE i,
+         last_analyzed    TYPE timestamp,
+         col_cnt          TYPE i,
+    END OF ts_idx_only_stats
+`</ITEM>
+   <ITEM CMPNAME="TS_IDX_STATS" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">
+    BEGIN OF ts_idx_stats.
+  INCLUDE TYPE ts_idx_only_stats AS base.
+  TYPES:
+         columns          TYPE STANDARD TABLE OF ts_col_stats WITH DEFAULT KEY,
+    END OF ts_idx_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Index Statistics"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_TABLE_ONLY_STATS" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    BEGIN OF ts_table_only_stats,
+         table_name       TYPE tabname,
+         num_rows         TYPE td_count,
+         blocks           TYPE td_count,
+         empty_blocks     TYPE td_count,
+         sample_size      TYPE i,
+         last_analyzed    TYPE timestamp,
+     END OF ts_table_only_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table&apos;s statistics"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_TABLE_STATS" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">
+    BEGIN OF ts_table_stats.
+  INCLUDE TYPE ts_table_only_stats AS base.
+  TYPES:
+         indexes          TYPE tt_idx_stats,
+     END OF ts_table_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Table&apos;s statistics (With indexes)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_IDX_STATS" EXPOSURE="2" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    tt_idx_stats TYPE SORTED TABLE OF ts_idx_stats WITH UNIQUE KEY index_name
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Indexes Statistics"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
  </RAW>
 </ZL_OBJECT>

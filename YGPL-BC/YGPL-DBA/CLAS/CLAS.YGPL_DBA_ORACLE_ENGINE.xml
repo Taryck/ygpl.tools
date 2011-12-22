@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="37E7D5DF386CE05A973645CE7F50333E" CODE_SIGNATURE="E1587E53C58C0EACBECF223E3AD2A8C2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9B888D0CF5982CCE35FA99106D84201E" CODE_SIGNATURE="3575903517B9E9D153C3493F1EE4B12E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_DBA_COMMON_ENGINE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
  </DEPENDENCIES>
@@ -100,7 +101,7 @@ AS</ITEM>
 * Can&apos;t be saved in shared memory : too big ??
   ENDTRY.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="COMPUTE_INDEX_LIST" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="COMPUTE_INDEX_LIST" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Compute Index_list from Oracle DB"/>
     </TEXTS>
@@ -137,7 +138,7 @@ AS</ITEM>
 
   indexes_list = t_data.     &quot; standard table to hashed table</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="COMPUTE_TABLE_LIST" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="COMPUTE_TABLE_LIST" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Compute table_list from Oracle DB"/>
     </TEXTS>
@@ -190,11 +191,146 @@ AS</ITEM>
 
   tables_list = t_data.     &quot; standard table to hashed table</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_TABLE_ORA_STATS" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Table statistics (Table &amp; Indexes)"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="STATS" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_ORA_TABLE_INDEX_STATS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Oracle Statistics for a table and his indexes"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TABLE_NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA rc TYPE i.
+  DATA ind_cnt TYPE i.
+  DATA col_cnt TYPE i.
+  FIELD-SYMBOLS:
+    &lt;ti&gt; TYPE tt_ora_idx_stats.
+
+  stats-table-table_name = table_name.
+  PERFORM get_table_info IN PROGRAM rsxplora
+          CHANGING stats-table rc.
+  IF rc &lt;&gt; 0.
+    CLEAR stats.
+    EXIT.
+  ENDIF.
+
+  PERFORM get_indexes IN PROGRAM rsxplora
+          USING  stats-table-table_name ind_cnt col_cnt.
+  ASSIGN (&apos;(RSXPLORA)_INDEX_INFO_TAB[]&apos;) TO &lt;ti&gt;.
+  ASSERT sy-subrc = 0.
+  stats-indexes = &lt;ti&gt;.</SOURCE>
+   </ITEM>
   </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_DBA_COMMON_ENGINE" MTDNAME="YGPLITABLES_STATISTICS~GET_TABLE_STATS">
+    <SOURCE>`
+  DATA stats TYPE ts_ora_table_index_stats.
+  DATA index LIKE LINE OF result-indexes.
+  DATA col   LIKE LINE OF index-columns.
+  FIELD-SYMBOLS:
+    &lt;i&gt; LIKE LINE OF stats-indexes,
+    &lt;c&gt; LIKE LINE OF &lt;i&gt;-columns.
+
+  stats = get_table_ora_stats( table_name ).
+  CHECK NOT stats IS INITIAL.
+  MOVE-CORRESPONDING stats-table TO result-base.
+  LOOP AT stats-indexes ASSIGNING &lt;i&gt;.
+    CLEAR index.
+    MOVE-CORRESPONDING &lt;i&gt;-index TO index-base.
+    LOOP AT &lt;i&gt;-columns ASSIGNING &lt;c&gt;.
+      CLEAR col.
+      MOVE-CORRESPONDING &lt;c&gt; TO col.
+      APPEND col TO index-columns.
+    ENDLOOP.
+    INSERT index INTO result-indexes.
+    ASSERT sy-subrc = 0.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
    <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
    <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
   </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TS_ORA_COL_STATS" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">BEGIN OF ts_ora_col_stats,       &quot; copy of t_index_column IN PROGRAM RSXPLORA
+         column_name(30),
+         num_distinct(16) TYPE p DECIMALS 0,
+       END OF ts_ora_col_stats
+`</ITEM>
+   <ITEM CMPNAME="TS_ORA_IDX_ONLY_STATS" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="4">BEGIN OF ts_ora_idx_only_stats,     &quot; Copy of t_index_info IN PROGRAM RSXPLORA
+         index_name       TYPE ind_ora-index_name,
+         table_name       TYPE ind_ora-table_name,
+         uniqueness       TYPE ind_ora-uniqueness,
+         blevel           TYPE ind_ora-blevel,
+         leaf_blocks      TYPE ind_ora-leaf_blks,
+         distinct_keys    TYPE ind_ora-dist_keys,
+         avg_leaf_blks    TYPE ind_ora-avg_leaf_b,
+         avg_data_blks    TYPE ind_ora-avg_data_b,
+         clust_factor     TYPE ind_ora-clust_fact,
+         sample_size      TYPE i,
+         last_analyzed(14),
+         col_cnt          TYPE i,
+    END OF ts_ora_idx_only_stats
+`</ITEM>
+   <ITEM CMPNAME="TS_ORA_IDX_STATS" EXPOSURE="1" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    BEGIN OF ts_ora_idx_stats.     &quot; Copy of t_index_info IN PROGRAM RSXPLORA
+      INCLUDE TYPE ts_ora_idx_only_stats as Index.
+  types:
+         columns          TYPE STANDARD TABLE OF ts_ora_col_stats WITH DEFAULT KEY,
+    END OF ts_ora_idx_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Oracle Statistics for 1 index"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_ORA_TABLE_INDEX_STATS" EXPOSURE="1" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    BEGIN OF ts_ora_table_index_stats.
+  INCLUDE TYPE ts_ora_table_stats AS table.
+  TYPES:
+      indexes TYPE tt_ora_idx_stats,
+    END OF ts_ora_table_index_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Oracle Statistics for a table and his indexes"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_ORA_TABLE_STATS" EXPOSURE="1" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    BEGIN OF ts_ora_table_stats,         &quot; Copy of t_table_info IN PROGRAM RSXPLORA
+         table_name       TYPE tab_ora-table_name,
+         num_rows         TYPE tab_ora-num_rows,
+         blocks           TYPE tab_ora-blocks,
+         empty_blocks     TYPE tab_ora-empty_blks,
+         avg_space        TYPE tab_ora-avg_space,
+         chain_cnt        TYPE tab_ora-chain_cnt,
+         avg_row_len      TYPE tab_ora-avg_row_ln,
+         sample_size      TYPE i,
+         last_analyzed(14),
+         partitioned(3),
+     END OF ts_ora_table_stats
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Oracle Statistics for a table"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_ORA_IDX_STATS" EXPOSURE="1" STATE="1" EDITORDER="4 " TYPTYPE="4">
+    tt_ora_idx_stats TYPE STANDARD TABLE OF ts_ora_idx_stats WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Oracle Indexes Statistics"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
  </RAW>
 </ZL_OBJECT>
