@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F486CE63460690C7794C51ACCDF3D2E1" CODE_SIGNATURE="E169C67FC3B2A894077F0F03027040D1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4E38DC0E962FDFC0781D5E0C2EC9C5BD" CODE_SIGNATURE="29E90069982A609D2940DC1726210831" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
  </DEPENDENCIES>
@@ -32,12 +32,12 @@ AS</ITEM>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="O_OBJ_SIZE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
-   <ITEM CMPNAME="TABLE_ENQ_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="RSDEO-OBJTYPE">
+   <ITEM CMPNAME="TABLE_ENQ_TYPE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="RSDEO-OBJTYPE">
     <TEXTS>
-     <ITEM LANG="E" TEXT="ABAP/4 Dictionary object type"/>
+     <ITEM LANG="E" TEXT="Pseudo Cosntant : ABAP/4 Dictionary object type"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TABLE_TYPE" EXPOSURE="2" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;T&apos;" TYPTYPE="1" TYPE="RSEDD0-DDOBJTYPE">
+   <ITEM CMPNAME="TABLE_TYPE" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;T&apos;" TYPTYPE="1" TYPE="RSEDD0-DDOBJTYPE">
     <TEXTS>
      <ITEM LANG="E" TEXT="DD object type in DE management system"/>
     </TEXTS>
@@ -133,6 +133,217 @@ AS</ITEM>
    <ITEM CMPNAME="GET_TABLE_CHECK_PROTOCOL" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get Table&apos;s Check protocol"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table name, 16 characters"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_CHECK_LOG"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA objname  TYPE rsedd0-ddobjname.
+  DATA protid   TYPE sy-tabix.
+  DATA actmode  TYPE ddrefstruc-mode.
+  DATA subrc    TYPE sy-subrc.
+  DATA s_memid  TYPE tstrf01-filename.
+
+  DEFINE define_struct.                  &quot;Parameter: Name Bezugsstruktur
+    data: begin of &amp;1.
+            include structure &amp;2.
+    data: end of &amp;1.
+  END-OF-DEFINITION.
+
+  objname = name.
+  CALL FUNCTION &apos;INTERN_DD_CHECK_EXIST&apos;&quot;Existenz-/Objektklasseprüfung
+         EXPORTING
+              objname            = objname
+              objtype            = table_type
+              err_message        = &apos; &apos;
+              objstate           = &apos;M&apos;
+              exists             = &apos;X&apos;
+         EXCEPTIONS
+              OTHERS             = 01.
+  CHECK sy-subrc = 0.
+
+  CALL FUNCTION &apos;DD_OBJ_PROT_OPEN&apos;
+    EXPORTING
+      objectname = objname
+      objecttype = table_enq_type
+      level      = 1
+      device     = &apos;M&apos;
+      ddfunc     = &apos;CHE&apos;
+    IMPORTING
+      prid       = protid
+    EXCEPTIONS
+      OTHERS     = 01.
+  ASSERT sy-subrc = 0.
+
+  PERFORM stdo_set_format IN PROGRAM radbtout USING protid &apos;S&apos;.
+  actmode = 9.                       &quot;Prüfen
+
+** Ledge to control activation
+*  define_struct ctrl_tabl_act dctablact.
+** 2. Set the ledge for the activation dependent of activation-mode
+*  PERFORM tabl_setactivation IN PROGRAM SAPLSDTA
+**          USING ctrl_tabl_act act_mode ntab_putstate timer_on &apos; &apos; auth_chk &apos; &apos; &apos;M&apos; excommit.
+*          USING ctrl_tabl_act 9 &apos;A&apos; &apos; &apos; &apos; &apos; &apos;X&apos; &apos; &apos; &apos;M&apos; &apos;X&apos;.
+
+  DATA dd02v_wa       TYPE dd02v.
+  DATA dd02v_wa_a     TYPE dd02v.
+  DATA dd12v_tab      TYPE STANDARD TABLE OF dd12v WITH DEFAULT KEY.
+  DATA dd12v_tab_a    TYPE STANDARD TABLE OF dd12v WITH DEFAULT KEY.
+  DATA dd17v_tab      TYPE STANDARD TABLE OF dd17v WITH DEFAULT KEY.
+  DATA dd17v_tab_a    TYPE STANDARD TABLE OF dd17v WITH DEFAULT KEY.
+  DATA dd03p_tab      TYPE STANDARD TABLE OF dd03p WITH DEFAULT KEY.
+*  DATA prid           TYPE sy-tabix.
+  DATA ctrl_tbix_act  TYPE dctbixact.
+  DATA rc             TYPE sy-subrc.
+
+*  prid = 0.
+  CALL FUNCTION &apos;DD_TABL_GET&apos;
+    EXPORTING
+*     get_state            = &apos;M&apos;
+      langu                = sy-langu
+      prid                 = protid
+      tabl_name            = objname
+*     WITHTEXT             = &apos; &apos;
+      add_typeinfo         = &apos;D&apos;
+*     USE_CACHE            = &apos; &apos;
+*     TRACELEVEL           = 0
+    IMPORTING
+      dd02v_wa_a           = dd02v_wa_a
+      dd02v_wa_n           = dd02v_wa
+*     DD09L_WA_A           =
+*     DD09L_WA_N           =
+*     GOT_STATE            =
+    TABLES
+*     DD03P_TAB_A          =
+      dd03p_tab_n          = dd03p_tab
+*     DD05M_TAB_A          =
+*     DD05M_TAB_N          =
+*     DD08V_TAB_A          =
+*     DD08V_TAB_N          =
+      dd12v_tab_a          = dd12v_tab_a
+      dd12v_tab_n          = dd12v_tab
+      dd17v_tab_a          = dd17v_tab_a
+      dd17v_tab_n          = dd17v_tab
+*     DD35V_TAB_A          =
+*     DD35V_TAB_N          =
+*     DD36M_TAB_A          =
+*     DD36M_TAB_N          =
+    EXCEPTIONS
+      access_failure       = 1
+      OTHERS               = 2.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  PERFORM indx_setchecks IN PROGRAM radixchk
+          USING 10 space dd02v_wa_a dd02v_wa ctrl_tbix_act.   &quot; ctrl_tabl_act-tbixchk
+  PERFORM indx_cre_reflog IN PROGRAM radixchk
+          TABLES dd12v_tab USING protid.
+  PERFORM indx_dispatch IN PROGRAM radixchk
+          TABLES dd12v_tab_a dd12v_tab dd17v_tab_a dd17v_tab dd03p_tab
+           USING protid dd02v_wa ctrl_tbix_act rc.
+
+  PERFORM dd_pr_close IN PROGRAM radbtout USING protid &apos;X&apos;.
+
+*  CALL FUNCTION &apos;DD_TABL_INNER_ACT&apos;
+*    EXPORTING
+*      ctrl_tabl_act          =
+**     MODE                   = 1
+*      prid                   =
+*      tabname                =
+*      got_state              =
+*      dd02v_wa_a             =
+*      dd02v_wa               =
+*      dd09l_wa_a             =
+*      dd09l_wa               =
+**     MODEFLAG               = &apos; &apos;
+**     ACTION                 = &apos;   &apos;
+**     CTRL_TABL_INFO         =
+**   IMPORTING
+**     DD02V_HD               =
+**     SINGLEACT_RESULT       =
+**     CTRL_TABL_RES          =
+**     ACT_RES_INFO           =
+*    tables
+*      dd03p_tab_a            =
+*      dd03p_tab              =
+*      dd05m_tab_a            =
+*      dd05m_tab              =
+*      dd08v_tab_a            =
+*      dd08v_tab              =
+*      dd12v_tab_a            =
+*      dd12v_tab              =
+*      dd17v_tab_a            =
+*      dd17v_tab              =
+**     DD35V_TAB_A            =
+**     DD35V_TAB              =
+**     DD36M_TAB_A            =
+**     DD36M_TAB              =
+**     CTRL_TBVI_TAB          =
+**     CTRL_TBSH_TAB          =
+**     CTRL_TBEN_TAB          =
+**     DEPTYPES               =
+**   EXCEPTIONS
+**     DBCHANGE_FAILURE       = 1
+**     NTAB_GEN_FAILURE       = 2
+**     PUT_FAILURE            = 3
+**     READ_FAILURE           = 4
+**     OTHERS                 = 5
+*            .
+*  IF sy-subrc &lt;&gt; 0.
+** MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+**         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+*  ENDIF.
+
+*  CALL FUNCTION &apos;DD_TABL_ACT&apos;
+*    EXPORTING
+*      device      = &apos;M&apos;
+*      path        = &apos; &apos;
+*      protname    = &apos; &apos;
+*      tabname     = objname
+*      timer_on    = &apos; &apos;
+*      prid        = protid
+*      act_mode    = actmode
+**     AUTH_CHK                = &apos;X&apos;
+**     EXCOMMIT                = &apos;X&apos;
+*    IMPORTING
+*      act_result  = subrc
+**   TABLES
+**     ACT_RES_TAB             =
+*    EXCEPTIONS
+*      actok_failure           = 1
+*      dbchange_failure        = 2
+*      lockact_failure         = 3
+*      ntab_gen_failure        = 4
+*      put_failure             = 5
+*      read_failure            = 6
+*      unlockact_failure       = 7
+*      access_failure          = 8
+*      OTHERS                  = 9.
+*  CHECK sy-subrc = 0.   &quot; Generation Failure
+*  CHECK subrc &lt;= 4.     &quot; Warning
+
+  CONCATENATE &apos;CHE&apos; table_enq_type objname INTO s_memid.
+  CALL FUNCTION &apos;TRINT_READ_LOG_FROM_MEMORY&apos;
+    EXPORTING
+      iv_logname_memory = s_memid
+      iv_free_memory    = &apos;X&apos;
+    TABLES
+      et_log            = result
+    EXCEPTIONS
+      log_not_found     = 1
+      OTHERS            = 2.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SAV_GET_TABLE_CHECK_PROTOCOL" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Save of previous version of GET_TABLE_CHECK_PROTOCOL"/>
     </TEXTS>
     <PARAMETERS>
      <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME">
