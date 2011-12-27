@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="DCE2655E3905CE1E6F053BD091F86693" CODE_SIGNATURE="47E7D4113AAAC6D153C2CC73862F0CA5" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="EBB2135E1379C5A07CBDFA08E670C378" CODE_SIGNATURE="8F5DAE1E3FFAA8F9DD40F7FFFC454F65" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -32,7 +32,7 @@ DATA o_obj_size TYPE ygpl_dba_interfaces=&gt;ti_object_size.
 
 INITIALIZATION.
   DATA s_type LIKE LINE OF r_type.
-  DATA d_size TYPE ygplitables_size=&gt;td_size.
+  DATA d_size TYPE ygplidba_tables_size=&gt;td_size.
 
   o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).
 
@@ -47,13 +47,13 @@ INITIALIZATION.
 
 START-OF-SELECTION.
   DATA t_list         TYPE ygpl_tadir_search=&gt;tt_compkeys.
-  DATA d_table_name   TYPE ygplitables_size=&gt;td_table_name.
-  DATA d_table_size   TYPE ygplitables_size=&gt;td_size.
+  DATA d_table_name   TYPE ygplidba_tables_size=&gt;td_table_name.
+  DATA d_table_size   TYPE ygplidba_tables_size=&gt;td_size.
   FIELD-SYMBOLS:
     &lt;i&gt; LIKE LINE OF t_list.
   DATA t_results      TYPE STANDARD TABLE OF ygpl_tables_size_result WITH DEFAULT KEY.
   DATA s_result       LIKE LINE OF t_results.
-  DATA r_size_filter  TYPE ygplitables_size=&gt;tr_size.
+  DATA r_size_filter  TYPE ygplidba_tables_size=&gt;tr_size.
 
   d_table_size = p_size * 1024.   &quot; Mo =&gt; Ko
   r_size_filter = o_obj_size-&gt;create_filter_from_lower_limit( d_table_size ).
