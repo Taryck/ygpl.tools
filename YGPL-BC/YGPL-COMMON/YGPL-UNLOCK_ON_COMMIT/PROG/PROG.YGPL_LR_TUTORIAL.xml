@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="E4DA561467B14605E1A1D955E8E05F47" CODE_SIGNATURE="78F7CDA1AED73376580710CCE473D396" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_LR_TUTORIAL" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-UNLOCK_ON_COMMIT" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="T" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YGPL_LR_TUTORIAL
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ygpl_lr_tutorial.
+
+TYPE-POOLS: abap.
+
+START-OF-SELECTION.
+  DATA:
+    BEGIN OF my_lock,
+      mode_trdir        TYPE enqmode,
+      _scope            TYPE ddenqscope,
+     name               TYPE trdir-name,
+   END OF my_lock.
+  DATA parameters TYPE ygpl_lock_release=&gt;tt_function_parameters.
+
+  BREAK-POINT.
+
+* Create a lock
+  my_lock-mode_trdir = &apos;X&apos;.
+  my_lock-_scope = &apos;2&apos;.
+  my_lock-name = sy-repid.
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir
+      name           = my_lock-name
+      x_name         = abap_true
+      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 0.
+
+* Add lock to deregister queue using add_parameters
+  ygpl_lock_release=&gt;add_parameters( EXPORTING kind = abap_func_exporting
+                                          structure = my_lock
+                                CHANGING parameters = parameters ).
+  ygpl_lock_release=&gt;register_dequeue( dequeue_name = &apos;DEQUEUE_ESRDIRE&apos;
+                                         parameters = parameters ).
+
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir
+      name           = my_lock-name
+      x_name         = abap_true
+      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 1.
+
+  BREAK-POINT.    &quot; Check that lock is set
+
+  COMMIT WORK AND WAIT.
+
+  BREAK-POINT.    &quot; Check on SM12 that lock is no longer there after commit
+
+*  Lock can be set again
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir
+      name           = my_lock-name
+      x_name         = abap_true
+      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 0.        &quot; Lock is gone
+
+* Reset system &amp; lock
+  CALL FUNCTION &apos;DEQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir
+      name           = my_lock-name
+      x_name         = abap_true
+      _scope         = my_lock-_scope
+      _collect       = &apos; &apos;.
+  CLEAR parameters.
+
+* New version using add_param (one by one)
+* Create a lock with default values
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+*      mode_trdir     = my_lock-mode_trdir
+      name           = my_lock-name
+      x_name         = abap_true
+*      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 0.
+
+* Add lock to deregister queue using add_parameter
+  ygpl_lock_release=&gt;add_parameter( EXPORTING name = &apos;NAME&apos;
+                                              kind = abap_func_exporting
+                                              type = &apos;TRDIR-NAME&apos;
+                                             value = sy-repid
+                               CHANGING parameters = parameters ).
+  ygpl_lock_release=&gt;register_dequeue( dequeue_name = &apos;DEQUEUE_ESRDIRE&apos;
+                                         parameters = parameters ).
+
+* check lock is set
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir   &quot; Exclusive
+      name           = my_lock-name
+      x_name         = abap_true
+*      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 1.
+  BREAK-POINT.    &quot; Check on SM12 that lock is set
+
+  CALL FUNCTION &apos;BAPI_TRANSACTION_ROLLBACK&apos;
+*   IMPORTING
+*     RETURN        =
+            .
+
+  BREAK-POINT.    &quot; Check on SM12 that lock is no longer there after rollback
+
+* Lock can be set again
+  CALL FUNCTION &apos;ENQUEUE_ESRDIRE&apos;
+    EXPORTING
+      mode_trdir     = my_lock-mode_trdir   &quot; Exclusive
+      name           = my_lock-name
+      x_name         = abap_true
+*      _scope         = my_lock-_scope
+      _wait          = abap_true
+      _collect       = &apos; &apos;
+    EXCEPTIONS
+      foreign_lock   = 1
+      system_failure = 2
+      OTHERS         = 3.
+  ASSERT sy-subrc = 0.
+
+  BREAK-POINT.    &quot; Lock will be removed à the end of program</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Lock Release - Demo" LENGTH="19 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
