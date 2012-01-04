@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="EBB2135E1379C5A07CBDFA08E670C378" CODE_SIGNATURE="8F5DAE1E3FFAA8F9DD40F7FFFC454F65" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="CC258217FA023127E98F101B5633F7C7" CODE_SIGNATURE="41F73E7F655E0A4A0531EBEAE874AAC9" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -81,8 +81,7 @@ START-OF-SELECTION.
                        100 *      &quot; 2 decimals
                        d_table_size / o_obj_size-&gt;db_size.
     s_result-size = d_table_size * 1000 / 1024.   &quot; 3 decimals
-    s_result-tadir_info = ygpl_tadir_search=&gt;get_object_information( type = ygpl_dba_constants=&gt;c_table_comptype
-                                                                     name = &lt;i&gt;-name ).
+    s_result-tadir_info = o_obj_size-&gt;get_table_information( table_name = d_table_name ).
     APPEND s_result TO t_results.
   ENDLOOP.
 

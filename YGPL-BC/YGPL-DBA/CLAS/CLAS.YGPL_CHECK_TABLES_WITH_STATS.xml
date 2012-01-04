@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="B71B5C44B198427FE160F7D7D62E3852" CODE_SIGNATURE="19C03270DCBE86B17B65ECE1260A4315" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES_WITH_STATS" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_CHECK_TABLES"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="YGPL_CHECK_TABLES" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="DBA tools - Check table consistency using statistics"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_OBJ_STATS" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_OBJECT_STATISTICS"/>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+* Must be Statit Attibute in order to be instancied before super-&gt;Constructor
+  o_obj_stats = ygpl_dba_factories=&gt;get_object_statistics( ).</SOURCE>
+   </ITEM>
+  </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_CHECK_TABLES" MTDNAME="GET_TABLE_DEFINITION">
+    <SOURCE>`
+  DATA s_stats TYPE ygplidba_tables_statistics=&gt;ts_table_stats.
+  DATA l_name TYPE ygplidba_tables_statistics=&gt;td_table_name.
+  FIELD-SYMBOLS:
+    &lt;i&gt;   LIKE LINE OF s_stats-indexes,
+    &lt;f&gt;   LIKE LINE OF &lt;i&gt;-columns,
+    &lt;17&gt;  LIKE LINE OF result-t_dd17v.
+
+*  define read_17.
+*      READ TABLE result-t_dd17v ASSIGNING &lt;17&gt;
+*          WITH KEY sqltab = name
+*                indexname = &lt;i&gt;-index_name
+*                fieldname = &lt;f&gt;-column_name.
+*      IF sy-subrc = 0.
+*        CLEAR &lt;17&gt;.
+*      ENDIF.
+*  end-of-DEFINITION.
+
+  result = super-&gt;get_table_definition( name = name
+                                      protid = protid ).
+* If no specific index exists skip this table (no need of statistics)
+  CHECK result-t_dd12v IS NOT INITIAL
+   OR result-t_dd12v_a IS NOT INITIAL.
+
+  l_name = name.
+  s_stats = o_obj_stats-&gt;get_table_stats( l_name ).
+
+  LOOP AT s_stats-indexes ASSIGNING &lt;i&gt;.
+    LOOP AT &lt;i&gt;-columns ASSIGNING &lt;f&gt;
+         WHERE num_distinct &lt;= 1.
+* Remove field with unique values =&gt; because useless
+* Act as they do not exists for indexes check
+      READ TABLE result-t_dd17v ASSIGNING &lt;17&gt;
+          WITH KEY sqltab = name
+                indexname = &lt;i&gt;-index_name
+                fieldname = &lt;f&gt;-column_name.
+      IF sy-subrc = 0.
+        CLEAR &lt;17&gt;.
+      ENDIF.
+      READ TABLE result-t_dd17v_a ASSIGNING &lt;17&gt;
+          WITH KEY sqltab = name
+                indexname = &lt;i&gt;-index_name
+                fieldname = &lt;f&gt;-column_name.
+      IF sy-subrc = 0.
+        CLEAR &lt;17&gt;.
+      ENDIF.
+    ENDLOOP.
+  ENDLOOP.
+
+  DELETE result-t_dd17v WHERE table_line IS INITIAL.
+  DELETE result-t_dd17v_a WHERE table_line IS INITIAL.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+ </RAW>
+</ZL_OBJECT>

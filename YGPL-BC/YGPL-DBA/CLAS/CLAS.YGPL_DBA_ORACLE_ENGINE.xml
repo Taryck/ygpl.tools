@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="B52B52622CE0F9C6521F9D7DF2F83468" CODE_SIGNATURE="D59BA33F3A5F58B5FEAABFBCFD99D5D9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="308E00A31016E62DA79B9C8BF8DBAA45" CODE_SIGNATURE="D50A7315794D89C699AF9F13E129CC7D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_DBA_COMMON_ENGINE"/>
   <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
@@ -218,6 +218,7 @@ AS</ITEM>
     &lt;ti&gt; TYPE tt_ora_idx_stats.
 
   stats-table-table_name = table_name.
+  PERFORM get_schemaname IN PROGRAM rsxplora.
   PERFORM get_table_info IN PROGRAM rsxplora
           CHANGING stats-table rc.
   IF rc &lt;&gt; 0.
@@ -238,6 +239,7 @@ AS</ITEM>
   DATA stats TYPE ts_ora_table_index_stats.
   DATA index LIKE LINE OF result-indexes.
   DATA col   LIKE LINE OF index-columns.
+  DATA l_tab TYPE td_table_name.
   FIELD-SYMBOLS:
     &lt;i&gt; LIKE LINE OF stats-indexes,
     &lt;c&gt; LIKE LINE OF &lt;i&gt;-columns.
@@ -248,12 +250,17 @@ AS</ITEM>
   LOOP AT stats-indexes ASSIGNING &lt;i&gt;.
     CLEAR index.
     MOVE-CORRESPONDING &lt;i&gt;-index TO index-base.
+* &lt;i&gt;-index_name is in oracle format TABLE~index
+    SPLIT &lt;i&gt;-index_name AT &apos;~&apos; INTO l_tab index-index_name.
+    CHECK l_tab = table_name. &quot; remove other indexes
+* Uniqueness
+    IF &lt;i&gt;-uniqueness = &apos;UNIQUE&apos;.   index-uniqueness = abap_true.     ELSE.     index-uniqueness = abap_false.     ENDIF.
     LOOP AT &lt;i&gt;-columns ASSIGNING &lt;c&gt;.
       CLEAR col.
       MOVE-CORRESPONDING &lt;c&gt; TO col.
       APPEND col TO index-columns.
     ENDLOOP.
-    INSERT index INTO result-indexes.
+    INSERT index INTO TABLE  result-indexes.
     ASSERT sy-subrc = 0.
   ENDLOOP.</SOURCE>
    </ITEM>

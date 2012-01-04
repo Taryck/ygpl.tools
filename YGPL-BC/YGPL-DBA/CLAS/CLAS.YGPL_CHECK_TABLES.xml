@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4E38DC0E962FDFC0781D5E0C2EC9C5BD" CODE_SIGNATURE="29E90069982A609D2940DC1726210831" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
- <DEPENDENCIES>
-  <ITEM TYPE="CLAS" NAME="YGPL_TADIR_SEARCH"/>
- </DEPENDENCIES>
+<ZL_OBJECT CHECKSUM="11D56D97C750BAF1848FD8142FD8FA9F" CODE_SIGNATURE="A3B2FF56AFBA0553A74F0DDC802F8F47" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -21,6 +18,7 @@ AS</ITEM>
   </A0_MAINDATA>
   <ALIASES>
    <ITEM CMPNAME="TI_OBJECT_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_INTERFACES" REFCMPNAME="TI_OBJECT_SIZE"/>
+   <ITEM CMPNAME="TI_OBJECT_STATISTICS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_INTERFACES" REFCMPNAME="TI_OBJECT_STATISTICS"/>
    <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TR_SIZE"/>
    <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
   </ALIASES>
@@ -43,11 +41,6 @@ AS</ITEM>
     </TEXTS>
    </ITEM>
   </ATTRIBUTS>
-  <DEFERRED>
-   <CLASSES>
-    <ITEM TYPEGROUP="YGPL_TADIR_SEARCH" TPUTYPE="1" EXPLICIT="X"/>
-   </CLASSES>
-  </DEFERRED>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
    <ITEM REFCLSNAME="YGPL_DBA_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
@@ -91,6 +84,15 @@ AS</ITEM>
      <ITEM SCONAME="R_SIZE_FILTER" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SIZE"/>
     </PARAMETERS>
     <SOURCE>`
+  component_list = o_obj_size-&gt;filter_table( comp_list ).
+  component_list = o_obj_size-&gt;filter_by_table_size( list = component_list
+                                              size_filter = r_size_filter ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="DO_CHECK" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Do the Check"/>
+    </TEXTS>
+    <SOURCE>`
   DATA d_name   TYPE td_table_name.
   DATA d_tname  TYPE o_obj_size-&gt;td_table_name.
   DATA t_log    TYPE tt_check_log.
@@ -99,9 +101,6 @@ AS</ITEM>
     &lt;l&gt; LIKE LINE OF t_log,
     &lt;t&gt; LIKE LINE OF component_list.
 
-  component_list = o_obj_size-&gt;filter_table( comp_list ).
-  component_list = o_obj_size-&gt;filter_by_table_size( list = component_list
-                                              size_filter = r_size_filter ).
 * Process list
   LOOP AT component_list ASSIGNING &lt;t&gt;.
     d_name = &lt;t&gt;-name.
@@ -130,7 +129,7 @@ AS</ITEM>
   ENDLOOP.
   SORT check_log BY table_name subindex_name index_name.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_TABLE_CHECK_PROTOCOL" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+   <ITEM CMPNAME="GET_TABLE_CHECK_PROTOCOL" EXPOSURE="2" STATE="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get Table&apos;s Check protocol"/>
     </TEXTS>
@@ -143,11 +142,14 @@ AS</ITEM>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_CHECK_LOG"/>
     </PARAMETERS>
     <SOURCE>`
-  DATA objname  TYPE rsedd0-ddobjname.
-  DATA protid   TYPE sy-tabix.
-  DATA actmode  TYPE ddrefstruc-mode.
-  DATA subrc    TYPE sy-subrc.
-  DATA s_memid  TYPE tstrf01-filename.
+  DATA objname        TYPE rsedd0-ddobjname.
+  DATA protid         TYPE sy-tabix.
+  DATA actmode        TYPE ddrefstruc-mode.
+  DATA subrc          TYPE sy-subrc.
+  DATA s_memid        TYPE tstrf01-filename.
+  DATA s_table_def    TYPE ts_table_def.
+  DATA ctrl_tbix_act  TYPE dctbixact.
+  DATA rc             TYPE sy-subrc.
 
   DEFINE define_struct.                  &quot;Parameter: Name Bezugsstruktur
     data: begin of &amp;1.
@@ -190,144 +192,18 @@ AS</ITEM>
 **          USING ctrl_tabl_act act_mode ntab_putstate timer_on &apos; &apos; auth_chk &apos; &apos; &apos;M&apos; excommit.
 *          USING ctrl_tabl_act 9 &apos;A&apos; &apos; &apos; &apos; &apos; &apos;X&apos; &apos; &apos; &apos;M&apos; &apos;X&apos;.
 
-  DATA dd02v_wa       TYPE dd02v.
-  DATA dd02v_wa_a     TYPE dd02v.
-  DATA dd12v_tab      TYPE STANDARD TABLE OF dd12v WITH DEFAULT KEY.
-  DATA dd12v_tab_a    TYPE STANDARD TABLE OF dd12v WITH DEFAULT KEY.
-  DATA dd17v_tab      TYPE STANDARD TABLE OF dd17v WITH DEFAULT KEY.
-  DATA dd17v_tab_a    TYPE STANDARD TABLE OF dd17v WITH DEFAULT KEY.
-  DATA dd03p_tab      TYPE STANDARD TABLE OF dd03p WITH DEFAULT KEY.
-*  DATA prid           TYPE sy-tabix.
-  DATA ctrl_tbix_act  TYPE dctbixact.
-  DATA rc             TYPE sy-subrc.
-
-*  prid = 0.
-  CALL FUNCTION &apos;DD_TABL_GET&apos;
-    EXPORTING
-*     get_state            = &apos;M&apos;
-      langu                = sy-langu
-      prid                 = protid
-      tabl_name            = objname
-*     WITHTEXT             = &apos; &apos;
-      add_typeinfo         = &apos;D&apos;
-*     USE_CACHE            = &apos; &apos;
-*     TRACELEVEL           = 0
-    IMPORTING
-      dd02v_wa_a           = dd02v_wa_a
-      dd02v_wa_n           = dd02v_wa
-*     DD09L_WA_A           =
-*     DD09L_WA_N           =
-*     GOT_STATE            =
-    TABLES
-*     DD03P_TAB_A          =
-      dd03p_tab_n          = dd03p_tab
-*     DD05M_TAB_A          =
-*     DD05M_TAB_N          =
-*     DD08V_TAB_A          =
-*     DD08V_TAB_N          =
-      dd12v_tab_a          = dd12v_tab_a
-      dd12v_tab_n          = dd12v_tab
-      dd17v_tab_a          = dd17v_tab_a
-      dd17v_tab_n          = dd17v_tab
-*     DD35V_TAB_A          =
-*     DD35V_TAB_N          =
-*     DD36M_TAB_A          =
-*     DD36M_TAB_N          =
-    EXCEPTIONS
-      access_failure       = 1
-      OTHERS               = 2.
-  IF sy-subrc &lt;&gt; 0.
-    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-  ENDIF.
+  s_table_def = get_table_definition( name = name
+                                    protid = protid ).
 
   PERFORM indx_setchecks IN PROGRAM radixchk
-          USING 10 space dd02v_wa_a dd02v_wa ctrl_tbix_act.   &quot; ctrl_tabl_act-tbixchk
+          USING 10 space s_table_def-dd02v_a s_table_def-dd02v ctrl_tbix_act.   &quot; ctrl_tabl_act-tbixchk
   PERFORM indx_cre_reflog IN PROGRAM radixchk
-          TABLES dd12v_tab USING protid.
+          TABLES s_table_def-t_dd12v USING protid.
   PERFORM indx_dispatch IN PROGRAM radixchk
-          TABLES dd12v_tab_a dd12v_tab dd17v_tab_a dd17v_tab dd03p_tab
-           USING protid dd02v_wa ctrl_tbix_act rc.
+          TABLES s_table_def-t_dd12v_a s_table_def-t_dd12v s_table_def-t_dd17v_a s_table_def-t_dd17v s_table_def-t_dd03p
+           USING protid s_table_def-dd02v ctrl_tbix_act rc.
 
   PERFORM dd_pr_close IN PROGRAM radbtout USING protid &apos;X&apos;.
-
-*  CALL FUNCTION &apos;DD_TABL_INNER_ACT&apos;
-*    EXPORTING
-*      ctrl_tabl_act          =
-**     MODE                   = 1
-*      prid                   =
-*      tabname                =
-*      got_state              =
-*      dd02v_wa_a             =
-*      dd02v_wa               =
-*      dd09l_wa_a             =
-*      dd09l_wa               =
-**     MODEFLAG               = &apos; &apos;
-**     ACTION                 = &apos;   &apos;
-**     CTRL_TABL_INFO         =
-**   IMPORTING
-**     DD02V_HD               =
-**     SINGLEACT_RESULT       =
-**     CTRL_TABL_RES          =
-**     ACT_RES_INFO           =
-*    tables
-*      dd03p_tab_a            =
-*      dd03p_tab              =
-*      dd05m_tab_a            =
-*      dd05m_tab              =
-*      dd08v_tab_a            =
-*      dd08v_tab              =
-*      dd12v_tab_a            =
-*      dd12v_tab              =
-*      dd17v_tab_a            =
-*      dd17v_tab              =
-**     DD35V_TAB_A            =
-**     DD35V_TAB              =
-**     DD36M_TAB_A            =
-**     DD36M_TAB              =
-**     CTRL_TBVI_TAB          =
-**     CTRL_TBSH_TAB          =
-**     CTRL_TBEN_TAB          =
-**     DEPTYPES               =
-**   EXCEPTIONS
-**     DBCHANGE_FAILURE       = 1
-**     NTAB_GEN_FAILURE       = 2
-**     PUT_FAILURE            = 3
-**     READ_FAILURE           = 4
-**     OTHERS                 = 5
-*            .
-*  IF sy-subrc &lt;&gt; 0.
-** MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
-**         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
-*  ENDIF.
-
-*  CALL FUNCTION &apos;DD_TABL_ACT&apos;
-*    EXPORTING
-*      device      = &apos;M&apos;
-*      path        = &apos; &apos;
-*      protname    = &apos; &apos;
-*      tabname     = objname
-*      timer_on    = &apos; &apos;
-*      prid        = protid
-*      act_mode    = actmode
-**     AUTH_CHK                = &apos;X&apos;
-**     EXCOMMIT                = &apos;X&apos;
-*    IMPORTING
-*      act_result  = subrc
-**   TABLES
-**     ACT_RES_TAB             =
-*    EXCEPTIONS
-*      actok_failure           = 1
-*      dbchange_failure        = 2
-*      lockact_failure         = 3
-*      ntab_gen_failure        = 4
-*      put_failure             = 5
-*      read_failure            = 6
-*      unlockact_failure       = 7
-*      access_failure          = 8
-*      OTHERS                  = 9.
-*  CHECK sy-subrc = 0.   &quot; Generation Failure
-*  CHECK subrc &lt;= 4.     &quot; Warning
 
   CONCATENATE &apos;CHE&apos; table_enq_type objname INTO s_memid.
   CALL FUNCTION &apos;TRINT_READ_LOG_FROM_MEMORY&apos;
@@ -339,6 +215,70 @@ AS</ITEM>
     EXCEPTIONS
       log_not_found     = 1
       OTHERS            = 2.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_TABLE_DEFINITION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Table&apos;s definition"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Table name, 16 characters"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="PROTID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROTOCOL_ID" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Protocole ID"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_TABLE_DEF"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+    <SOURCE>`
+  DATA objname  TYPE rsedd0-ddobjname.
+
+  objname = name.
+  CALL FUNCTION &apos;DD_TABL_GET&apos;
+    EXPORTING
+*     get_state            = &apos;M&apos;
+      langu                = sy-langu
+      prid                 = protid
+      tabl_name            = objname
+*     WITHTEXT             = &apos; &apos;
+      add_typeinfo         = &apos;D&apos;
+*     USE_CACHE            = &apos; &apos;
+*     TRACELEVEL           = 0
+    IMPORTING
+      dd02v_wa_a           = result-dd02v_a
+      dd02v_wa_n           = result-dd02v
+*     DD09L_WA_A           =
+*     DD09L_WA_N           =
+*     GOT_STATE            =
+    TABLES
+*     DD03P_TAB_A          =
+      dd03p_tab_n          = result-t_dd03p
+*     DD05M_TAB_A          =
+*     DD05M_TAB_N          =
+*     DD08V_TAB_A          =
+*     DD08V_TAB_N          =
+      dd12v_tab_a          = result-t_dd12v_a
+      dd12v_tab_n          = result-t_dd12v
+      dd17v_tab_a          = result-t_dd17v_a
+      dd17v_tab_n          = result-t_dd17v
+*     DD35V_TAB_A          =
+*     DD35V_TAB_N          =
+*     DD36M_TAB_A          =
+*     DD36M_TAB_N          =
+    EXCEPTIONS
+      access_failure       = 1
+      OTHERS               = 2.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SAV_GET_TABLE_CHECK_PROTOCOL" STATE="1" MTDDECLTYP="1">
@@ -429,12 +369,34 @@ AS</ITEM>
    </ITEM>
   </METHODS>
   <TYPES>
+   <ITEM CMPNAME="TD_PROTOCOL_ID" EXPOSURE="1" STATE="1" EDITORDER="6 " TYPTYPE="1" TYPE="SY-TABIX">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Protocole ID"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TD_TABLE_NAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="DD02D-DBTABNAME">
     <TEXTS>
      <ITEM LANG="E" TEXT="Table name, 16 characters"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TS_DD02V" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="DD02V"/>
+   <ITEM CMPNAME="TS_TABLE_DEF" EXPOSURE="1" STATE="1" EDITORDER="5 " TYPTYPE="4">BEGIN OF ts_table_def,
+      dd02v         TYPE ts_dd02v,
+      dd02v_a       TYPE ts_dd02v,
+      t_dd12v       TYPE tt_dd12v,
+      t_dd12v_a     TYPE tt_dd12v,
+      t_dd17v       TYPE tt_dd17v,
+      t_dd17v_a     TYPE tt_dd17v,
+      t_dd03p       TYPE tt_dd03p,
+    END OF ts_table_def
+`</ITEM>
    <ITEM CMPNAME="TT_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_check_log TYPE STANDARD TABLE OF trlogm WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_DD03P" EXPOSURE="1" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_dd03p      TYPE STANDARD TABLE OF dd03p WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_DD12V" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="4">tt_dd12v      TYPE STANDARD TABLE OF dd12v WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_DD17V" EXPOSURE="1" STATE="1" EDITORDER="3 " TYPTYPE="4">tt_dd17v      TYPE STANDARD TABLE OF dd17v WITH DEFAULT KEY
 `</ITEM>
    <ITEM CMPNAME="TT_TABLES_CHECK_LOG" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">tt_tables_check_log TYPE STANDARD TABLE OF ygpl_tables_check_result WITH DEFAULT KEY
 `</ITEM>

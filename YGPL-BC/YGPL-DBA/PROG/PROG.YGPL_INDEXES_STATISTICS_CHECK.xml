@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="3F25A756F35835FDD02F98A8BB54C2AE" CODE_SIGNATURE="4AA8A80238B92533FA2A547CFDF7C96C" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="0FE53934AF0342A88C8E70313180DC0B" CODE_SIGNATURE="75CD9716CB0F0654E059ED2205D98688" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_STATISTICS_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -8,7 +8,7 @@
 * Report  YGPL_TABLES_CHECK
 *---------------------------------------------------------------------*
 
-REPORT  ygpl_tables_check LINE-SIZE 256.
+REPORT  ygpl_indexes_statistics_check LINE-SIZE 256.
 
 TABLES: tadir, tdevc.
 TYPE-POOLS: abap, icon.
@@ -65,9 +65,11 @@ START-OF-SELECTION.
                       author     = s_author[] ).
 
   CREATE OBJECT o_check
+    TYPE
+      ygpl_check_tables_with_stats
     EXPORTING
-      comp_list     = t_list
-      r_size_filter = r_size_filter.
+      comp_list                    = t_list
+      r_size_filter                = r_size_filter.
 
   o_check-&gt;do_check( ).
 
@@ -164,7 +166,7 @@ ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT
    </ITEM>
    <ITEM ID="R">
     <TEXTS>
-     <ITEM LANGU="E" ENTRY="Control Table Indexes V0.0" LENGTH="26 "/>
+     <ITEM LANGU="E" ENTRY="Control Table Indexes using Indexes Statistics V0.0" LENGTH="51 "/>
      <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
     </TEXTS>
    </ITEM>
