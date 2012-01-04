@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="606992F37505F492DECD3A8E9F013231" CODE_SIGNATURE="4332B3A69EAD567BF5B71B0DCCD8693A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DEVC_SEARCH" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Tools for TADIR query">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_PACKAGE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TD_PACKAGE"/>
+   <ITEM CMPNAME="TR_PACKAGES" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TR_PACKAGES"/>
+   <ITEM CMPNAME="TR_SOFTCOMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TR_SOFTCOMP"/>
+   <ITEM CMPNAME="TS_DEVC_INFORMATION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TS_DEVC_INFORMATION"/>
+  </ALIASES>
+  <FRIENDS>
+   <ITEM REFCLSNAME="YGPL_TADIR_SEARCH" STATE="1"/>
+  </FRIENDS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_COMMON_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* USE THIS SOURCE FILE FOR ANY TYPE DECLARATIONS (CLASS
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* IMPLEMENTATION OR PRIVATE METHOD&apos;S SIGNATURE</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* LOCAL CLASS IMPLEMENTATION FOR PUBLIC CLASS
+*&quot;* use this source file for the implementation part of
+*&quot;* LOCAL HELPER CLASSES</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* USE THIS SOURCE FILE FOR ANY MACRO DEFINITIONS YOU NEED
+*&quot;* IN THE IMPLEMENTATION PART OF THE CLASS</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="EXTEND_PACKAGE" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Extend Package list to sub packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_PACK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package list"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_PACK">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tt_pack.
+
+  t_level = result = packages .
+  WHILE NOT t_level[] IS INITIAL.
+    SORT t_level.
+    DELETE ADJACENT DUPLICATES FROM t_level.
+
+    SELECT devclass
+        FROM tdevc
+        INTO TABLE t_level
+           FOR ALL ENTRIES IN t_level
+        WHERE parentcl = t_level-table_line.
+
+    APPEND LINES OF t_level TO result.
+  ENDWHILE.
+
+  SORT result.
+  DELETE ADJACENT DUPLICATES FROM result.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="EXTEND_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Extend Package to sub_packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  CHECK NOT packages IS INITIAL.
+  r_exclu = packages.   DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+* Package selection
+  result = get_sub_packages( packages ).
+
+  IF NOT r_exclu IS INITIAL.
+    s_pack-sign = &apos;I&apos;.   MODIFY r_exclu FROM s_pack TRANSPORTING sign WHERE sign &lt;&gt; s_pack-sign.
+    r_exclu = get_sub_packages( r_exclu ).
+    DELETE result WHERE low IN r_exclu.
+  ENDIF.
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+  IF result IS INITIAL.     &quot; NO result
+    result = packages.      &quot; set backrange to prevent no result being range with no values =&gt; all values
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_PACKAGE_INFORMATION" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get package information"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PACKAGE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_DEVC_INFORMATION">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK package IS NOT INITIAL.
+
+  SELECT SINGLE p~as4user p~pdevclass p~dlvunit s~ps_posid p~namespace
+    INTO result
+    FROM tdevc AS p
+    INNER JOIN df14l AS s ON s~fctr_id = p~component
+                         AND s~as4local = &apos;A&apos;   &quot; Active
+    WHERE devclass = package.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_SUB_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Sub Package of packages"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  CHECK NOT packages IS INITIAL.
+
+* Package selection
+  SELECT devclass AS low
+      FROM tdevc
+      INTO CORRESPONDING FIELDS OF TABLE result
+      WHERE devclass in packages.
+
+* Package extention
+  t_level = result.
+  WHILE NOT t_level[] IS INITIAL.
+    SORT t_level.
+    DELETE ADJACENT DUPLICATES FROM t_level.
+
+    SELECT devclass AS low
+        FROM tdevc
+        INTO CORRESPONDING FIELDS OF TABLE t_level
+           FOR ALL ENTRIES IN t_level
+        WHERE parentcl = t_level-low.
+
+    APPEND LINES OF t_level TO result.
+  ENDWHILE.
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="LIMIT_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Limit/extend packages to Software component"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_PACKAGES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SOFTCOMP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_SOFTCOMP">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Software Component"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA r_exclu TYPE tr_packages.
+  DATA t_level TYPE tr_packages.
+  DATA s_pack LIKE LINE OF result.
+
+  result = packages.
+  CHECK NOT softcomp IS INITIAL.
+
+* Package selection
+  SELECT devclass AS low
+      FROM tdevc
+      INTO CORRESPONDING FIELDS OF TABLE result
+      WHERE devclass IN packages
+        AND dlvunit IN softcomp.
+
+  r_exclu = packages.   DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+
+  SORT result.    DELETE ADJACENT DUPLICATES FROM result COMPARING low.
+  s_pack-sign = &apos;I&apos;.  s_pack-option = &apos;EQ&apos;.   MODIFY result FROM s_pack TRANSPORTING sign option WHERE NOT low IS INITIAL.
+
+  APPEND LINES OF r_exclu TO result.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SEWOR" EXPLICIT="X"/>
+   <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TT_PACK" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_pack TYPE STANDARD TABLE OF tdevc-devclass with DEFAULT KEY
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
