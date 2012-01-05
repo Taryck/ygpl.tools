@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8AFA722C22310AEDED593D6393A4A2D7" CODE_SIGNATURE="845480B77E382A3F965C91367EB000B8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="014D7F037175E35D0416A62B7A8F0157" CODE_SIGNATURE="092794F77CB9A6E17249A4E96404BAE3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CHECK_TABLES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -149,54 +149,6 @@ AS</ITEM>
        IMPORTING
             enqueue_type = table_enq_type.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="DO8CHECK" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Do the Check"/>
-    </TEXTS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-  DATA d_name   TYPE td_table_name.
-  DATA d_tname  TYPE o_obj_size-&gt;td_table_name.
-  DATA t_log    TYPE tt_check_log.
-  DATA s_line   LIKE LINE OF check_log.
-  FIELD-SYMBOLS:
-    &lt;l&gt; LIKE LINE OF t_log,
-    &lt;t&gt; LIKE LINE OF o_list-&gt;components.
-
-* Process list
-  LOOP AT o_list-&gt;components ASSIGNING &lt;t&gt;.
-    d_name = &lt;t&gt;-name.
-    t_log = ygplidba_check_tables~get_table_check_protocol( d_name ).
-    DELETE t_log
-           WHERE NOT (
-                      ( ag = &apos;DT&apos; AND msgnr = &apos;510&apos; )    &quot;  Index &amp;-&amp; completely contains the fields of index &amp;
-           ) .
-    CHECK NOT t_log IS INITIAL.
-    LOOP AT t_log ASSIGNING &lt;l&gt;.
-      CLEAR s_line.
-      d_tname = s_line-table_name = &lt;t&gt;-name.
-      s_line-index_name = &lt;l&gt;-var2.
-      s_line-subindex_name = &lt;l&gt;-var3.
-      MESSAGE ID &lt;l&gt;-ag TYPE &apos;I&apos; NUMBER &lt;l&gt;-msgnr WITH &lt;l&gt;-var1 &lt;l&gt;-var2 &lt;l&gt;-var3 &lt;l&gt;-var4 INTO s_line-message.
-      s_line-size = o_obj_size-&gt;get_index_size( table_name = d_tname
-                                                index_name = s_line-subindex_name ).
-      s_line-percent = 100 *      &quot; Percent
-                       100 *      &quot; 2 decimals
-                       s_line-size / o_obj_size-&gt;db_size.
-      s_line-size = s_line-size / 1024.     &quot; Ko =&gt; Mo
-      s_line-tadir_info = o_obj_size-&gt;get_index_information( table_name = d_tname
-                                                             index_name = s_line-subindex_name ).
-      APPEND s_line TO check_log.
-    ENDLOOP.
-  ENDLOOP.
-  SORT check_log BY table_name subindex_name index_name.</SOURCE>
-   </ITEM>
    <ITEM CMPNAME="GET_TABLE_DEFINITION" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get Table&apos;s definition"/>
@@ -259,94 +211,6 @@ AS</ITEM>
     EXCEPTIONS
       access_failure       = 1
       OTHERS               = 2.
-  ASSERT sy-subrc = 0.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="GET_TABLE_PROT" EXPOSURE="2" STATE="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Get Table&apos;s Check protocol"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Table name, 16 characters"/>
-      </TEXTS>
-     </ITEM>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_CHECK_LOG"/>
-    </PARAMETERS>
-    <SOURCE>`
-  DATA objname        TYPE rsedd0-ddobjname.
-  DATA protid         TYPE sy-tabix.
-  DATA actmode        TYPE ddrefstruc-mode.
-  DATA subrc          TYPE sy-subrc.
-  DATA s_memid        TYPE tstrf01-filename.
-  DATA s_table_def    TYPE ts_table_def.
-  DATA ctrl_tbix_act  TYPE dctbixact.
-  DATA rc             TYPE sy-subrc.
-
-  DEFINE define_struct.                  &quot;Parameter: Name Bezugsstruktur
-    data: begin of &amp;1.
-            include structure &amp;2.
-    data: end of &amp;1.
-  END-OF-DEFINITION.
-
-  objname = name.
-  CALL FUNCTION &apos;INTERN_DD_CHECK_EXIST&apos;&quot;Existenz-/Objektklasseprüfung
-         EXPORTING
-              objname            = objname
-              objtype            = table_type
-              err_message        = &apos; &apos;
-              objstate           = &apos;M&apos;
-              exists             = &apos;X&apos;
-         EXCEPTIONS
-              OTHERS             = 01.
-  CHECK sy-subrc = 0.
-
-  CALL FUNCTION &apos;DD_OBJ_PROT_OPEN&apos;
-    EXPORTING
-      objectname = objname
-      objecttype = table_enq_type
-      level      = 1
-      device     = &apos;M&apos;
-      ddfunc     = &apos;CHE&apos;
-    IMPORTING
-      prid       = protid
-    EXCEPTIONS
-      OTHERS     = 01.
-  ASSERT sy-subrc = 0.
-
-  PERFORM stdo_set_format IN PROGRAM radbtout USING protid &apos;S&apos;.
-  actmode = 9.                       &quot;Prüfen
-
-** Ledge to control activation
-*  define_struct ctrl_tabl_act dctablact.
-** 2. Set the ledge for the activation dependent of activation-mode
-*  PERFORM tabl_setactivation IN PROGRAM SAPLSDTA
-**          USING ctrl_tabl_act act_mode ntab_putstate timer_on &apos; &apos; auth_chk &apos; &apos; &apos;M&apos; excommit.
-*          USING ctrl_tabl_act 9 &apos;A&apos; &apos; &apos; &apos; &apos; &apos;X&apos; &apos; &apos; &apos;M&apos; &apos;X&apos;.
-
-  s_table_def = get_table_definition( name = name
-                                    protid = protid ).
-
-  PERFORM indx_setchecks IN PROGRAM radixchk
-          USING 10 space s_table_def-dd02v_a s_table_def-dd02v ctrl_tbix_act.   &quot; ctrl_tabl_act-tbixchk
-  PERFORM indx_cre_reflog IN PROGRAM radixchk
-          TABLES s_table_def-t_dd12v USING protid.
-  PERFORM indx_dispatch IN PROGRAM radixchk
-          TABLES s_table_def-t_dd12v_a s_table_def-t_dd12v s_table_def-t_dd17v_a s_table_def-t_dd17v s_table_def-t_dd03p
-           USING protid s_table_def-dd02v ctrl_tbix_act rc.
-
-  PERFORM dd_pr_close IN PROGRAM radbtout USING protid &apos;X&apos;.
-
-  CONCATENATE &apos;CHE&apos; table_enq_type objname INTO s_memid.
-  CALL FUNCTION &apos;TRINT_READ_LOG_FROM_MEMORY&apos;
-    EXPORTING
-      iv_logname_memory = s_memid
-      iv_free_memory    = &apos;X&apos;
-    TABLES
-      et_log            = result
-    EXCEPTIONS
-      log_not_found     = 1
-      OTHERS            = 2.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="SAV_GET_TABLE_CHECK_PROTOCOL" STATE="1" MTDDECLTYP="1">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7B77978610CBB1DA7D055F89F4247271" CODE_SIGNATURE="E58ACEC36E877AD0D6FB6BE74A8281AE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="F369E850823F3FDEA1A420DBFD4A10AD" CODE_SIGNATURE="A75992C249FF2E86FB7A5684BCBB97FE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -51,7 +51,8 @@ END-OF-SELECTION.
 *&amp;      Form  DISPLAY_RESULT
 *&amp;---------------------------------------------------------------------*
 FORM display_result  USING    o_check   TYPE ygpl_dba_interfaces=&gt;ti_check_table.
-  DATA t_data TYPE ygpl_check_tables=&gt;tt_tables_check_log.
+  DATA no_need_just_for_use_case_link TYPE ygpl_dba_tables_check_result.
+  DATA t_data TYPE ygplidba_check_tables=&gt;tt_tables_check_log.
   t_data = o_check-&gt;check_log.
   SORT t_data BY namespace appl_component devclass table_name subindex_name index_name.
   CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
@@ -65,7 +66,7 @@ FORM display_result  USING    o_check   TYPE ygpl_dba_interfaces=&gt;ti_check_ta
 *     I_CALLBACK_TOP_OF_PAGE            = &apos; &apos;
 *     I_CALLBACK_HTML_TOP_OF_PAGE       = &apos; &apos;
 *     I_CALLBACK_HTML_END_OF_LIST       = &apos; &apos;
-      i_structure_name                  = &apos;YGPL_TABLES_CHECK_RESULT&apos;
+      i_structure_name                  = &apos;YGPL_DBA_TABLES_CHECK_RESULT&apos;
 *     I_BACKGROUND_ID                   = &apos; &apos;
 *     I_GRID_TITLE                      =
 *     I_GRID_SETTINGS                   =

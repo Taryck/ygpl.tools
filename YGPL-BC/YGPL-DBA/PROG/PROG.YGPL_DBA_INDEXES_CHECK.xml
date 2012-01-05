@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="558430C500430FC440EAB4CA7D0465D4" CODE_SIGNATURE="1D4672E150FFBE98541C7531823D570E" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="A0FE825E45514280A9DA364609F4C5E1" CODE_SIGNATURE="F294FCFC49832159CE01E1FE303BFD93" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -51,7 +51,8 @@ END-OF-SELECTION.
 *&amp;      Form  DISPLAY_RESULT
 *&amp;---------------------------------------------------------------------*
 form DISPLAY_RESULT  using    o_check TYPE ygpl_dba_interfaces=&gt;ti_check_indexes.
-  DATA t_data TYPE ygpl_check_indexes=&gt;tt_indexes_check_log.
+  DATA no_need_just_for_use_case_link TYPE YGPL_DBA_INDEXES_CHECK_RESULT.
+  DATA t_data TYPE ygplidba_check_indexes=&gt;tt_indexes_check_log.
   t_data = o_check-&gt;check_log.
   sort t_data by namespace appl_component devclass tabname indexname.
   CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
@@ -65,7 +66,7 @@ form DISPLAY_RESULT  using    o_check TYPE ygpl_dba_interfaces=&gt;ti_check_inde
 *     I_CALLBACK_TOP_OF_PAGE            = &apos; &apos;
 *     I_CALLBACK_HTML_TOP_OF_PAGE       = &apos; &apos;
 *     I_CALLBACK_HTML_END_OF_LIST       = &apos; &apos;
-      i_structure_name                  = &apos;YGPL_INDEXES_CHECK_RESULT&apos;
+      i_structure_name                  = &apos;YGPL_DBA_INDEXES_CHECK_RESULT&apos;
 *     I_BACKGROUND_ID                   = &apos; &apos;
 *     I_GRID_TITLE                      =
 *     I_GRID_SETTINGS                   =
