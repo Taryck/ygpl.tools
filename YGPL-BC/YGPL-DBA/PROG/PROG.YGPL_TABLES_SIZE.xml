@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CC258217FA023127E98F101B5633F7C7" CODE_SIGNATURE="41F73E7F655E0A4A0531EBEAE874AAC9" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="8286D68868A9A15DBCDD853BE680827D" CODE_SIGNATURE="E1AC97C6583BB67AA4AEA9C82C30C2DE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLES_SIZE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -25,25 +25,16 @@ SELECT-OPTIONS:
   s_author FOR tadir-author DEFAULT sy-uname.
 
 PARAMETERS:
-  p_size TYPE ygpl_table_size.
+  p_size TYPE ygpl_dba_table_size.
 
 DATA r_type     TYPE ygpl_tadir_search=&gt;tr_comptype.
 DATA o_obj_size TYPE ygpl_dba_interfaces=&gt;ti_object_size.
 
 INITIALIZATION.
-  DATA s_type LIKE LINE OF r_type.
-  DATA d_size TYPE ygplidba_tables_size=&gt;td_size.
-
-  o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).
-
-  s_type-sign = &apos;I&apos;.
-  s_type-option = &apos;EQ&apos;.
-  s_type-low = &apos;TABL&apos;.
-  APPEND s_type TO r_type.
-
-  d_size = o_obj_size-&gt;db_size / 1024.          &quot; DB Size (ko) =&gt; (Mo)
-  d_size = d_size / 1000.                       &quot; 0,1% of db_size
-  p_size = d_size * 1000.                       &quot; 3 decimals
+  PERFORM init_typerange IN PROGRAM ygpl_dba_cockpit
+          CHANGING r_type.
+  PERFORM set_default_object_size IN PROGRAM ygpl_dba_cockpit
+          CHANGING p_size o_obj_size.
 
 START-OF-SELECTION.
   DATA t_list         TYPE ygpl_tadir_search=&gt;tt_compkeys.

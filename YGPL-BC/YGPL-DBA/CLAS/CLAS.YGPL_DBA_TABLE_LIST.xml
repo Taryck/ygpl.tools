@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="87FE4814010991ACE78902F3714CBC3E" CODE_SIGNATURE="3953F7FDDE1201E64659A061EBBDACCE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLE_LIST" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Table List"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="ADD_COMPONENTS" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIDBA_TABLE_LIST" REFCMPNAME="ADD_COMPONENTS"/>
+   <ITEM CMPNAME="COMPONENTS" EXPOSURE="2" REFCLSNAME="YGPLIDBA_TABLE_LIST" REFCMPNAME="COMPONENTS"/>
+   <ITEM CMPNAME="C_TABLE_COMPTYPE" EXPOSURE="2" REFCLSNAME="YGPL_DBA_CONSTANTS" REFCMPNAME="C_TABLE_COMPTYPE"/>
+   <ITEM CMPNAME="RESET" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIDBA_TABLE_LIST" REFCMPNAME="RESET"/>
+   <ITEM CMPNAME="TD_SIZE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIDBA_TABLE_LIST" REFCMPNAME="TD_SIZE"/>
+   <ITEM CMPNAME="TD_TABLE_NAME" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TD_TABLE_NAME"/>
+   <ITEM CMPNAME="TI_OBJECT_SIZE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPL_DBA_INTERFACES" REFCMPNAME="TI_OBJECT_SIZE"/>
+   <ITEM CMPNAME="TR_COMPTYPE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TR_COMPTYPE"/>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIDBA_TABLE_LIST" REFCMPNAME="TR_SIZE"/>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="C_R_TABLE_TYPE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TR_COMPTYPE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Component Range for Table"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_ENGINE" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
+   <ITEM CMPNAME="R_SIZE_FILTER" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TR_SIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Size filter"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIDBA_TABLE_LIST" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ADD_COMPONENTS">
+      <SOURCE>`
+  DATA t_comp TYPE tt_compkeys.
+  t_comp = keep_only_table( components ).
+  t_comp = filter_by_table_size( t_comp ).
+  INSERT LINES OF t_comp INTO me-&gt;components.
+  SORT me-&gt;components.
+  DELETE ADJACENT DUPLICATES FROM me-&gt;components.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="RESET">
+      <SOURCE>`
+  CLEAR components.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SEARCH_ADD_COMPONENTS">
+      <SOURCE>`
+  DATA t_list TYPE tt_compkeys.
+
+  t_list = ygpl_tadir_search=&gt;get_keys_from_tadir(
+                      srcsystem  = criteria-r_srcs
+                      softcomp   = criteria-r_soft
+                      type       = c_r_table_type
+                      name       = criteria-r_name
+                      packages   = criteria-r_pack
+                      ext        = criteria-p_ext
+                      author     = criteria-r_author ).
+  CHECK t_list IS NOT INITIAL.
+  ygplidba_table_list~add_components( t_list ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_LOWER_SIZE_LIMIT">
+      <SOURCE>`
+  DATA s_size LIKE LINE OF r_size_filter.
+  REFRESH r_size_filter.
+  CHECK size &gt; 0.
+  s_size-sign = &apos;I&apos;.
+  s_size-option = &apos;GE&apos;.
+  s_size-low = size.
+  APPEND s_size TO r_size_filter.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_DBA_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_type LIKE LINE OF c_r_table_type.
+
+  REFRESH c_r_table_type.
+  s_type-sign = &apos;I&apos;.
+  s_type-option = &apos;EQ&apos;.
+  s_type-low = c_table_comptype.
+  APPEND s_type TO c_r_table_type.
+
+  o_engine = ygpl_dba_factories=&gt;get_object_size( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="FILTER_BY_TABLE_SIZE" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Keep only table with specific table size"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LIST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA d_table_name   TYPE td_table_name.
+  DATA d_table_size   TYPE td_size.
+  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF list.
+
+  IF r_size_filter IS INITIAL.
+    result = list.
+  ELSE.
+    LOOP AT list ASSIGNING &lt;i&gt;.
+      IF &lt;i&gt;-type = c_table_comptype.
+        d_table_name = &lt;i&gt;-name.
+        d_table_size = o_engine-&gt;get_table_size( d_table_name ).
+        CHECK d_table_size IN r_size_filter.
+      ENDIF.
+      APPEND &lt;i&gt; TO result.
+    ENDLOOP.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="KEEP_ONLY_TABLE" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Keep only Table in Component list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LIST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+    </PARAMETERS>
+    <SOURCE>`
+  TYPES:
+    BEGIN OF ts_table,
+      name TYPE td_table_name,
+    END OF ts_table.
+  DATA t_tables       TYPE STANDARD TABLE OF ts_table WITH DEFAULT KEY.
+  DATA s_table        LIKE LINE OF t_tables.
+  DATA s_line         LIKE LINE OF result.
+  DATA l_list         TYPE tt_compkeys.
+  FIELD-SYMBOLS:
+    &lt;i&gt; LIKE LINE OF list.
+
+  l_list = list.
+  SORT l_list.
+  DELETE ADJACENT DUPLICATES FROM l_list.
+  DELETE l_list WHERE type NOT IN c_r_table_type.
+  SORT me-&gt;components BY type name.
+
+  LOOP AT list ASSIGNING &lt;i&gt;.
+    READ TABLE me-&gt;components TRANSPORTING NO FIELDS
+         WITH KEY type = &lt;i&gt;-type
+                  name = &lt;i&gt;-name.
+    CHECK sy-subrc &lt;&gt; 0.      &quot; not already present in list
+    s_table-name = &lt;i&gt;-name.
+    APPEND s_table TO t_tables.
+  ENDLOOP.
+
+* Get tables only (remove structures)
+  SELECT tabname AS name
+    INTO CORRESPONDING FIELDS OF TABLE result
+    FROM dd02l
+    FOR ALL ENTRIES IN t_tables
+    WHERE tabname = t_tables-name
+      AND tabclass = &apos;TRANSP&apos;
+    %_HINTS ORACLE &apos;&amp;max_in_blocking_factor 200&amp;&apos; .
+
+  s_line-type = c_table_comptype.
+  MODIFY result FROM s_line TRANSPORTING type WHERE type IS INITIAL.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

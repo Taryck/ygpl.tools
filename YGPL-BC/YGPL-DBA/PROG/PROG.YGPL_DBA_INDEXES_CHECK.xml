@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5AF9D2AEF6460E68C0012EAA9329C70F" CODE_SIGNATURE="95B1E3B7AF8A58AB9432DFEC0741FF3A" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="32F0BFFB499144793836057F3257BA17" CODE_SIGNATURE="931772810F52D16105BB76E5DADAD6A9" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
   <SOURCE>`
 *---------------------------------------------------------------------*
-* Report  YGPL_INDEXES_CHECK
+* Report  YGPL_DBA_INDEXES_CHECK
 *---------------------------------------------------------------------*
 
-REPORT  ygpl_indexes_check LINE-SIZE 256.
+REPORT  ygpl_dba_indexes_check LINE-SIZE 256.
 
 TABLES: tadir, tdevc.
 TYPE-POOLS: abap, icon.
@@ -16,7 +16,6 @@ TYPE-POOLS: abap, icon.
 SELECT-OPTIONS:
   s_srcs FOR tadir-srcsystem  DEFAULT sy-sysid,
   s_soft FOR tdevc-dlvunit,
-*  s_type FOR tadir-object,
   s_name FOR tadir-obj_name,
   s_pack FOR tadir-devclass.
 PARAMETERS:
@@ -27,12 +26,9 @@ SELECT-OPTIONS:
 PARAMETERS:
   p_size TYPE ygpl_dba_table_size.
 
-DATA r_type     TYPE ygpl_tadir_search=&gt;tr_comptype.
 DATA o_obj_size TYPE ygpl_dba_interfaces=&gt;ti_object_size.
 
 INITIALIZATION.
-  PERFORM init_typerange IN PROGRAM ygpl_dba_cockpit
-          CHANGING r_type.
   PERFORM set_default_object_size IN PROGRAM ygpl_dba_cockpit
           CHANGING p_size o_obj_size.
 
@@ -117,7 +113,7 @@ END-OF-SELECTION.
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
   ENDIF.</SOURCE>
   <TEXTS>
-   <ITEM LANGU="E">
+   <ITEM LANGU="E" SHORT_TXT="Control Mandant-Table has only Mandant-Indexes V0.0">
     <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
 ASCheck that tables with a client field as part of the primary key also
   have this client field in every indexes of the table.
@@ -153,21 +149,14 @@ AS</LONG_TXT>
    </ITEM>
   </TEXTS>
   <TEXTSPOOL>
-   <ITEM ID="I" KEY="CPL">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="Liste des composants" LENGTH="125 "/>
-    </TEXTS>
-   </ITEM>
    <ITEM ID="R">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="Control Mandant-Table has only Mandant-Indexes V0.0" LENGTH="51 "/>
-     <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_EXT">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Extend to sub-packages" LENGTH="30 "/>
-     <ITEM LANGU="F" ENTRY="        Etendre aux sous-packages" LENGTH="33 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_SIZE">
@@ -178,36 +167,26 @@ AS</LONG_TXT>
    <ITEM ID="S" KEY="S_AUTHOR">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="26 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_NAME">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Table Name" LENGTH="19 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_PACK">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="15 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="15 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_SOFT">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="26 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_SRCS">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="23 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="23 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_TYPE">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
   </TEXTSPOOL>

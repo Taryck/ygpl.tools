@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5AF9D2AEF6460E68C0012EAA9329C70F" CODE_SIGNATURE="95B1E3B7AF8A58AB9432DFEC0741FF3A" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="7B77978610CBB1DA7D055F89F4247271" CODE_SIGNATURE="E58ACEC36E877AD0D6FB6BE74A8281AE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
   <SOURCE>`
 *---------------------------------------------------------------------*
-* Report  YGPL_INDEXES_CHECK
+* Report  YGPL_DBA_TABLES_CHECK
 *---------------------------------------------------------------------*
 
-REPORT  ygpl_indexes_check LINE-SIZE 256.
+REPORT  ygpl_dba_tables_check LINE-SIZE 256.
 
 TABLES: tadir, tdevc.
 TYPE-POOLS: abap, icon.
@@ -16,7 +16,6 @@ TYPE-POOLS: abap, icon.
 SELECT-OPTIONS:
   s_srcs FOR tadir-srcsystem  DEFAULT sy-sysid,
   s_soft FOR tdevc-dlvunit,
-*  s_type FOR tadir-object,
   s_name FOR tadir-obj_name,
   s_pack FOR tadir-devclass.
 PARAMETERS:
@@ -27,43 +26,34 @@ SELECT-OPTIONS:
 PARAMETERS:
   p_size TYPE ygpl_dba_table_size.
 
-DATA r_type     TYPE ygpl_tadir_search=&gt;tr_comptype.
 DATA o_obj_size TYPE ygpl_dba_interfaces=&gt;ti_object_size.
 
 INITIALIZATION.
-  PERFORM init_typerange IN PROGRAM ygpl_dba_cockpit
-          CHANGING r_type.
   PERFORM set_default_object_size IN PROGRAM ygpl_dba_cockpit
           CHANGING p_size o_obj_size.
 
 START-OF-SELECTION.
-  DATA t_list         TYPE ygpl_tadir_search=&gt;tt_compkeys.
-  DATA d_table_name   TYPE ygplidba_tables_size=&gt;td_table_name.
-  DATA d_table_size   TYPE ygplidba_tables_size=&gt;td_size.
-  DATA o_check        TYPE REF TO ygpl_check_indexes.
-  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF t_list.
-  DATA r_size_filter  TYPE ygplidba_tables_size=&gt;tr_size.
+  DATA o_list         TYPE ygpl_dba_interfaces=&gt;ti_table_list.
+  DATA o_check        TYPE ygpl_dba_interfaces=&gt;ti_check_table.
 
-  d_table_size = p_size * 1024.   &quot; Mo =&gt; Ko
-  r_size_filter = o_obj_size-&gt;create_filter_from_lower_limit( d_table_size ).
+  PERFORM create_list IN PROGRAM ygpl_dba_cockpit
+          USING s_srcs[] s_soft[] s_name[] s_pack[] s_author[] p_ext p_size
+          CHANGING o_list.
 
-  t_list = ygpl_tadir_search=&gt;get_keys_from_tadir(          &quot; Issue 1
-                      srcsystem  = s_srcs[]
-                      softcomp   = s_soft[]
-                      type       = r_type
-                      name       = s_name[]
-                      packages   = s_pack[]
-                      ext        = p_ext
-                      author     = s_author[] ).
+  o_check = ygpl_dba_factories=&gt;create_check_table( ).
+  o_check-&gt;set_list( o_list ).
+  o_check-&gt;do_check( ).
 
-  CREATE OBJECT o_check
-    EXPORTING
-      comp_list     = t_list
-      r_size_filter = r_size_filter.
+  PERFORM display_result USING o_check.
 
 END-OF-SELECTION.
-  DATA t_data TYPE ygpl_check_indexes=&gt;tt_indexes_check_log.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DISPLAY_RESULT
+*&amp;---------------------------------------------------------------------*
+FORM display_result  USING    o_check   TYPE ygpl_dba_interfaces=&gt;ti_check_table.
+  DATA t_data TYPE ygpl_check_tables=&gt;tt_tables_check_log.
   t_data = o_check-&gt;check_log.
+  SORT t_data BY namespace appl_component devclass table_name subindex_name index_name.
   CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
     EXPORTING
 *     I_INTERFACE_CHECK                 = &apos; &apos;
@@ -75,7 +65,7 @@ END-OF-SELECTION.
 *     I_CALLBACK_TOP_OF_PAGE            = &apos; &apos;
 *     I_CALLBACK_HTML_TOP_OF_PAGE       = &apos; &apos;
 *     I_CALLBACK_HTML_END_OF_LIST       = &apos; &apos;
-      i_structure_name                  = &apos;YGPL_INDEXES_CHECK_RESULT&apos;
+      i_structure_name                  = &apos;YGPL_TABLES_CHECK_RESULT&apos;
 *     I_BACKGROUND_ID                   = &apos; &apos;
 *     I_GRID_TITLE                      =
 *     I_GRID_SETTINGS                   =
@@ -115,12 +105,16 @@ END-OF-SELECTION.
   IF sy-subrc &lt;&gt; 0.
     MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-  ENDIF.</SOURCE>
+  ENDIF.
+
+ENDFORM.                    &quot; DISPLAY_RESULT</SOURCE>
   <TEXTS>
    <ITEM LANGU="E">
     <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
-ASCheck that tables with a client field as part of the primary key also
-  have this client field in every indexes of the table.
+ASCheck the selected tables. This action is exactly the same as the &quot;check
+  button&quot; on table display in transaction SE11.
+ASOnly messages like &quot;Index &amp;-&amp; completely contains the fields of index
+  &lt;(&gt;&amp;&lt;)&gt;&quot; are returned.
 U1&amp;INTEGRATION&amp;
 AS
 U1&amp;PREREQUISITES&amp;
@@ -134,22 +128,14 @@ AS
 U2&amp;OUTPUT&amp;
 AS
 U1&amp;ACTIVITIES&amp;
-ASTables with a client field as part of the primary key should always have
-  this client field in each index. Sometime this field is forgotten. This
-  should not have a large impact on productive system with only one client
-  (see transaction SCC4), but could have an important impact on system
-  with 5 clients or more.
-ASTo prevent from having any trouble please fix the index =&gt; add the
-  client flied in the index :
-B1If this index is a SAP one, please search for an existing SAP notes with
-  corrections for this index and/or open an OSS message to ask for a SAP
-  note with correction on this index. We suggested to do not make change
-  yourself as a reparation request because this will cause small trouble
-  on system upgrades
-B1If this index is a customer one, please fix this issue by add the client
-  field.
+ASYou should adapt or delete the index (the one that completely contains
+  the fields of an other index).
+B1If this index is a SAP one, please search for notes and/or open an OSS
+  message to get instructions.
+B1If this index is a customer one, please fix this issue by removing the
+  index.
 U1&amp;EXAMPLE&amp;
-AS</LONG_TXT>
+ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT>
    </ITEM>
   </TEXTS>
   <TEXTSPOOL>
@@ -160,7 +146,7 @@ AS</LONG_TXT>
    </ITEM>
    <ITEM ID="R">
     <TEXTS>
-     <ITEM LANGU="E" ENTRY="Control Mandant-Table has only Mandant-Indexes V0.0" LENGTH="51 "/>
+     <ITEM LANGU="E" ENTRY="Control Table Indexes V0.0" LENGTH="26 "/>
      <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
     </TEXTS>
    </ITEM>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="606992F37505F492DECD3A8E9F013231" CODE_SIGNATURE="4332B3A69EAD567BF5B71B0DCCD8693A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DEVC_SEARCH" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2A254E961BB70A279EBF319924659CF8" CODE_SIGNATURE="7220BFA8B51CA7C01A73CAD4ABC51494" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DEVC_SEARCH" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
@@ -22,6 +22,9 @@ AS</ITEM>
    <ITEM CMPNAME="TR_SOFTCOMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TR_SOFTCOMP"/>
    <ITEM CMPNAME="TS_DEVC_INFORMATION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TS_DEVC_INFORMATION"/>
   </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="PACKAGE_INFOS" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_PACKAGE_INFO"/>
+  </ATTRIBUTS>
   <FRIENDS>
    <ITEM REFCLSNAME="YGPL_TADIR_SEARCH" STATE="1"/>
   </FRIENDS>
@@ -135,14 +138,21 @@ AS</ITEM>
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  CHECK package IS NOT INITIAL.
+  DATA s_data         LIKE LINE OF package_infos.
+  FIELD-SYMBOLS: &lt;i&gt;  LIKE LINE OF package_infos.
 
-  SELECT SINGLE p~as4user p~pdevclass p~dlvunit s~ps_posid p~namespace
-    INTO result
-    FROM tdevc AS p
-    INNER JOIN df14l AS s ON s~fctr_id = p~component
-                         AND s~as4local = &apos;A&apos;   &quot; Active
-    WHERE devclass = package.</SOURCE>
+  READ TABLE package_infos ASSIGNING &lt;i&gt;
+       WITH TABLE KEY package = package.
+  IF sy-subrc = 0.
+    result = &lt;i&gt;-info.
+    EXIT.
+  ENDIF.
+  s_data-package = package.
+  s_data-info = _get_package_information( package ).
+  INSERT s_data INTO TABLE package_infos.
+  ASSERT sy-subrc = 0.
+
+  result = s_data-info.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_SUB_PACKAGES" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -233,6 +243,32 @@ AS</ITEM>
 
   APPEND LINES OF r_exclu TO result.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="_GET_PACKAGE_INFORMATION" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get package information"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PACKAGE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PACKAGE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_DEVC_INFORMATION">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Package Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CHECK package IS NOT INITIAL.
+
+  SELECT SINGLE p~as4user p~pdevclass p~dlvunit s~ps_posid p~namespace
+    INTO result
+    FROM tdevc AS p
+    INNER JOIN df14l AS s ON s~fctr_id = p~component
+                         AND s~as4local = &apos;A&apos;   &quot; Active
+    WHERE devclass = package.</SOURCE>
+   </ITEM>
   </METHODS>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
@@ -240,7 +276,14 @@ AS</ITEM>
    <ITEM TYPEGROUP="SWBM" EXPLICIT="X"/>
   </TYPEGROUPS>
   <TYPES>
-   <ITEM CMPNAME="TT_PACK" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_pack TYPE STANDARD TABLE OF tdevc-devclass with DEFAULT KEY
+   <ITEM CMPNAME="TS_PACKAGE_INFO" EXPOSURE="1" STATE="1" EDITORDER="2 " TYPTYPE="4">BEGIN OF ts_package_info,
+          package       TYPE string,      &quot; td_table_name, For memory consoption
+          info          TYPE ts_devc_information,
+        END OF ts_package_info
+`</ITEM>
+   <ITEM CMPNAME="TT_PACK" EXPOSURE="1" STATE="1" EDITORDER="1 " TYPTYPE="4">tt_pack TYPE STANDARD TABLE OF tdevc-devclass WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_PACKAGE_INFO" EXPOSURE="1" STATE="1" EDITORDER="3 " TYPTYPE="4">tt_package_info TYPE SORTED TABLE OF ts_package_info WITH UNIQUE KEY package
 `</ITEM>
   </TYPES>
  </RAW>

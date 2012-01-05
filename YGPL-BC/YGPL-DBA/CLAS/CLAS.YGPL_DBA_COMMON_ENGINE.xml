@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="41BCC40D969BE9DE8B47C25A5762E2F2" CODE_SIGNATURE="770795F4B3511903E3ADF8A2E4636045" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COMMON_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6AA07E38FCFF3C39AB7EFF4BB96D8C6D" CODE_SIGNATURE="4944DF7E1B9E384020643415B4C126FB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COMMON_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_DEVC_SEARCH"/>
   <ITEM TYPE="CLAS" NAME="YGPL_DS_ENGINE"/>
@@ -40,7 +40,7 @@ AS</ITEM>
      <ITEM LANG="E" TEXT="Cache validity Time (in sec) of cache : 2 heures"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="INDEXES_TADIR_INFO" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_INDEX_TADIR_INFO"/>
+   <ITEM CMPNAME="INDEXES_INFOS" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_INDEX_INFO"/>
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
@@ -114,10 +114,10 @@ AS</ITEM>
      </ITEM>
      <ITEM MTDNAME="GET_INDEX_INFORMATION">
       <SOURCE>`
-  DATA s_data       LIKE LINE OF indexes_tadir_info.
-  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF indexes_tadir_info.
+  DATA s_data         LIKE LINE OF indexes_infos.
+  FIELD-SYMBOLS: &lt;i&gt;  LIKE LINE OF indexes_infos.
 
-  READ TABLE indexes_tadir_info ASSIGNING &lt;i&gt;
+  READ TABLE indexes_infos ASSIGNING &lt;i&gt;
        WITH TABLE KEY table_name = table_name
                       index_name = index_name.
   IF sy-subrc = 0.
@@ -137,7 +137,7 @@ AS</ITEM>
   IF s_data-info IS INITIAL.
     s_data-info = ygplidba_tables_size~get_table_information( table_name = table_name ).
   ENDIF.
-  INSERT s_data INTO TABLE indexes_tadir_info.
+  INSERT s_data INTO TABLE indexes_infos.
   ASSERT sy-subrc = 0.
 
   result = s_data-info.</SOURCE>
@@ -326,23 +326,23 @@ AS</ITEM>
       indexes   type tt_table_size,
     end of ts_cache
 `</ITEM>
-   <ITEM CMPNAME="TS_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">BEGIN OF ts_index_tadir_info,
-          table_name    TYPE string,      &quot; td_table_name,
-          index_name    TYPE td_index_name,
-          info          TYPE ygpl_tadir_search=&gt;ts_tadir_information,
-        END OF ts_index_tadir_info
+   <ITEM CMPNAME="TS_INDEX_INFO" EXPOSURE="2" STATE="1" EDITORDER="6 " TYPTYPE="4">BEGIN OF ts_index_info,
+            table_name    TYPE string,      &quot; td_table_name,
+            index_name    TYPE td_index_name,
+            info          TYPE ts_object_information,
+          END OF ts_index_info
 `</ITEM>
    <ITEM CMPNAME="TS_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="9 " TYPTYPE="4">BEGIN OF ts_table_size,
-          table_name    TYPE string,      &quot; td_table_name,
-          size          TYPE td_size,
-        END OF ts_table_size
+            table_name    TYPE string,      &quot; td_table_name,
+            size          TYPE td_size,
+          END OF ts_table_size
 `</ITEM>
    <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPL_TADIR_SEARCH=&gt;TT_COMPKEYS">
     <TEXTS>
      <ITEM LANG="E" TEXT="List of component keys"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_INDEX_TADIR_INFO" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">tt_index_tadir_info TYPE SORTED TABLE OF ts_index_tadir_info WITH UNIQUE KEY table_name index_name
+   <ITEM CMPNAME="TT_INDEX_INFO" EXPOSURE="2" STATE="1" EDITORDER="7 " TYPTYPE="4">tt_index_info TYPE SORTED TABLE OF ts_index_info WITH UNIQUE KEY table_name index_name
 `</ITEM>
    <ITEM CMPNAME="TT_TABLE_SIZE" EXPOSURE="2" STATE="1" EDITORDER="10 " TYPTYPE="4">tt_table_size TYPE HASHED TABLE OF ts_table_size WITH UNIQUE KEY table_name
 `</ITEM>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="738C0868D27755BE726D60CAD7C9CEDC" CODE_SIGNATURE="F12E6094A41FEBFA7627308CA723AE2E" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_INDEXES_STATISTICS_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="77E38EA4FE8EC96E73067ABAD8AEBE4E" CODE_SIGNATURE="0C37B73E7CE4E2BEE62203351002E495" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK_W_STATS" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
   <SOURCE>`
 *---------------------------------------------------------------------*
-* Report  YGPL_TABLES_CHECK
+* Report  YGPL_DBA_TABLES_CHECK_W_STATS
 *---------------------------------------------------------------------*
 
-REPORT  ygpl_indexes_statistics_check LINE-SIZE 256.
+REPORT  ygpl_dba_tables_check_w_stats LINE-SIZE 256.
 
 TABLES: tadir, tdevc.
 TYPE-POOLS: abap, icon.
@@ -51,15 +51,22 @@ START-OF-SELECTION.
 END-OF-SELECTION.</SOURCE>
   <TEXTS>
    <ITEM LANGU="E">
-    <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
-ASCheck the selected tables. This action is exactly the same as the &quot;check
-  button&quot; on table display in transaction SE11.
-ASOnly messages like &quot;Index &amp;-&amp; completely contains the fields of index
-  &lt;(&gt;&amp;&lt;)&gt;&quot; are returned.
+    <LONG_TXT TDFRELES="701" TDLRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+ASCheck the selected tables. This action is the same as the &quot;check button&quot;
+  on table display in transaction SE11.
+ASOnly messages like &quot;Index &amp;-&amp; completely contains the fields of index &amp;&quot;
+  are returned.
+ASBefore comparing indexes, index&apos;s fields that only have one possible
+  value are removed from index definition before calling check function.
+  Indexes that do not have common fields list might be reported as because
+  field that make the difference is useless because has only one distinct
+  value.
 U1&amp;INTEGRATION&amp;
-AS
+ASDo not make any action on table or index.
 U1&amp;PREREQUISITES&amp;
-AS
+ASThis analyze must be done ONLY in productive SAP system.
+ASThis analyze must be compared with the standard table check in SE11.
+  Only &quot;new indexes&quot; that are not listed in SE11 should be investigated.
 U1&amp;FEATURES&amp;
 AS
 U2&amp;SELECTION&amp;
@@ -71,12 +78,12 @@ AS
 U1&amp;ACTIVITIES&amp;
 ASYou should adapt or delete the index (the one that completely contains
   the fields of an other index).
-B1If this index is a SAP one, please search for notes and/or open an OSS
-  message to get instructions.
+B1If this index is a SAP one, please considerer deleting this index
+  because useless in your system.
 B1If this index is a customer one, please fix this issue by removing the
-  index.
+  index or adapting it.
 U1&amp;EXAMPLE&amp;
-ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT>
+AS</LONG_TXT>
    </ITEM>
   </TEXTS>
   <TEXTSPOOL>

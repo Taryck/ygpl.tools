@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="974A7AE39F4A08BEF696CA5061D5CBF8" CODE_SIGNATURE="9DA96FCAC90DA0971C212039E2CD5F49" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLIDBA_TABLE_LIST" TYPE="INTF" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Table list">U1&amp;FUNCTIONALITY&amp;
+ASAllow to activate (compile) a components.
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+AS
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TD_SIZE"/>
+   <ITEM CMPNAME="TR_SIZE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TR_SIZE"/>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_DBA_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="COMPONENTS" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_DBA_TYPESPOOL" STATE="1"/>
+  </INTERFACES>
+  <METHODS>
+   <ITEM CMPNAME="ADD_COMPONENTS" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add components to list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="COMPONENTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS" PAROPTIONL="X"/>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="RESET" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Reset components list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SEARCH_ADD_COMPONENTS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Search and Add components to list"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CRITERIA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="S_TADIR_SEARCH"/>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="SET_LOWER_SIZE_LIMIT" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create size filter with lower limit"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TR_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Range of Size in KO"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SIZE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_SIZE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="lower limite Size in Ko"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="S_TADIR_SEARCH" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="4">BEGIN OF s_tadir_search,
+      r_srcs         TYPE ygpl_tadir_search=&gt;tr_srcsystem,
+      r_soft         TYPE ygpl_tadir_search=&gt;tr_softcomp,
+*      r_type         TYPE ygpl_tadir_search=&gt;TR_COMPTYPE,    &quot; Only tables
+      r_name         TYPE ygpl_tadir_search=&gt;tr_compname,
+      r_pack         TYPE ygpl_tadir_search=&gt;tr_packages,
+      r_author       TYPE ygpl_tadir_search=&gt;tr_author,
+      p_ext          TYPE abap_bool,
+    END OF s_tadir_search
+`</ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

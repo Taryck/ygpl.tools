@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="2FE76B87D3806A3F2014A665FE4AB5F0" CODE_SIGNATURE="2B8E5874352FA72DF72B93DFD5D28BB8" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="DDEB189A878E76E51E7DB0722A3DD816" CODE_SIGNATURE="4033BE2C262431FE48C87FF6E079880E" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="M" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -81,12 +81,52 @@ MODULE user_command_0100 INPUT.
 ENDMODULE.                 &quot; USER_COMMAND_0100  INPUT
 
 *&amp;---------------------------------------------------------------------*
-*&amp;      Form  at_user_command
+*&amp;      Form  Set_Default_object_size
 *&amp;---------------------------------------------------------------------*
 *       text
 *----------------------------------------------------------------------*
-*      --&gt;FCODE      text
-*----------------------------------------------------------------------*
+FORM set_default_object_size CHANGING p_size      TYPE ygpl_dba_table_size
+                                      o_obj_size  TYPE ygpl_dba_interfaces=&gt;ti_object_size.
+  DATA d_size TYPE ygplidba_tables_size=&gt;td_size.
+  IF o_obj_size IS NOT BOUND.
+    o_obj_size = ygpl_dba_factories=&gt;get_object_size( ).
+  ENDIF.
+
+  d_size = o_obj_size-&gt;db_size / 1024.    &quot; DB Size (ko) =&gt; (Mo)
+  d_size = d_size / 1000.                       &quot; 0,1% of db_size
+  p_size = d_size * 1000.                       &quot; 3 decimals
+ENDFORM.                    &quot;Set_Default_object_size
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_LIST
+*&amp;---------------------------------------------------------------------*
+FORM create_list  USING    r_srcs         TYPE ygpl_tadir_search=&gt;tr_srcsystem
+                           r_soft         TYPE ygpl_tadir_search=&gt;tr_softcomp
+                           r_name         TYPE ygpl_tadir_search=&gt;tr_compname
+                           r_pack         TYPE ygpl_tadir_search=&gt;tr_packages
+                           r_author       TYPE ygpl_tadir_search=&gt;tr_author
+                           p_ext          TYPE abap_bool
+                           p_size         TYPE ygpl_dba_table_size
+                  CHANGING o_list         TYPE ygpl_dba_interfaces=&gt;ti_table_list.
+
+  DATA d_table_size   TYPE ygpl_dba_typespool=&gt;td_size.
+  DATA s_search_crit  TYPE ygplidba_table_list=&gt;s_tadir_search.
+
+  d_table_size = p_size * 1024.   &quot; Mo =&gt; Ko
+  o_list = ygpl_dba_factories=&gt;create_table_list( ).
+  o_list-&gt;set_lower_size_limit( d_table_size ).
+  s_search_crit-r_srcs = r_srcs.
+  s_search_crit-r_soft = r_soft.
+  s_search_crit-r_name = r_name.
+  s_search_crit-r_pack = r_pack.
+  s_search_crit-r_author = r_author.
+  s_search_crit-p_ext = p_ext.
+  o_list-&gt;search_add_components( s_search_crit ).
+ENDFORM.                    &quot; CREATE_LIST
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  at_user_command
+*&amp;---------------------------------------------------------------------*
 FORM at_user_command USING fcode.
   CASE fcode.
 * Table group box
