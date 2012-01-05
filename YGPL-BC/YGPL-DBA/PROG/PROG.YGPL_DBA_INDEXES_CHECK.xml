@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="32F0BFFB499144793836057F3257BA17" CODE_SIGNATURE="931772810F52D16105BB76E5DADAD6A9" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="558430C500430FC440EAB4CA7D0465D4" CODE_SIGNATURE="1D4672E150FFBE98541C7531823D570E" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -33,33 +33,27 @@ INITIALIZATION.
           CHANGING p_size o_obj_size.
 
 START-OF-SELECTION.
-  DATA t_list         TYPE ygpl_tadir_search=&gt;tt_compkeys.
-  DATA d_table_name   TYPE ygplidba_tables_size=&gt;td_table_name.
-  DATA d_table_size   TYPE ygplidba_tables_size=&gt;td_size.
-  DATA o_check        TYPE REF TO ygpl_check_indexes.
-  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF t_list.
-  DATA r_size_filter  TYPE ygplidba_tables_size=&gt;tr_size.
+  DATA o_list         TYPE ygpl_dba_interfaces=&gt;ti_table_list.
+  DATA o_check        TYPE ygpl_dba_interfaces=&gt;ti_check_indexes.
 
-  d_table_size = p_size * 1024.   &quot; Mo =&gt; Ko
-  r_size_filter = o_obj_size-&gt;create_filter_from_lower_limit( d_table_size ).
+  PERFORM create_list IN PROGRAM ygpl_dba_cockpit
+          USING s_srcs[] s_soft[] s_name[] s_pack[] s_author[] p_ext p_size
+          CHANGING o_list.
 
-  t_list = ygpl_tadir_search=&gt;get_keys_from_tadir(          &quot; Issue 1
-                      srcsystem  = s_srcs[]
-                      softcomp   = s_soft[]
-                      type       = r_type
-                      name       = s_name[]
-                      packages   = s_pack[]
-                      ext        = p_ext
-                      author     = s_author[] ).
+  o_check = ygpl_dba_factories=&gt;create_check_indexes( ).
+  o_check-&gt;set_list( o_list ).
+  o_check-&gt;do_check( ).
 
-  CREATE OBJECT o_check
-    EXPORTING
-      comp_list     = t_list
-      r_size_filter = r_size_filter.
+  PERFORM display_result USING o_check.
 
 END-OF-SELECTION.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DISPLAY_RESULT
+*&amp;---------------------------------------------------------------------*
+form DISPLAY_RESULT  using    o_check TYPE ygpl_dba_interfaces=&gt;ti_check_indexes.
   DATA t_data TYPE ygpl_check_indexes=&gt;tt_indexes_check_log.
   t_data = o_check-&gt;check_log.
+  sort t_data by namespace appl_component devclass tabname indexname.
   CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
     EXPORTING
 *     I_INTERFACE_CHECK                 = &apos; &apos;
@@ -111,9 +105,11 @@ END-OF-SELECTION.
   IF sy-subrc &lt;&gt; 0.
     MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-  ENDIF.</SOURCE>
+  ENDIF.
+
+endform.                    &quot; DISPLAY_RESULT</SOURCE>
   <TEXTS>
-   <ITEM LANGU="E" SHORT_TXT="Control Mandant-Table has only Mandant-Indexes V0.0">
+   <ITEM LANGU="E">
     <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
 ASCheck that tables with a client field as part of the primary key also
   have this client field in every indexes of the table.
@@ -149,14 +145,21 @@ AS</LONG_TXT>
    </ITEM>
   </TEXTS>
   <TEXTSPOOL>
+   <ITEM ID="I" KEY="CPL">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="Liste des composants" LENGTH="125 "/>
+    </TEXTS>
+   </ITEM>
    <ITEM ID="R">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="Control Mandant-Table has only Mandant-Indexes V0.0" LENGTH="51 "/>
+     <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_EXT">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Extend to sub-packages" LENGTH="30 "/>
+     <ITEM LANGU="F" ENTRY="        Etendre aux sous-packages" LENGTH="33 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_SIZE">
@@ -167,26 +170,36 @@ AS</LONG_TXT>
    <ITEM ID="S" KEY="S_AUTHOR">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="26 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_NAME">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Table Name" LENGTH="19 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_PACK">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="15 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="15 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_SOFT">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="26 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_SRCS">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="23 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="23 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="S_TYPE">
+    <TEXTS>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
   </TEXTSPOOL>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="DDEB189A878E76E51E7DB0722A3DD816" CODE_SIGNATURE="4033BE2C262431FE48C87FF6E079880E" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="53CAB46A90A005110EF957B5EE059247" CODE_SIGNATURE="41E32295AA23C65C2257786E34BEC0F5" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="M" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -24,6 +24,16 @@ PROCESS AFTER INPUT.
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="IDX_01_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="009" COLUMN="057" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="I_MANDANT_NFO" FORMAT="CHAR" REQU_ENTRY="N">
+        <TEXTS>
+         <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
+        </TEXTS>
+       </ITEM>
+       <ITEM TYPE="PUSH" NAME="IDX_02" TEXT="Check_Table&apos;s_Indexes_____________________________" ICON_NAME="ICON_CHECK" WITH_ICON="X" LINE="009" COLUMN="073" LENGTH="055" VISLENGTH="050" HEIGHT="001" PUSH_FCODE="I_CHECK" FORMAT="CHAR" REQU_ENTRY="N">
+        <TEXTS>
+         <ITEM LANGU="E" SHORT_TXT="@38@ Check Table&apos;s Indexes"/>
+        </TEXTS>
+       </ITEM>
+       <ITEM TYPE="PUSH" NAME="IDX_02_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="009" COLUMN="125" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="I_CHECK_NFO" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
         </TEXTS>
@@ -85,7 +95,7 @@ ENDMODULE.                 &quot; USER_COMMAND_0100  INPUT
 *&amp;---------------------------------------------------------------------*
 *       text
 *----------------------------------------------------------------------*
-FORM set_default_object_size CHANGING p_size      TYPE ygpl_dba_table_size
+FORM set_default_object_size CHANGING p_size      TYPE ygpl_dba_typespool=&gt;td_size
                                       o_obj_size  TYPE ygpl_dba_interfaces=&gt;ti_object_size.
   DATA d_size TYPE ygplidba_tables_size=&gt;td_size.
   IF o_obj_size IS NOT BOUND.
@@ -131,18 +141,22 @@ FORM at_user_command USING fcode.
   CASE fcode.
 * Table group box
     WHEN &apos;T_SIZE&apos;.
-      SUBMIT ygpl_tables_size VIA SELECTION-SCREEN AND RETURN.
+      SUBMIT ygpl_dba_tables_size VIA SELECTION-SCREEN AND RETURN.
     WHEN &apos;T_SIZE_NFO&apos;.
-      PERFORM display_help USING &apos;YGPL_TABLES_SIZE&apos;.
+      PERFORM display_help USING &apos;YGPL_DBA_TABLES_SIZE&apos;.
     WHEN &apos;T_CHECK&apos;.
-      SUBMIT ygpl_tables_check VIA SELECTION-SCREEN AND RETURN.
+      SUBMIT ygpl_DBA_tables_check VIA SELECTION-SCREEN AND RETURN.
     WHEN &apos;T_CHECK_NFO&apos;.
-      PERFORM display_help USING &apos;YGPL_TABLES_CHECK&apos;.
+      PERFORM display_help USING &apos;YGPL_DBA_TABLES_CHECK&apos;.
 * Indexes group box
     WHEN &apos;I_MANDANT&apos;.
-      SUBMIT ygpl_indexes_check VIA SELECTION-SCREEN AND RETURN.
+      SUBMIT ygpl_DBA_indexes_check VIA SELECTION-SCREEN AND RETURN.
     WHEN &apos;I_MANDANT_NFO&apos;.
-      PERFORM display_help USING &apos;YGPL_INDEXES_CHECK&apos;.
+      PERFORM display_help USING &apos;YGPL_DBA_INDEXES_CHECK&apos;.
+    WHEN &apos;I_CHECK&apos;.
+      SUBMIT ygpl_DBA_tables_check_W_STATS VIA SELECTION-SCREEN AND RETURN.
+    WHEN &apos;I_CHECK_NFO&apos;.
+      PERFORM display_help USING &apos;YGPL_DBA_TABLES_CHECK_W_STATS&apos;.
   ENDCASE.
 ENDFORM.                    &quot;at_user_command
 *&amp;---------------------------------------------------------------------*
