@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5CD1E1BFB5C67C751A727C9DAF150323" CODE_SIGNATURE="D1E600C4B7F8BAD79708ED307570DC11" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="1738A5C7F84DF246A713F3C7DBDBE718" CODE_SIGNATURE="D1E600C4B7F8BAD79708ED307570DC11" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_COCKPIT" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="M" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -7,6 +7,7 @@
    <ITEM SCREEN="0100" LANGUAGE="E" DESCRIPT="DBA Cockpit Menu" TYPE="N" NEXTSCREEN="0100" LINES="012" COLUMNS="136">
     <TEXTS>
      <ITEM LANG="E" DTXT="DBA Cockpit Menu"/>
+     <ITEM LANG="F" DTXT="Menu du Cockpit DBA"/>
     </TEXTS>
     <FLOW_LOGIC>`
 PROCESS BEFORE OUTPUT.
@@ -21,51 +22,61 @@ PROCESS AFTER INPUT.
        <ITEM TYPE="PUSH" NAME="IDX_01" TEXT="Check_Index_for_mandant___________________________" ICON_NAME="ICON_FOREIGN_KEY" WITH_ICON="X" LINE="009" COLUMN="005" LENGTH="055" VISLENGTH="050" HEIGHT="001" PUSH_FCODE="I_MANDANT" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@3V@ Check Index for mandant"/>
+         <ITEM LANGU="F" SHORT_TXT="@3V@ Controle des mandant dans les indexes"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="IDX_01_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="009" COLUMN="057" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="I_MANDANT_NFO" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
+         <ITEM LANGU="F" SHORT_TXT="@0S@ Info"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="IDX_02" TEXT="Check_Table&apos;s_Indexes_using_statistics_________" ICON_NAME="ICON_CHECK" WITH_ICON="X" LINE="009" COLUMN="073" LENGTH="052" VISLENGTH="050" HEIGHT="001" PUSH_FCODE="I_CHECK" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@38@ Check Table&apos;s Indexes using statistics"/>
+         <ITEM LANGU="F" SHORT_TXT="@38@ Ctrl des tables en utilisant les statistiques"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="IDX_02_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="009" COLUMN="125" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="I_CHECK_NFO" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
+         <ITEM LANGU="F" SHORT_TXT="@0S@ Info"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="FRAME" NAME="INDEXES" TEXT="Indexes_____________________________________________________________________________________________________________________________" LINE="007" COLUMN="002" LENGTH="134" VISLENGTH="134" HEIGHT="005" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="Indexes"/>
+         <ITEM LANGU="F" SHORT_TXT="Indexes"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="FRAME" NAME="TABLES" TEXT="Tables______________________________________________________________________________________________________________________________" LINE="001" COLUMN="002" LENGTH="134" VISLENGTH="134" HEIGHT="005" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="Tables"/>
+         <ITEM LANGU="F" SHORT_TXT="Tables"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="TBL_01" TEXT="Table_Size_(including_Indexes_&amp;_BLOB)_____________" ICON_NAME="ICON_PERIOD" WITH_ICON="X" LINE="003" COLUMN="005" LENGTH="055" VISLENGTH="050" HEIGHT="001" PUSH_FCODE="T_SIZE" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@58@ Table Size (including Indexes &amp; BLOB)"/>
+         <ITEM LANGU="F" SHORT_TXT="@58@ Taille des tables (incluant Indexes &amp; BLOB)"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="TBL_01_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="003" COLUMN="057" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="T_SIZE_NFO" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
+         <ITEM LANGU="F" SHORT_TXT="@0S@ Info"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="TBL_02" TEXT="Check_Table&apos;s_Indexes_____________________________" ICON_NAME="ICON_CHECK" WITH_ICON="X" LINE="003" COLUMN="073" LENGTH="055" VISLENGTH="050" HEIGHT="001" PUSH_FCODE="T_CHECK" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@38@ Check Table&apos;s Indexes"/>
+         <ITEM LANGU="F" SHORT_TXT="@38@ Controle des indexes des tables"/>
         </TEXTS>
        </ITEM>
        <ITEM TYPE="PUSH" NAME="TBL_02_NFO" TEXT="Info_" ICON_NAME="ICON_INFORMATION" WITH_ICON="X" LINE="003" COLUMN="125" LENGTH="010" VISLENGTH="008" HEIGHT="001" PUSH_FCODE="T_CHECK_NFO" FORMAT="CHAR" REQU_ENTRY="N">
         <TEXTS>
          <ITEM LANGU="E" SHORT_TXT="@0S@ Info"/>
+         <ITEM LANGU="F" SHORT_TXT="@0S@ Info"/>
         </TEXTS>
        </ITEM>
       </FIELDS>
@@ -78,16 +89,19 @@ PROCESS AFTER INPUT.
     <ITEM CODE="BACK" TEXTNO="001" TEXT_TYPE="S">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Back"/>
+      <ITEM LANGU="F" TEXT="Retour"/>
      </TEXTS>
     </ITEM>
     <ITEM CODE="EXIT" TEXTNO="001" TEXT_TYPE="S" TEXT_NAME="ICON_CANCEL" ICON_ID="@0W@">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Cancel"/>
+      <ITEM LANGU="F" TEXT="Annule"/>
      </TEXTS>
     </ITEM>
     <ITEM CODE="STOP" TEXTNO="001" TEXT_TYPE="S" TEXT_NAME="ICON_CANCEL" ICON_ID="@0W@">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Cancel"/>
+      <ITEM LANGU="F" TEXT="Annule"/>
      </TEXTS>
     </ITEM>
    </FUNCTIONS>
@@ -95,6 +109,7 @@ PROCESS AFTER INPUT.
     <ITEM OBJ_CODE="000001" MODAL="D">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Default Status Screen 0100"/>
+      <ITEM LANGU="F" TEXT="Status par défaut pour écran 0100"/>
      </TEXTS>
      <KEYS>
       <ITEM PFNO="03" FUNCODE="BACK" FUNNO="001"/>
@@ -104,6 +119,7 @@ PROCESS AFTER INPUT.
       <ITEM SUB_CODE="0001" MODAL="D">
        <TEXTS>
         <ITEM LANGU="E" TEXT="Default Status Screen 0100"/>
+        <ITEM LANGU="F" TEXT="Status par défaut pour écran 0100"/>
        </TEXTS>
       </ITEM>
      </PUSHBUTTONS>
@@ -113,6 +129,7 @@ PROCESS AFTER INPUT.
     <ITEM OBJ_CODE="000001" MODAL="D">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Default Status Screen 0100"/>
+      <ITEM LANGU="F" TEXT="Status par défaut pour écran 0100"/>
      </TEXTS>
     </ITEM>
    </MENU_BARS>
@@ -120,6 +137,7 @@ PROCESS AFTER INPUT.
     <ITEM CODE="ST_0100" MODAL="D" ACTCODE="000001" PFKCODE="000001" BUTCODE="0001">
      <TEXTS>
       <ITEM LANGU="E" TEXT="Default Status Screen 0100"/>
+      <ITEM LANGU="F" TEXT="Status par défaut pour écran 0100"/>
      </TEXTS>
      <FUNCTIONS>
       <ITEM>BACK</ITEM>
@@ -254,50 +272,10 @@ MODULE status_0100 OUTPUT.
 
 ENDMODULE.                 &quot; STATUS_0100  OUTPUT</SOURCE>
   <TEXTSPOOL>
-   <ITEM ID="I" KEY="CPL">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="Liste des composants" LENGTH="125 "/>
-    </TEXTS>
-   </ITEM>
    <ITEM ID="R">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="YGPL Database Administrator Cockpit ver 0.0" LENGTH="43 "/>
-     <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="P_EXT">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="        Etendre aux sous-packages" LENGTH="33 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_AUTHOR">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_NAME">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_PACK">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="15 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_SOFT">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="26 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_SRCS">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="23 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_TYPE">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
+     <ITEM LANGU="F" ENTRY="YGPL Cockpit d&apos;Administration de base de donnée Ver 0.0" LENGTH="70 "/>
     </TEXTS>
    </ITEM>
   </TEXTSPOOL>

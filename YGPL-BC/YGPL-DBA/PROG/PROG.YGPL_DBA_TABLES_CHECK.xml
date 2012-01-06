@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F369E850823F3FDEA1A420DBFD4A10AD" CODE_SIGNATURE="A75992C249FF2E86FB7A5684BCBB97FE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="87EC9FD63AC5F20E7A8B9D8B74C39B8C" CODE_SIGNATURE="A75992C249FF2E86FB7A5684BCBB97FE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_TABLES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -111,11 +111,11 @@ FORM display_result  USING    o_check   TYPE ygpl_dba_interfaces=&gt;ti_check_ta
 ENDFORM.                    &quot; DISPLAY_RESULT</SOURCE>
   <TEXTS>
    <ITEM LANGU="E">
-    <LONG_TXT TDFRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+    <LONG_TXT TDFRELES="701" TDLRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
 ASCheck the selected tables. This action is exactly the same as the &quot;check
   button&quot; on table display in transaction SE11.
-ASOnly messages like &quot;Index &amp;-&amp; completely contains the fields of index
-  &lt;(&gt;&amp;&lt;)&gt;&quot; are returned.
+ASOnly messages like &quot;Index &amp;-&amp; completely contains the fields of index &amp;&quot;
+  are returned.
 U1&amp;INTEGRATION&amp;
 AS
 U1&amp;PREREQUISITES&amp;
@@ -138,17 +138,43 @@ B1If this index is a customer one, please fix this issue by removing the
 U1&amp;EXAMPLE&amp;
 ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT>
    </ITEM>
+   <ITEM LANGU="F">
+    <LONG_TXT TDFRELES="701" TDLRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+ASContrôle les tables sélectionnées. Cette action est identique à l&apos;action
+  sur le bouton &quot;control&quot; de l&apos;écran d&apos;affichage d&apos;une table dans la
+  transaction SE11.
+ASSeul les messages &quot;Index &amp;-&amp; comporte toutes les zones de l&apos;index
+  &lt;(&gt;&amp;&lt;)&gt;&quot; sont renvoyés.
+U1&amp;INTEGRATION&amp;
+AS
+U1&amp;PREREQUISITES&amp;
+AS
+U1&amp;FEATURES&amp;
+AS
+U2&amp;SELECTION&amp;
+AS
+U2&amp;STANDARD_VARIANTS&amp;
+AS
+U2&amp;OUTPUT&amp;
+AS
+U1&amp;ACTIVITIES&amp;
+ASVous devriez adapter l&apos;index (celui qui contient toutes les zones de
+  l&apos;autre) ou le supprimer.
+B1Si cet index est un index SAP, recherchez une note existante SAP sur le
+  sujet et/ou ouvrez un message OSS pour obtenir des instructions.
+B1Si cet index est un index client, corrigez le problème en supprimant cet
+  index.
+U1&amp;EXAMPLE&amp;
+ASSur ECC, vous devriez avoir un message de ce genre en contrôlant la
+  table BKPF.
+AS</LONG_TXT>
+   </ITEM>
   </TEXTS>
   <TEXTSPOOL>
-   <ITEM ID="I" KEY="CPL">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="Liste des composants" LENGTH="125 "/>
-    </TEXTS>
-   </ITEM>
    <ITEM ID="R">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="Control Table Indexes V0.0" LENGTH="26 "/>
-     <ITEM LANGU="F" ENTRY="Extraction en masse de componsants" LENGTH="70 "/>
+     <ITEM LANGU="F" ENTRY="Controle des indexes des tables V0.0" LENGTH="70 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="P_EXT">
@@ -160,6 +186,7 @@ ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT
    <ITEM ID="S" KEY="P_SIZE">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="9 "/>
+     <ITEM LANGU="F" ENTRY="D       ." LENGTH="9 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_AUTHOR">
@@ -171,7 +198,7 @@ ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT
    <ITEM ID="S" KEY="S_NAME">
     <TEXTS>
      <ITEM LANGU="E" ENTRY="        Table Name" LENGTH="19 "/>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
+     <ITEM LANGU="F" ENTRY="        ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
    <ITEM ID="S" KEY="S_PACK">
@@ -190,11 +217,6 @@ ASYou should get this message with index BKPF-BUT on ECC 6.0 or above.</LONG_TXT
     <TEXTS>
      <ITEM LANGU="E" ENTRY="D       ." LENGTH="23 "/>
      <ITEM LANGU="F" ENTRY="D       ." LENGTH="23 "/>
-    </TEXTS>
-   </ITEM>
-   <ITEM ID="S" KEY="S_TYPE">
-    <TEXTS>
-     <ITEM LANGU="F" ENTRY="D       ." LENGTH="19 "/>
     </TEXTS>
    </ITEM>
   </TEXTSPOOL>
