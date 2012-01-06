@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CC7DEF290819559BD20E36B5F1E82551" CODE_SIGNATURE="958B0F7B74A940F29363693B5CE24DB1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CHECK_TABLES_W_STATS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="D79D92008E757656909E32E0EF56FEFE" CODE_SIGNATURE="331188E46E30EA2BE73AB5150FD5AC21" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CHECK_TABLES_W_STATS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_DBA_CHECK_TABLES"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
-  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_DBA">
    <INHERITANCE REFCLSNAME="YGPL_DBA_CHECK_TABLES" STATE="1"/>
    <TEXTS>
     <ITEM LANG="E" TEXT="DBA tools - Check table consistency using statistics"/>
@@ -40,9 +40,11 @@
   <REDEFINITIONS>
    <ITEM REFCLSNAME="YGPL_DBA_CHECK_TABLES" MTDNAME="GET_TABLE_DEFINITION">
     <SOURCE>`
-  DATA s_stats TYPE ygplidba_tables_statistics=&gt;ts_table_stats.
-  DATA l_name TYPE ygplidba_tables_statistics=&gt;td_table_name.
+  DATA s_stats  TYPE ygplidba_tables_statistics=&gt;ts_table_stats.
+  DATA l_name   TYPE ygplidba_tables_statistics=&gt;td_table_name.
+  DATA s_line   LIKE LINE OF check_log.
   FIELD-SYMBOLS:
+    &lt;d&gt;   LIKE LINE OF result-t_dd12v,
     &lt;i&gt;   LIKE LINE OF s_stats-indexes,
     &lt;f&gt;   LIKE LINE OF &lt;i&gt;-columns,
     &lt;17&gt;  LIKE LINE OF result-t_dd17v.
@@ -66,6 +68,8 @@
   l_name = name.
   s_stats = o_obj_stats-&gt;get_table_stats( l_name ).
 
+  CHECK s_stats-num_rows &gt; 0.     &quot; do not process empty tables
+
   LOOP AT s_stats-indexes ASSIGNING &lt;i&gt;.
     LOOP AT &lt;i&gt;-columns ASSIGNING &lt;f&gt;
          WHERE num_distinct &lt;= 1.
@@ -74,14 +78,16 @@
       READ TABLE result-t_dd17v ASSIGNING &lt;17&gt;
           WITH KEY sqltab = name
                 indexname = &lt;i&gt;-index_name
-                fieldname = &lt;f&gt;-column_name.
+                fieldname = &lt;f&gt;-column_name
+               BINARY SEARCH.
       IF sy-subrc = 0.
         CLEAR &lt;17&gt;.
       ENDIF.
       READ TABLE result-t_dd17v_a ASSIGNING &lt;17&gt;
           WITH KEY sqltab = name
                 indexname = &lt;i&gt;-index_name
-                fieldname = &lt;f&gt;-column_name.
+                fieldname = &lt;f&gt;-column_name
+               BINARY SEARCH.
       IF sy-subrc = 0.
         CLEAR &lt;17&gt;.
       ENDIF.
@@ -89,7 +95,36 @@
   ENDLOOP.
 
   DELETE result-t_dd17v WHERE table_line IS INITIAL.
-  DELETE result-t_dd17v_a WHERE table_line IS INITIAL.</SOURCE>
+  DELETE result-t_dd17v_a WHERE table_line IS INITIAL.
+
+* Remove index with no fields
+  LOOP AT result-t_dd12v ASSIGNING &lt;d&gt;.
+    READ TABLE result-t_dd17v_a ASSIGNING &lt;17&gt;
+        WITH KEY sqltab = name
+              indexname = &lt;d&gt;-indexname.
+    IF sy-subrc &lt;&gt; 0.   &quot; Field no longer exists
+      CLEAR s_line.
+      s_line-table_name = name.
+      s_line-subindex_name = s_line-index_name = &lt;d&gt;-indexname.
+      MESSAGE i000 WITH name &lt;d&gt;-indexname INTO s_line-message.
+      s_line-size = o_obj_size-&gt;get_index_size( table_name = l_name
+                                                index_name = s_line-subindex_name ).
+      s_line-percent = 100 *      &quot; Percent
+                       100 *      &quot; 2 decimals
+                       s_line-size / o_obj_size-&gt;db_size.
+      s_line-size = s_line-size / 1024.     &quot; Ko =&gt; Mo
+      s_line-tadir_info = o_obj_size-&gt;get_index_information( table_name = l_name
+                                                             index_name = s_line-subindex_name ).
+      APPEND s_line TO check_log.
+      ASSERT sy-subrc = 0.
+
+* Remove it
+      DELETE result-t_dd12v_a WHERE sqltab = name
+                                AND indexname = &lt;d&gt;-indexname.
+      CLEAR &lt;d&gt;.
+    ENDIF.
+  ENDLOOP.
+  DELETE result-t_dd12v WHERE table_line IS INITIAL.</SOURCE>
    </ITEM>
   </REDEFINITIONS>
  </RAW>
