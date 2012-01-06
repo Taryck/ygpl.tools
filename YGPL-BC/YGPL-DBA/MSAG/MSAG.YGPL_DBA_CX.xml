@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CB9567EACFEC6E6A8584645AE1DD305C" CONNECTOR="1FAC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CX" TYPE="MSAG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="A486D237F8CB9F5180D9C183FE18B40B" CONNECTOR="1FAC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_CX" TYPE="MSAG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA MASTERLANG="E" RESPUSER="TBENSIAL"/>
@@ -7,16 +7,19 @@
    <ITEM MSGNR="000" SELFDEF="3">
     <TEXTS>
      <ITEM LANGU="E" SHORT_TXT="General failure DBA : &amp;1"/>
+     <ITEM LANGU="F" SHORT_TXT="Echec majeur pour outil DBA : &amp;1"/>
     </TEXTS>
    </ITEM>
    <ITEM MSGNR="001" SELFDEF="3">
     <TEXTS>
      <ITEM LANGU="E" SHORT_TXT="No Engine Exists for Database kind &apos;&amp;1&apos;"/>
+     <ITEM LANGU="F" SHORT_TXT="Aucun moteur n&apos;existe pour les bases de données de type &apos;&amp;1&apos;"/>
     </TEXTS>
    </ITEM>
   </MESSAGES>
   <TEXTS>
    <ITEM LANGU="E" SHORT_TXT="Exception message for YGPL DBA Tools"/>
+   <ITEM LANGU="F" SHORT_TXT="Message pour les exceptions du composant YGPL-DBA"/>
   </TEXTS>
  </RAW>
 </ZL_OBJECT>
