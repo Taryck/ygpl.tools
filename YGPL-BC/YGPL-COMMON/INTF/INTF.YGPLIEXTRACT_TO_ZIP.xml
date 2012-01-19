@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="B13361080689948342BAA1000265DF8D" CODE_SIGNATURE="F004BF992E4829F798FF6B81CADC3971" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLIEXTRACT_TO_ZIP" TYPE="INTF" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="ZIP file"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="FILETYPES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">BEGIN OF filetypes,
+              local     TYPE td_filetype VALUE &apos;L&apos;,         &quot;#EC NOTEXT
+              server    TYPE td_filetype VALUE &apos;S&apos;,         &quot;#EC NOTEXT
+            END OF filetypes
+`</ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="CL_ABAP_CHAR_UTILITIES" TPUTYPE="1" EXPLICIT="X"/>
+    <ITEM TYPEGROUP="YGPL_CX_FILE" TPUTYPE="1" IMPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <METHODS>
+   <ITEM CMPNAME="ADD_TABLE_AS_FILE_TO_ZIP" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="As table content as a file (tab as separator) in zip file"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="ANY_TABLE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY TABLE"/>
+     <ITEM SCONAME="FILENAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FILENAME" PAROPTIONL="X"/>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="GET_FILENAME" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename : Getter"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_FILENAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filename"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="GET_FILETYPE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filetype : Getter"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_FILETYPE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filetype : Local or Server"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="SAVE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Save ZIP file content"/>
+    </TEXTS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="SAVE_DIALOG" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Save Dialog"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="FILENAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FILENAME" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filename"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="SET_FILENAME" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename : Setter"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FILENAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filename"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="SET_FILETYPE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filetype : Setter"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FILETYPE">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filetype : Local or Server"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YGPL_CX_FILE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="YGPL Exception for Files"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TD_FILENAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPL_CX_FILE=&gt;TD_FILENAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_FILETYPE" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPL_CX_FILE=&gt;TD_FILETYPE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filetype : Local or Server"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

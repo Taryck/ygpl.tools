@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="C4BA016B88A11FB012ABF6934B8A65AF" CODE_SIGNATURE="438FA41705C4AFF335367E77AFC04A21" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="ZGPL_EXTRACT_TO_ZIP" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="CL_ABAP_CHAR_UTILITIES"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="ZIP file"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="ADD_TABLE_AS_FILE_TO_ZIP" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="ADD_TABLE_AS_FILE_TO_ZIP"/>
+   <ITEM CMPNAME="FILETYPES" EXPOSURE="2" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="FILETYPES"/>
+   <ITEM CMPNAME="GET_FILENAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="GET_FILENAME"/>
+   <ITEM CMPNAME="GET_FILETYPE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="GET_FILETYPE"/>
+   <ITEM CMPNAME="SAVE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SAVE"/>
+   <ITEM CMPNAME="SAVE_DIALOG" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SAVE_DIALOG"/>
+   <ITEM CMPNAME="SET_FILENAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SET_FILENAME"/>
+   <ITEM CMPNAME="SET_FILETYPE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SET_FILETYPE"/>
+   <ITEM CMPNAME="TD_FILENAME" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILENAME"/>
+   <ITEM CMPNAME="TD_FILETYPE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILETYPE"/>
+  </ALIASES>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CR" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;CR_LF" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='&quot;New'/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CRLF" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;CR_LF" TYPTYPE="1" TYPE="ABAP_CR_LF">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Cariage Return + Line Feed"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="FF" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;FORM_FEED" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='&quot;Page Break Character&quot;'/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_CONV" EXPOSURE="1" STATE="1" TYPTYPE="3" TYPE="CL_ABAP_CONV_OUT_CE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Page and Endian Conversion (System Format -&gt; External)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_ZIP" EXPOSURE="1" STATE="1" TYPTYPE="3" TYPE="CL_ABAP_ZIP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Zip Utility"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TABULATION" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;HORIZONTAL_TAB" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Tabluation"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="ZIP_FILE_EXTENSION" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="&apos;.zip&apos;" TYPTYPE="1" TYPE="TD_FILENAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="ZIP file extention"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_FILENAME" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TD_FILENAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_FILETYPE" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TD_FILETYPE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filetype : Local or Server"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="CL_ABAP_CHAR_UTILITIES" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLIEXTRACT_TO_ZIP" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="ADD_TABLE_AS_FILE_TO_ZIP">
+      <SOURCE>`
+  DATA _desc      TYPE REF TO cl_abap_tabledescr.
+  DATA _line      TYPE REF TO cl_abap_structdescr.
+  DATA line       TYPE string.
+  DATA content    TYPE string.
+  DATA value      TYPE string.
+  DATA x_string   TYPE xstring.
+  DATA _filename  TYPE td_filename.
+  FIELD-SYMBOLS:
+    &lt;c&gt; LIKE LINE OF _line-&gt;components,
+    &lt;l&gt; TYPE ANY,
+    &lt;f&gt; TYPE ANY.
+
+  _desc ?= cl_abap_typedescr=&gt;describe_by_data( p_data = any_table ).
+  ASSERT _desc-&gt;kind = cl_abap_datadescr=&gt;kind_table.
+  _line ?= _desc-&gt;get_table_line_type( ).
+  IF NOT filename IS INITIAL.
+    _filename = filename.
+  ELSE.
+    _filename = _desc-&gt;absolute_name.
+  ENDIF.
+
+  LOOP AT _line-&gt;components ASSIGNING &lt;c&gt;.
+    CONCATENATE line &lt;c&gt;-name tabulation INTO line.
+  ENDLOOP.
+  content = line.
+  LOOP AT any_table ASSIGNING &lt;l&gt;.
+    CLEAR line.
+    LOOP AT _line-&gt;components ASSIGNING &lt;c&gt;.
+      ASSIGN COMPONENT &lt;c&gt;-name OF STRUCTURE &lt;l&gt; TO &lt;f&gt;.
+      ASSERT sy-subrc = 0.
+      value = &lt;f&gt;.
+      REPLACE ALL OCCURRENCES OF tabulation IN value WITH ``.     &quot; Prevent CRLF to jump to next field
+      REPLACE ALL OCCURRENCES OF crlf IN value WITH ``.           &quot; Prevent CRLF to jump to next line
+      REPLACE ALL OCCURRENCES OF cr IN value WITH ``.             &quot; Prevent CR to jump to next line
+      CONCATENATE line value tabulation INTO line.
+    ENDLOOP.
+    CONCATENATE content crlf line INTO content.
+  ENDLOOP.
+
+  o_conv-&gt;convert( EXPORTING   data = content
+                   IMPORTING buffer = x_string ).
+  CALL METHOD o_zip-&gt;add
+    EXPORTING
+      name    = _filename
+      content = x_string.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_FILENAME">
+      <SOURCE>`
+  result = _filename.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_FILETYPE">
+      <SOURCE>`
+  result = _filetype.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SAVE">
+      <SOURCE>`
+  DATA _cx TYPE REF TO ygpl_cx_file.
+  DATA tmptable TYPE STANDARD TABLE OF x.
+  DATA cx_name TYPE string.
+  DATA cx TYPE REF TO cx_root.
+  DATA x_string TYPE xstring.
+  DATA file_type TYPE char10.
+  DATA file_size TYPE i.
+  DATA o_conv  TYPE REF TO cl_abap_conv_out_ce.
+  FIELD-SYMBOLS:
+    &lt;s&gt; LIKE LINE OF tmptable.
+
+  x_string = o_zip-&gt;save( ).
+
+  IF _filetype = filetypes-local.
+    IF _filename IS INITIAL.
+      ygpliextract_to_zip~save_dialog( ).
+    ELSE.
+      CALL FUNCTION &apos;SCMS_XSTRING_TO_BINARY&apos;
+        EXPORTING
+          buffer                = x_string
+*       APPEND_TO_TABLE       = &apos; &apos;
+       IMPORTING
+         output_length         = file_size
+        TABLES
+          binary_tab            =  tmptable.
+
+      CONCATENATE _filename zip_file_extension INTO _filename.
+      file_type = &apos;BIN&apos;.      &quot; change in debug
+      CALL METHOD cl_gui_frontend_services=&gt;gui_download
+        EXPORTING
+          bin_filesize              = file_size
+          filename                  = _filename
+          filetype                  = file_type
+*      append                    = SPACE
+*      write_field_separator     = SPACE
+*      header                    = &apos;00&apos;
+*      trunc_trailing_blanks     = SPACE
+*      write_lf                  = &apos;X&apos;
+*      col_select                = SPACE
+*      col_select_mask           = SPACE
+*      dat_mode                  = SPACE
+*      confirm_overwrite         = SPACE
+*      no_auth_check             = SPACE
+*      codepage                  = SPACE
+*      ignore_cerr               = ABAP_TRUE
+*      replacement               = &apos;#&apos;
+*      write_bom                 = SPACE
+*      trunc_trailing_blanks_eol = &apos;X&apos;
+*      wk1_n_format              = SPACE
+*      wk1_n_size                = SPACE
+*      wk1_t_format              = SPACE
+*      wk1_t_size                = SPACE
+*    IMPORTING
+*      filelength                =
+        CHANGING
+          data_tab                  = tmptable
+        EXCEPTIONS
+          file_write_error          = 1
+          no_batch                  = 2
+          gui_refuse_filetransfer   = 3
+          invalid_type              = 4
+          no_authority              = 5
+          unknown_error             = 6
+          header_not_allowed        = 7
+          separator_not_allowed     = 8
+          filesize_not_allowed      = 9
+          header_too_long           = 10
+          dp_error_create           = 11
+          dp_error_send             = 12
+          dp_error_write            = 13
+          unknown_dp_error          = 14
+          access_denied             = 15
+          dp_out_of_memory          = 16
+          disk_full                 = 17
+          dp_timeout                = 18
+          file_not_found            = 19
+          dataprovider_exception    = 20
+          control_flush_error       = 21
+          not_supported_by_gui      = 22
+          error_no_gui              = 23
+          OTHERS                    = 24.
+      IF sy-subrc &lt;&gt; 0.
+        CASE sy-subrc.
+          WHEN &apos;1&apos;.
+            cx_name = &apos;&apos;.
+          WHEN OTHERS.
+            cx_name = &apos;OTHERS&apos;.
+        ENDCASE.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+        RAISE EXCEPTION TYPE ygpl_cx_file_save_error
+              EXPORTING filename = _filename
+                        filetype = _filetype
+                         cx_name = cx_name.
+      ENDIF.
+    ENDIF.
+  ELSEIF _filetype = filetypes-server.
+    TRY.
+        OPEN DATASET _filename FOR OUTPUT IN BINARY MODE.
+      CATCH cx_root INTO cx.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+        CREATE OBJECT _cx
+          TYPE
+            ygpl_cx_file_save_error
+          EXPORTING
+            filename                = _filename
+            filetype                = _filetype
+            previous                = cx.
+        _cx-&gt;update( ).
+        RAISE EXCEPTION _cx.
+    ENDTRY.
+    IF sy-subrc &lt;&gt; 0.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+      RAISE EXCEPTION TYPE ygpl_cx_file_save_error
+            EXPORTING cx_name = &apos;OPEN DATASET&apos;
+                     filename = _filename
+                     filetype = _filetype.
+    ENDIF.
+
+    TRY.
+        TRANSFER x_string TO _filename.
+      CATCH cx_root INTO cx.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+        CREATE OBJECT _cx
+          TYPE
+            ygpl_cx_file_save_error
+          EXPORTING
+            filename = _filename
+            filetype = _filetype
+            previous = cx.
+        _cx-&gt;update( ).
+        RAISE EXCEPTION _cx.
+    ENDTRY.
+
+    TRY.
+        CLOSE DATASET _filename.
+      CATCH cx_root INTO cx.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+        CREATE OBJECT _cx
+          TYPE
+            ygpl_cx_file_save_error
+          EXPORTING
+            filename = _filename
+            filetype = _filetype
+            previous = cx.
+        _cx-&gt;update( ).
+        RAISE EXCEPTION _cx.
+    ENDTRY.
+    IF sy-subrc &lt;&gt; 0.
+* Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
+      RAISE EXCEPTION TYPE ygpl_cx_file_save_error
+            EXPORTING cx_name = &apos;CLOSE DATASET&apos;
+                     filename = _filename
+                     filetype = _filetype.
+    ENDIF.
+  ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SAVE_DIALOG">
+      <SOURCE>`
+  DATA retfilename TYPE string.
+  DATA retpath TYPE string.
+  DATA retfullpath TYPE string.
+  DATA retuseract TYPE i.
+
+  IF filename IS INITIAL.
+    retfilename = _filename.
+  ELSE.
+    retfilename = filename.
+  ENDIF.
+  CASE _filetype.
+    WHEN filetypes-local.
+
+      CALL METHOD cl_gui_frontend_services=&gt;file_save_dialog
+        EXPORTING
+          default_file_name = retfilename
+        CHANGING
+          filename          = retfilename
+          path              = retpath
+          fullpath          = retfullpath
+          user_action       = retuseract.
+      IF retuseract &lt;&gt; 0.
+* Dialog canceled by user
+        RAISE EXCEPTION TYPE ygpl_cx_dialog_canceled
+              EXPORTING filename = filename
+                        filetype = _filetype.
+      ENDIF.
+      _filename = retfullpath.                              &quot; Issue 69
+    WHEN filetypes-server.
+* No dialog right now
+    WHEN OTHERS.
+      RAISE EXCEPTION TYPE ygpl_cx_invalid_filetype
+            EXPORTING filetype = _filetype.
+  ENDCASE.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_FILENAME">
+      <SOURCE>`
+  IF data IS INITIAL.
+* Filename &apos;&amp;file&amp;&apos; is invalid. Please provide a valid filename for filetype &apos;&amp;filetype&amp;&apos;
+    RAISE EXCEPTION TYPE ygpl_cx_invalid_filename
+          EXPORTING filetype = _filetype
+                    filename = data.
+  ENDIF.
+  IF NOT _filetype IS INITIAL.
+* TODO Check filename
+  ENDIF.
+  _filename = data.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="SET_FILETYPE">
+      <SOURCE>`
+  IF data &lt;&gt; filetypes-local AND data &lt;&gt; filetypes-server.
+    RAISE EXCEPTION TYPE ygpl_cx_invalid_filetype
+         EXPORTING filetype = data.
+  ENDIF.
+  IF NOT _filename IS INITIAL.
+* TODO Check filename
+  ENDIF.
+  _filetype = data.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  CREATE OBJECT o_zip.
+  o_conv = cl_abap_conv_out_ce=&gt;create( ).</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+ </RAW>
+</ZL_OBJECT>
