@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CFF40C0A4367FAC19CA1436A86ED7C36" CODE_SIGNATURE="932B8C9D6BB719AEF2D9E31ED5663ADA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="96C84C425FC76072118FB12A1EEE448D" CODE_SIGNATURE="D289F25FFFEB18527504DBE62B2E853D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -264,6 +264,13 @@
                                            subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
   ENDIF.
+
+* Issue 2 : Job added only if Job Close was OK
+  CALL METHOD add_thread
+    EXPORTING
+      jobname  = current_job-name
+      jobcount = current_job-id.
+
   CLEAR current_job.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="GET_AS_LOAD">
@@ -326,10 +333,11 @@
     RAISE EXCEPTION o_cx.
   ENDIF.
 
-  CALL METHOD add_thread
-    EXPORTING
-      jobname  = current_job-name
-      jobcount = current_job-id.
+* Issue 2 : Thread should be added @ job close
+*  CALL METHOD add_thread
+*    EXPORTING
+*      jobname  = current_job-name
+*      jobcount = current_job-id.
   result = current_job.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="SLEEP">
