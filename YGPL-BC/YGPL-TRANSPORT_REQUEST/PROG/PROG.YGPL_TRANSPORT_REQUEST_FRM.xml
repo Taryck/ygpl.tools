@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="FB77FC49C9ABC0A50DD13A121BD5332E" CODE_SIGNATURE="267516BDF8251EC84AA8C68E2D5D4FBC" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TRANSPORT_REQUEST_FRM" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-TRANSPORT_REQUEST" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="I" APPL="S" LEVL="701" RMAND="220" RLOAD="E" UCCHECK="X"/>
+  <SOURCE>`
+*---------------------------------------------------------------------*
+*  Include           ZAPLINK_FRM
+*---------------------------------------------------------------------*
+DEFINE mac_replace.
+  replace all occurrences of regex &apos;&lt;:&amp;2:&gt;&apos; in &amp;1 with sy-&amp;2.
+END-OF-DEFINITION.
+*/---------------------writeMessage-----------------------\
+FORM writemessage USING value(p_type) TYPE sy-msgty
+                        value(p_msg).
+  CASE p_type.
+    WHEN &apos;E&apos; OR &apos;A&apos; OR &apos;X&apos;.
+      WRITE / icon_red_light AS ICON.
+    WHEN &apos;W&apos;.
+      WRITE / icon_yellow_light AS ICON.
+    WHEN &apos;S&apos;.
+      WRITE / icon_green_light AS ICON.
+    WHEN OTHERS.
+      WRITE / icon_light_out AS ICON. &quot; ICON_ARROW_RIGHT
+  ENDCASE.
+
+  WRITE p_msg.
+ENDFORM.                    &quot;WriteMessage
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  add
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add .
+  DATA _keys TYPE ygpl_tadir_search=&gt;tt_compkeys.
+
+  TRY.
+      _keys = ygpl_tadir_search=&gt;get_keys_from_tadir( srcsystem = s_srcs[]
+                                                           type = s_type[]
+                                                           name = s_name[]
+                                                       packages = s_pack[]
+                                                            ext = p_ext
+                                                         author = s_author[] ).
+* No component was selected with this parameters
+      IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
+      objlist-&gt;add_keys( _keys ).
+
+    CATCH zaplink_cx INTO o_exception.
+      o_exception-&gt;write( ).
+      EXIT.
+  ENDTRY.
+
+*    PERFORM dsp_result_display USING space objlist space.
+
+ENDFORM.                    &quot; add
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  add_tr
+*&amp;---------------------------------------------------------------------*
+FORM add_tr USING r_tr TYPE zaplink_gui=&gt;tr_tr.
+  DATA _keys TYPE zaplink_gui=&gt;tt_compkeys.
+
+  IF r_tr[] IS INITIAL.
+    MESSAGE i000(0k) WITH &apos;Transport Request required&apos;(003).
+    EXIT.
+  ENDIF.
+
+  TRY.
+      _keys = zaplink_gui=&gt;get_keys_from_tr( r_tr ).
+* No component was selected with this parameters
+      IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
+      objlist-&gt;add_keys( _keys ).
+
+    CATCH zaplink_cx INTO o_exception.
+      o_exception-&gt;write( ).
+      EXIT.
+  ENDTRY.
+
+ENDFORM.                    &quot; add_tr
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_OBJECT_LIST
+*&amp;---------------------------------------------------------------------*
+FORM create_object_list .
+  CREATE OBJECT objlist.
+  CASE abap_true.
+    WHEN a_add.       PERFORM add.                      &quot; add objects
+    WHEN a_add_tr.    PERFORM add_tr USING s_tr[].      &quot; add transport requests
+  ENDCASE.
+
+  objlist-&gt;select_default( zaplink_list=&gt;sel_actions-export ).
+  objlist-&gt;change_selection( ).
+ENDFORM.                    &quot; CREATE_OBJECT_LIST
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_COMPONENTS
+*&amp;---------------------------------------------------------------------*
+FORM get_components .
+  DATA o_list           TYPE to_objlist.
+
+  o_list = objlist-&gt;selection_as_list( ).
+  keys = o_list-&gt;get_keys( ).
+ENDFORM.                    &quot; GET_COMPONENTS</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Include ZAPLINK_FRM" LENGTH="19 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

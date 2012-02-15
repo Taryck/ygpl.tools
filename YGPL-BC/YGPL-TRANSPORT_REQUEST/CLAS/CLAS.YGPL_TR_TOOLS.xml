@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="BEEBF79764A4C29E7B471CE6544A5F30" CODE_SIGNATURE="2382E33A563A344ED7BA666FFEFB0923" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TR_TOOLS" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-TRANSPORT_REQUEST" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Toolbox for Transport Requests"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ALIASES>
+   <ITEM CMPNAME="TD_TRANSPORT_REQUEST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TD_TRANSPORT_REQUEST"/>
+   <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
+  </ALIASES>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPL_COMMON_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="ADD_KEYS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add keys to transport request"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+     <ITEM SCONAME="TRANSPORT_REQUEST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TRANSPORT_REQUEST"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA t_e071 TYPE STANDARD TABLE OF e071 WITH DEFAULT KEY.
+  DATA s_e071 LIKE LINE OF t_e071.
+  FIELD-SYMBOLS:
+    &lt;k&gt; LIKE LINE OF keys.
+
+  LOOP AT keys ASSIGNING &lt;k&gt;.
+    CLEAR s_e071.
+    s_e071-pgmid = &apos;R3TR&apos;.
+    s_e071-object = &lt;k&gt;-type.
+    s_e071-obj_name = &lt;k&gt;-name.
+    APPEND s_e071 TO t_e071.
+  ENDLOOP.
+  CALL FUNCTION &apos;TRINT_APPEND_COMM&apos;
+    EXPORTING
+      wi_exclusive                       = abap_true
+      wi_sel_e071                        = abap_true
+*     WI_SEL_E071K                       = &apos; &apos;
+      wi_trkorr                          = transport_request
+*   IMPORTING
+*     WE_KEYS_PHYSICAL_APPENDED          =
+*     WE_OBJECTS_PHYSICAL_APPENDED       =
+    TABLES
+      wt_e071                            = t_e071
+*     WT_E071K                           =
+    EXCEPTIONS
+      e071k_append_error                 = 1
+      e071_append_error                  = 2
+      trkorr_empty                       = 3
+      OTHERS                             = 4.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>
