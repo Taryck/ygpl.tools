@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="B7CEED0B4727781A32D56DF9792016C7" CODE_SIGNATURE="CF8318AA9C421AA22FEDCF2CE2BB3043" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="10AA61079AA565370C672C4C253F7C42" CODE_SIGNATURE="8156805D8AFD0789F2167C4632CB85DC" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" APPL="S" RSTAT="K" RMAND="321" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -52,12 +52,12 @@
     </ITEM>
     <ITEM CODE="DISPLAY" TEXTNO="001" TEXT_TYPE="S" TEXT_NAME="ICON_COMPARE" ICON_ID="@46@">
      <TEXTS>
-      <ITEM LANGU="E" TEXT="Compare components" INFO="Compare selected components"/>
+      <ITEM LANGU="E" TEXT="Compare components" ICON="Compare" INFO="Compare selected components"/>
      </TEXTS>
     </ITEM>
     <ITEM CODE="EXIT" TEXTNO="001" TEXT_TYPE="S" TEXT_NAME="ICON_CANCEL" ICON_ID="@0W@">
      <TEXTS>
-      <ITEM LANGU="E" TEXT="Exit" INFO="Stop comparing components"/>
+      <ITEM LANGU="E" TEXT="Exit" ICON="Cancel" INFO="Stop comparing components"/>
      </TEXTS>
     </ITEM>
     <ITEM CODE="PRINT" TEXTNO="001" TEXT_TYPE="S" TEXT_NAME="ICON_PRINT" ICON_ID="@0X@">
@@ -167,183 +167,18 @@
 *    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 REPORT  ygpl_delta_analysis MESSAGE-ID zaplink.
 
-TYPE-POOLS: abap, icon.
-
 INCLUDE ygpl_delta_analysis_top.
 INCLUDE ygpl_delta_analysis_scr.
 
 */----------------------main------------------------------------------\
 START-OF-SELECTION.
-  DATA o_cont   TYPE REF TO zaplink_container.
-  DATA o_cont_r TYPE REF TO zaplink_container.    &quot; Remote
-  DATA s_info   TYPE zaplink_gui=&gt;ts_contdata.
-  DATA keys     TYPE zaplink_gui=&gt;tt_compkeys.
-  DATA o_list   TYPE to_objlist.
-  DATA components_list  TYPE  zaplink_components_list.
-  DATA t_def_loc        TYPE  zaplink_components_contents.
-  DATA t_def_dis        TYPE  zaplink_components_contents.
-  DATA s_comp           LIKE LINE OF components_list.
-  FIELD-SYMBOLS:
-    &lt;r&gt; LIKE LINE OF t_def_loc,
-    &lt;c&gt; LIKE LINE OF keys.
-
-*   create empty Container
-  CREATE OBJECT o_file.
-  s_info-name = &apos;CONTAINER&apos;.
-  o_cont = zaplink_container=&gt;create_new( o_file = o_file
-                                            data = s_info ).
-
-  CASE abap_true.
-    WHEN a_add.       PERFORM add.          &quot; add object to Container
-    WHEN a_add_p.     PERFORM add_comp.
-    WHEN a_add_tr.    PERFORM add_tr USING p_tr[] CHANGING keys.
-  ENDCASE.
-
-* Allow user to refine object list
-  CREATE OBJECT objlist.
-  objlist-&gt;add_keys( keys ).
-  objlist-&gt;select_default( zaplink_list=&gt;sel_actions-export ).
-  objlist-&gt;change_selection( ).
-  o_list = objlist-&gt;selection_as_list( ).
-  keys = o_list-&gt;get_keys( ).
-  LOOP AT keys ASSIGNING &lt;c&gt;.
-    MOVE-CORRESPONDING &lt;c&gt; TO s_comp.
-    APPEND s_comp TO components_list.
-  ENDLOOP.
-  SORT components_list. DELETE ADJACENT DUPLICATES FROM components_list.
-
-* Get local components
-  CALL FUNCTION &apos;ZAPLINK_GET_COMPONENTS&apos;
-    EXPORTING
-      components_list = components_list
-    IMPORTING
-      definitions     = t_def_loc.
-
-* Remote call
-  CALL FUNCTION &apos;ZAPLINK_GET_COMPONENTS&apos;
-    DESTINATION p_rfc
-    EXPORTING
-      components_list = components_list
-    IMPORTING
-      definitions     = t_def_dis.
-
-  DATA t_results TYPE STANDARD TABLE OF ygpl_delta_analysis_result.
-  DATA s_result LIKE LINE OF t_results.
-  DATA t_fields TYPE slis_t_fieldcat_alv.
-  DATA s_layout TYPE slis_layout_alv.
-
-  LOOP AT t_def_loc ASSIGNING &lt;r&gt;.
-    CLEAR s_result.
-    MOVE-CORRESPONDING &lt;r&gt; TO s_result.
-    s_result-select = abap_true.
-    READ TABLE t_def_dis ASSIGNING &lt;r&gt;
-         WITH TABLE KEY type = s_result-type
-                        name = s_result-name.
-    IF sy-subrc = 0.
-      s_result-t_checksum = &lt;r&gt;-checksum.
-      s_result-t_code_signature = &lt;r&gt;-code_signature.
-    ELSE.
-      s_result-icon = icon_absence.
-    ENDIF.
-    IF s_result-icon IS INITIAL.
-      IF  s_result-t_checksum = s_result-checksum
-      AND s_result-t_code_signature = s_result-code_signature.
-        CLEAR s_result-select.
-        s_result-icon = icon_equal_green.
-      ELSEIF s_result-t_code_signature = s_result-code_signature AND s_result-code_signature IS NOT INITIAL.
-        s_result-icon = icon_translation.
-      ELSE.
-        s_result-icon = icon_not_equal_red.
-      ENDIF.
-    ENDIF.
-
-    APPEND s_result TO t_results.
-
-  ENDLOOP.
-
-  CALL FUNCTION &apos;REUSE_ALV_FIELDCATALOG_MERGE&apos;
-    EXPORTING
-      i_program_name               = &apos;YGPL_DELTA_ANALYSIS&apos;
-      i_internal_tabname           = &apos;T_RESULTS&apos;
-*     I_STRUCTURE_NAME             =
-*     I_CLIENT_NEVER_DISPLAY       = &apos;X&apos;
-*     I_INCLNAME                   =
-*     I_BYPASSING_BUFFER           =
-*     I_BUFFER_ACTIVE              =
-    CHANGING
-      ct_fieldcat                  = t_fields
-    EXCEPTIONS
-      inconsistent_interface       = 1
-      program_error                = 2
-      OTHERS                       = 3.
-  IF sy-subrc &lt;&gt; 0.
-    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-  ENDIF.
-  s_layout-box_fieldname = &apos;SELECT&apos;.
-  READ TABLE t_fields TRANSPORTING NO FIELDS WITH KEY fieldname = s_layout-box_fieldname.
-  ASSERT sy-subrc = 0.    &quot; missing select fields
-  s_layout-colwidth_optimize = abap_true.
-
-  CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
-    EXPORTING
-      i_callback_program       = &apos;YGPL_DELTA_ANALYSIS&apos;
-      i_callback_pf_status_set = &apos;ANALYSE&apos;
-      i_callback_user_command  = &apos;USER_COMMAND_USER&apos;
-      i_grid_title             = &apos;Select objects to compare&apos;(lst)
-      it_fieldcat              = t_fields
-      is_layout                = s_layout
-    TABLES
-      t_outtab                 = t_results
-    EXCEPTIONS
-      OTHERS                   = 0.
-
+  PERFORM create_object_list.
+  PERFORM get_components.
+  PERFORM display_list.
+  PERFORM display_delta_details.
 END-OF-SELECTION.
-  TYPES td_action TYPE rsmpe-func.
 
-  CONSTANTS:
-    c_act_exit    TYPE td_action VALUE &apos;EXIT&apos;,
-    c_act_display TYPE td_action VALUE &apos;DISPLAY&apos;.
-
-*&amp;---------------------------------------------------------------------*
-*&amp;      Form  user_command_user
-*&amp;---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-*      --&gt;R_UCOMM      text
-*      --&gt;RS_SELFIELD  text
-*----------------------------------------------------------------------*
-FORM user_command_user USING r_ucomm LIKE sy-ucomm
-                  rs_selfield TYPE slis_selfield.
-  FIELD-SYMBOLS:
-    &lt;s&gt; LIKE LINE OF t_def_loc,
-    &lt;t&gt; LIKE LINE OF t_def_dis,
-    &lt;r&gt; LIKE LINE OF t_results.
-
-  rs_selfield-exit = &apos;X&apos;.
-  CASE r_ucomm.
-    WHEN c_act_exit.
-    WHEN c_act_display.
-      LOOP AT t_results ASSIGNING &lt;r&gt;
-           WHERE select = abap_true.
-        READ TABLE t_def_loc ASSIGNING &lt;s&gt;
-             WITH TABLE KEY type = &lt;r&gt;-type
-                            name = &lt;r&gt;-name.
-        ASSERT sy-subrc = 0.
-        READ TABLE t_def_dis ASSIGNING &lt;t&gt;
-             WITH TABLE KEY type = &lt;r&gt;-type
-                            name = &lt;r&gt;-name.
-        CHECK sy-subrc = 0.   &quot; user selected a component that do not exists on target system
-
-      ENDLOOP.
-
-    WHEN OTHERS.
-      CLEAR rs_selfield-exit.
-  ENDCASE.
-ENDFORM.                    &quot;user_command_user
-
-*\--------------------------------------------------------------------/
-INCLUDE ygpl_delta_analysis_frm.</SOURCE>
+  INCLUDE ygpl_delta_analysis_frm.</SOURCE>
   <TEXTS>
    <ITEM LANGU="E">
     <LONG_TXT TDFRELES="700" TDLRELES="700" TDLINESIZE="072">U1&amp;PURPOSE&amp;
@@ -774,69 +609,5 @@ AS</LONG_TXT>
     </TEXTS>
    </ITEM>
   </TEXTSPOOL>
-  <VARIANTS>
-   <ITEM>
-    <ZL_OBJECT CHECKSUM="C13C4A1FEE9D2037414429AE174A7EC4" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS                     CUS&amp;SAVE_MYOBJ" TYPE="VARI" VERSION="1.0">
-     <RAW>
-      <A0_MAINDATA TRANSPORT="F" ENVIRONMNT="A" VERSION="1 " MLANGU="E" XFLAG1="30"/>
-      <SCREENS>
-       <ITEM DYNNR="1000"/>
-      </SCREENS>
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Save all my objects"/>
-      </TEXTS>
-      <VALUES>
-       <ITEM NAME="A_ADD"/>
-       <ITEM NAME="A_ADD_P"/>
-       <ITEM NAME="A_ADD_TR"/>
-       <ITEM NAME="CO_NAME"/>
-       <ITEM NAME="CO_TYPE"/>
-       <ITEM NAME="F_SUB" VALUE="X"/>
-       <ITEM NAME="P_EXT" APPENDAGE="C" VALUE="X"/>
-       <ITEM NAME="P_RFC" APPENDAGE="O"/>
-       <ITEM NAME="P_TR"/>
-       <ITEM NAME="S_AUTHOR" NO_IMPORT="X"/>
-       <ITEM NAME="S_NAME"/>
-       <ITEM NAME="S_PACK"/>
-       <ITEM NAME="S_SRCS" NO_IMPORT="X"/>
-       <ITEM NAME="S_TYPE"/>
-      </VALUES>
-     </RAW>
-    </ZL_OBJECT>
-   </ITEM>
-   <ITEM>
-    <ZL_OBJECT CHECKSUM="F3618C8851A135371BD775D2A26BE201" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS                     CUS&amp;SAV_ZL_FUL" TYPE="VARI" VERSION="1.0">
-     <RAW>
-      <A0_MAINDATA TRANSPORT="F" ENVIRONMNT="A" VERSION="1 " MLANGU="E" XFLAG1="30"/>
-      <SCREENS>
-       <ITEM DYNNR="1000"/>
-      </SCREENS>
-      <TEXTS>
-       <ITEM LANG="E" TEXT="SAVE Your ZAPLink framework"/>
-      </TEXTS>
-      <VALUES>
-       <ITEM NAME="A_ADD"/>
-       <ITEM NAME="A_ADD_P"/>
-       <ITEM NAME="A_ADD_TR"/>
-       <ITEM NAME="CO_NAME"/>
-       <ITEM NAME="CO_TYPE"/>
-       <ITEM NAME="F_SUB" VALUE="X"/>
-       <ITEM NAME="P_EXT" APPENDAGE="C" VALUE="X"/>
-       <ITEM NAME="P_RFC" APPENDAGE="O"/>
-       <ITEM NAME="P_TR"/>
-       <ITEM NAME="S_AUTHOR"/>
-       <ITEM NAME="S_NAME"/>
-       <ITEM NAME="S_PACK">
-        <VALUES>
-         <ITEM SIGN="I" OPTION="EQ" LOW="ZAPLINK"/>
-        </VALUES>
-       </ITEM>
-       <ITEM NAME="S_SRCS"/>
-       <ITEM NAME="S_TYPE"/>
-      </VALUES>
-     </RAW>
-    </ZL_OBJECT>
-   </ITEM>
-  </VARIANTS>
  </RAW>
 </ZL_OBJECT>

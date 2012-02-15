@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="DC9C7CB5CC36C66C1DDABA531B3078CA" CODE_SIGNATURE="8CC94FBAC1508259FC61A554911C7D76" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="891B2B4AF4551E2944A0BDEDE4C2D06B" CODE_SIGNATURE="A7AAEE54276041B3B2313961BEE52405" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="I" APPL="S" LEVL="701" RMAND="220" RLOAD="E" UCCHECK="X"/>
@@ -7,286 +7,445 @@
 *---------------------------------------------------------------------*
 *  Include           ZAPLINK_FRM
 *---------------------------------------------------------------------*
-  DEFINE mac_replace.
-    replace all occurrences of regex &apos;&lt;:&amp;2:&gt;&apos; in &amp;1 with sy-&amp;2.
-  END-OF-DEFINITION.
+DEFINE mac_replace.
+  replace all occurrences of regex &apos;&lt;:&amp;2:&gt;&apos; in &amp;1 with sy-&amp;2.
+END-OF-DEFINITION.
 */---------------------writeMessage-----------------------\
-  FORM writemessage USING value(p_type) TYPE sy-msgty
-                          value(p_msg).
-    CASE p_type.
-      WHEN &apos;E&apos; OR &apos;A&apos; OR &apos;X&apos;.
-        WRITE / icon_red_light AS ICON.
-      WHEN &apos;W&apos;.
-        WRITE / icon_yellow_light AS ICON.
-      WHEN &apos;S&apos;.
-        WRITE / icon_green_light AS ICON.
-      WHEN OTHERS.
-        WRITE / icon_light_out AS ICON. &quot; ICON_ARROW_RIGHT
-    ENDCASE.
+FORM writemessage USING value(p_type) TYPE sy-msgty
+                        value(p_msg).
+  CASE p_type.
+    WHEN &apos;E&apos; OR &apos;A&apos; OR &apos;X&apos;.
+      WRITE / icon_red_light AS ICON.
+    WHEN &apos;W&apos;.
+      WRITE / icon_yellow_light AS ICON.
+    WHEN &apos;S&apos;.
+      WRITE / icon_green_light AS ICON.
+    WHEN OTHERS.
+      WRITE / icon_light_out AS ICON. &quot; ICON_ARROW_RIGHT
+  ENDCASE.
 
-    WRITE p_msg.
-  ENDFORM.                    &quot;WriteMessage
-**&amp;---------------------------------------------------------------------*
-**&amp;      Form  DSP_RESULT_DISPLAY
-**&amp;---------------------------------------------------------------------*
-*  FORM dsp_result_display USING name TYPE td_name
-*                             objlist TYPE t_objlist
-*                              offset TYPE string.
-*    DATA msg    TYPE string.
-*    DATA t_comp TYPE t_comp.
-*    DATA _type  TYPE t_obj_type.
-*    DATA _name  TYPE t_obj_name.
-*    DATA _act   TYPE zaplink_component=&gt;td_action.
-*    DATA o_cx   TYPE REF TO zaplink_cx.
-*    DATA _cx    TYPE t_exception.
-*    DATA _msg_col TYPE t_msg_col.
-*    DATA _subc  TYPE t_objlist.
-*    DATA _offset TYPE string.
-*    CONSTANTS s_inc TYPE string VALUE `  `.
-*
-*    IF NOT name IS INITIAL.
-*      WRITE: / &apos;Object list for Container &apos;(001), name. SKIP.
-*    ENDIF.
-*    TRY.
-*        IF objlist IS BOUND.
-*          objlist-&gt;display_progress = abap_false.
-*          objlist-&gt;init_iter( ).
-*          t_comp = objlist-&gt;get_next( ).
-*        ENDIF.
-*        IF NOT name IS INITIAL AND NOT t_comp IS BOUND.
-*          PERFORM writemessage USING &apos;W&apos; &apos;You have an empty Container&apos;(002).
-*          EXIT.
-*        ENDIF.
-*
-*        CONCATENATE offset s_inc INTO _offset.
-*
-*        WHILE t_comp IS BOUND.
-*          _type = t_comp-&gt;get_type( ).
-*          _name = t_comp-&gt;get_name( ).
-*          _act  = t_comp-&gt;get_action( ).
-*
-*          IF t_comp-&gt;connector_exists( ) = zaplink_gui=&gt;exists-not_exists.
-*            CONCATENATE offset _type &apos;-&apos; _name &apos;no connector&apos;(nco)
-*                INTO msg SEPARATED BY space.
-*            PERFORM writemessage USING &apos;E&apos; msg.
-*          ELSEIF objlist-&gt;is_selected( t_comp ) = abap_false.
-*            CONCATENATE offset _type &apos;-&apos; _name &apos;not requested&apos;(nre)
-*                INTO msg SEPARATED BY space.
-*            PERFORM writemessage USING &apos;I&apos; msg.
-*          ELSE.
-*
-*            _cx = t_comp-&gt;get_exception( ).
-*            _msg_col = t_comp-&gt;get_msg_coll( ).
-*            IF _msg_col IS BOUND.
-*              IF _msg_col-&gt;has_messages_of_msgt( &apos;E&apos; ) = abap_false .
-*                CLEAR _msg_col.
-*              ENDIF.
-*            ENDIF.
-*            IF _cx IS BOUND OR _msg_col IS BOUND.
-*              CONCATENATE offset _type &apos;-&apos; _name &apos;FAILED&apos;(fai)
-*                  INTO msg SEPARATED BY space.
-*              PERFORM writemessage USING &apos;E&apos; msg.
-*              IF _cx IS BOUND.
-*                _cx-&gt;write( ).
-*                _msg_col = t_comp-&gt;get_msg_coll( ).
-*                IF _msg_col IS BOUND.
-*                  _msg_col-&gt;write( ).
-*                ENDIF.
-*              ELSE.
-*                IF _msg_col IS BOUND.
-*                  _msg_col-&gt;write( ).
-*                ENDIF.
-*              ENDIF.
-*            ELSE.
-*              IF _act = zaplink_list=&gt;sel_actions-activated.
-*                CONCATENATE offset _type &apos;-&apos; _name &apos;SUCCEED &amp; Activated&apos;(sac)
-*                    INTO msg SEPARATED BY space.
-*                PERFORM writemessage USING &apos;S&apos; msg.
-*              ELSEIF _act = zaplink_list=&gt;sel_actions-not_active.
-*                CONCATENATE offset _type &apos;-&apos; _name &apos;SUCCEED but NOT activated&apos;(sin)
-*                    INTO msg SEPARATED BY space.
-*                PERFORM writemessage USING &apos;W&apos; msg.
-*              ELSE.
-*                CONCATENATE offset _type &apos;-&apos; _name &apos;SUCCEED&apos;(suc)
-*                    INTO msg SEPARATED BY space.
-*                PERFORM writemessage USING &apos;S&apos; msg.
-*              ENDIF.
-*              _msg_col = t_comp-&gt;get_msg_coll( ).
-*              IF _msg_col IS BOUND.
-*                IF _msg_col-&gt;has_messages_of_msgt( &apos;W&apos; ) = abap_true .
-*                  _msg_col-&gt;write( ).
-*                ENDIF.
-*              ENDIF.
-*            ENDIF.
-*          ENDIF.
-*
-*          _subc = t_comp-&gt;get_subcomponents( ).
-*          IF _subc IS BOUND.
-*            PERFORM dsp_result_display USING space _subc _offset.
-*          ENDIF.
-*
-*          t_comp = objlist-&gt;get_next( ).
-*        ENDWHILE.
-*      CATCH zaplink_cx INTO o_cx.
-*        o_cx-&gt;write( ).
-*    ENDTRY.
-*
-*  ENDFORM.                    &quot; DSP_RESULT_DISPLAY
-*&amp;---------------------------------------------------------------------*
-*&amp;      Form  auto
-*&amp;---------------------------------------------------------------------*
-*       text
-*----------------------------------------------------------------------*
-  FORM auto.
-    DATA _keys TYPE zaplink_gui=&gt;tt_compkeys.
-
-    TRY.
-        _keys = zaplink_gui=&gt;get_keys_from_tadir( srcsystem = s_srcs[]
-                                                       type = s_type[]
-                                                       name = s_name[]
-                                                   packages = s_pack[]
-                                                        ext = p_ext
-                                                     author = s_author[] ).
-* No component was selected with this parameters
-        IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
-
-        d_name = &apos;c_name&apos;.
-        mac_replace d_name: uname, sysid, datum, uzeit.
-        IF d_name IS INITIAL. CONCATENATE sy-datum sy-uzeit INTO d_name. ENDIF.
-        CALL METHOD zaplink_gui=&gt;create
-          EXPORTING
-            name = d_name
-            file = o_file.
-
-        CREATE OBJECT objlist.
-        objlist-&gt;add_keys( _keys ).
-        objlist-&gt;select_default( zaplink_list=&gt;sel_actions-export ).
-        objlist-&gt;change_selection( ).
-
-        CALL METHOD zaplink_gui=&gt;export
-          EXPORTING
-            file         = o_file
-            with_subcomp = f_sub
-          CHANGING
-            objlist      = objlist.
-      CATCH zaplink_cx INTO o_exception.
-        o_exception-&gt;write( ).
-        EXIT.
-    ENDTRY.
-
-*    PERFORM dsp_result_display USING space objlist space.
-
-  ENDFORM.                    &quot; auto
-*&amp;---------------------------------------------------------------------*
-*&amp;      Form  add
-*&amp;---------------------------------------------------------------------*
-  FORM refresh .
-
-    TRY.
-        objlist = zaplink_gui=&gt;refresh( file = o_file
-                                with_subcomp = f_sub ).
-      CATCH zaplink_cx INTO o_exception.
-        o_exception-&gt;write( ).
-        EXIT.
-    ENDTRY.
-
-*    PERFORM dsp_result_display USING space objlist space.
-
-  ENDFORM.                    &quot; add
+  WRITE p_msg.
+ENDFORM.                    &quot;WriteMessage
 *&amp;---------------------------------------------------------------------*
 *&amp;      Form  add
 *&amp;---------------------------------------------------------------------*
 *       text
 *----------------------------------------------------------------------*
-  FORM add .
-    DATA _keys TYPE zaplink_gui=&gt;tt_compkeys.
+FORM add .
+  DATA _keys TYPE zaplink_gui=&gt;tt_compkeys.
 
-    TRY.
-        _keys = zaplink_gui=&gt;get_keys_from_tadir( srcsystem = s_srcs[]
-                                                       type = s_type[]
-                                                       name = s_name[]
-                                                   packages = s_pack[]
-                                                        ext = p_ext
-                                                     author = s_author[] ).
+  TRY.
+      _keys = zaplink_gui=&gt;get_keys_from_tadir( srcsystem = s_srcs[]
+                                                     type = s_type[]
+                                                     name = s_name[]
+                                                 packages = s_pack[]
+                                                      ext = p_ext
+                                                   author = s_author[] ).
 * No component was selected with this parameters
-        IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
-        CREATE OBJECT objlist.
-        objlist-&gt;add_keys( _keys ).
-        zaplink_gui=&gt;change_selection( action = zaplink_list=&gt;sel_actions-export
-                                         list = objlist ).
+      IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
+      objlist-&gt;add_keys( _keys ).
 
-        CALL METHOD zaplink_gui=&gt;export
-          EXPORTING
-            file         = o_file
-            with_subcomp = f_sub
-          CHANGING
-            objlist      = objlist.
-      CATCH zaplink_cx INTO o_exception.
-        o_exception-&gt;write( ).
-        EXIT.
-    ENDTRY.
+    CATCH zaplink_cx INTO o_exception.
+      o_exception-&gt;write( ).
+      EXIT.
+  ENDTRY.
 
 *    PERFORM dsp_result_display USING space objlist space.
 
-  ENDFORM.                    &quot; add
+ENDFORM.                    &quot; add
 *&amp;---------------------------------------------------------------------*
 *&amp;      Form  add_comp
 *&amp;---------------------------------------------------------------------*
-  FORM add_comp.
-    DATA o_comp    TYPE zaplink_gui=&gt;to_component.
+FORM add_comp.
+  DATA o_comp    TYPE zaplink_gui=&gt;to_component.
 
-    CHECK NOT co_type IS INITIAL AND NOT co_name IS INITIAL.
+  CHECK NOT co_type IS INITIAL AND NOT co_name IS INITIAL.
 
-    TRY.
-        CREATE OBJECT: o_comp, objlist.
-        o_comp-&gt;set_type( co_type ).    o_comp-&gt;set_name( co_name ).
-        IF o_comp-&gt;connector_exists( ) &lt;&gt; zaplink_gui=&gt;exists-exists.
+  TRY.
+      CREATE OBJECT o_comp.
+      o_comp-&gt;set_type( co_type ).    o_comp-&gt;set_name( co_name ).
+      IF o_comp-&gt;connector_exists( ) &lt;&gt; zaplink_gui=&gt;exists-exists.
 * There is no ZAPLink connector installed for object type &apos;&amp;1&apos;
-          MESSAGE i050 WITH co_type.
-          EXIT.
-        ENDIF.
-        IF o_comp-&gt;do_exists( ) &lt;&gt; zaplink_gui=&gt;exists-exists.
-* Component &apos;&amp;2&apos; (object type &apos;&amp;1&apos;) does not exists
-          MESSAGE i052 WITH co_type co_name.
-          EXIT.
-        ENDIF.
-        objlist-&gt;add( o_comp ).
-        objlist-&gt;select_all( ).
-
-        CALL METHOD zaplink_gui=&gt;export
-          EXPORTING
-            file         = o_file
-            with_subcomp = f_sub
-          CHANGING
-            objlist      = objlist.
-      CATCH zaplink_cx INTO o_exception.
-        o_exception-&gt;write( ).
+        MESSAGE i050 WITH co_type.
         EXIT.
-    ENDTRY.
+      ENDIF.
+      IF o_comp-&gt;do_exists( ) &lt;&gt; zaplink_gui=&gt;exists-exists.
+* Component &apos;&amp;2&apos; (object type &apos;&amp;1&apos;) does not exists
+        MESSAGE i052 WITH co_type co_name.
+        EXIT.
+      ENDIF.
+      objlist-&gt;add( o_comp ).
+
+    CATCH zaplink_cx INTO o_exception.
+      o_exception-&gt;write( ).
+      EXIT.
+  ENDTRY.
 
 *    PERFORM dsp_result_display USING space objlist space.
 
-  ENDFORM.                    &quot; add_package
+ENDFORM.                    &quot; add_package
 *&amp;---------------------------------------------------------------------*
 *&amp;      Form  add_tr
 *&amp;---------------------------------------------------------------------*
-  FORM add_tr using r_tr type zaplink_gui=&gt;tr_tr
-           CHANGING keys type zaplink_gui=&gt;tt_compkeys.
+FORM add_tr USING r_tr TYPE zaplink_gui=&gt;tr_tr.
+  DATA _keys TYPE zaplink_gui=&gt;tt_compkeys.
 
-    IF r_tr[] IS INITIAL.
-      MESSAGE i000(0k) WITH &apos;Transport Request required&apos;(003).
+  IF r_tr[] IS INITIAL.
+    MESSAGE i000(0k) WITH &apos;Transport Request required&apos;(003).
+    EXIT.
+  ENDIF.
+
+  TRY.
+      _keys = zaplink_gui=&gt;get_keys_from_tr( r_tr ).
+* No component was selected with this parameters
+      IF _keys  IS INITIAL.   MESSAGE s054.   EXIT.   ENDIF.
+      objlist-&gt;add_keys( _keys ).
+
+    CATCH zaplink_cx INTO o_exception.
+      o_exception-&gt;write( ).
       EXIT.
+  ENDTRY.
+
+ENDFORM.                    &quot; add_tr
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  bdc_dynpro
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;PROGRAM    text
+*      --&gt;DYNPRO     text
+*----------------------------------------------------------------------*
+FORM bdc_dynpro USING program dynpro.
+  CLEAR bdcdata.
+  bdcdata-program  = program.
+  bdcdata-dynpro   = dynpro.
+  bdcdata-dynbegin = &apos;X&apos;.
+  APPEND bdcdata.
+ENDFORM.                    &quot;BDC_DYNPRO
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  bdc_field
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;FNAM       text
+*      --&gt;FVAL       text
+*----------------------------------------------------------------------*
+FORM bdc_field USING fnam fval.
+  CLEAR bdcdata.
+  bdcdata-fnam = fnam.
+  bdcdata-fval = fval.
+  APPEND bdcdata.
+ENDFORM.                    &quot;BDC_FIELD
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_OBJECT_LIST
+*&amp;---------------------------------------------------------------------*
+FORM create_object_list .
+  CREATE OBJECT objlist.
+  CASE abap_true.
+    WHEN a_add.       PERFORM add.          &quot; add object to Container
+    WHEN a_add_p.     PERFORM add_comp.
+    WHEN a_add_tr.    PERFORM add_tr USING p_tr[].
+  ENDCASE.
+
+* Allow user to refine object list
+*        zaplink_gui=&gt;change_selection( action = zaplink_list=&gt;sel_actions-export
+*                                         list = objlist ).
+  objlist-&gt;select_default( zaplink_list=&gt;sel_actions-export ).
+  objlist-&gt;change_selection( ).
+ENDFORM.                    &quot; CREATE_OBJECT_LIST
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_COMPONENTS
+*&amp;---------------------------------------------------------------------*
+FORM get_components .
+  DATA keys             TYPE zaplink_gui=&gt;tt_compkeys.
+  DATA o_list           TYPE to_objlist.
+  DATA components_list  TYPE  zaplink_components_list.
+  DATA s_comp           LIKE LINE OF components_list.
+  FIELD-SYMBOLS:
+    &lt;c&gt; LIKE LINE OF keys.
+
+  o_list = objlist-&gt;selection_as_list( ).
+  keys = o_list-&gt;get_keys( ).
+  LOOP AT keys ASSIGNING &lt;c&gt;.
+    MOVE-CORRESPONDING &lt;c&gt; TO s_comp.
+    APPEND s_comp TO components_list.
+  ENDLOOP.
+  SORT components_list. DELETE ADJACENT DUPLICATES FROM components_list.
+
+* Get local components
+  CALL FUNCTION &apos;ZAPLINK_GET_COMPONENTS&apos;
+    EXPORTING
+      components_list = components_list
+    IMPORTING
+      definitions     = t_def_loc.
+
+* Remote call
+  CALL FUNCTION &apos;ZAPLINK_GET_COMPONENTS&apos;
+    DESTINATION p_rfc
+    EXPORTING
+      components_list = components_list
+    IMPORTING
+      definitions     = t_def_dis.
+ENDFORM.                    &quot; GET_COMPONENTS
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DISPLAY_LIST
+*&amp;---------------------------------------------------------------------*
+FORM display_list.
+  DATA s_result LIKE LINE OF t_results.
+  DATA s_layout TYPE slis_layout_alv.
+  FIELD-SYMBOLS:
+    &lt;rl&gt; LIKE LINE OF t_def_loc,
+    &lt;rd&gt; LIKE LINE OF t_def_loc.
+
+  LOOP AT t_def_loc ASSIGNING &lt;rl&gt;.
+    CLEAR s_result.
+    MOVE-CORRESPONDING &lt;rl&gt; TO s_result.
+    s_result-select = abap_true.
+    READ TABLE t_def_dis ASSIGNING &lt;rd&gt;
+         WITH TABLE KEY type = s_result-type
+                        name = s_result-name.
+    IF sy-subrc = 0.
+      s_result-t_checksum = &lt;rd&gt;-checksum.
+      s_result-t_code_signature = &lt;rd&gt;-code_signature.
+    ELSE.
+      s_result-icon = icon_absence.
+    ENDIF.
+    IF s_result-icon IS INITIAL.
+      IF  s_result-t_checksum = s_result-checksum
+      AND s_result-t_code_signature = s_result-code_signature.
+        CLEAR s_result-select.
+        s_result-icon = icon_equal_green.
+      ELSEIF s_result-t_code_signature = s_result-code_signature AND s_result-code_signature IS NOT INITIAL.
+        s_result-icon = icon_translation.
+      ELSE.
+        s_result-icon = icon_not_equal_red.
+      ENDIF.
     ENDIF.
 
-    TRY.
-        keys = zaplink_gui=&gt;get_keys_from_tr( r_tr ).
+    APPEND s_result TO t_results.
 
-      CATCH zaplink_cx INTO o_exception.
-        o_exception-&gt;write( ).
-        EXIT.
-    ENDTRY.
+  ENDLOOP.
 
-  ENDFORM.                    &quot; add_tr</SOURCE>
+  s_layout-box_fieldname = &apos;SELECT&apos;.
+  READ TABLE t_fields TRANSPORTING NO FIELDS WITH KEY fieldname = s_layout-box_fieldname.
+  ASSERT sy-subrc = 0.    &quot; missing select fields
+  s_layout-colwidth_optimize = abap_true.
+
+  CALL FUNCTION &apos;REUSE_ALV_GRID_DISPLAY&apos;
+    EXPORTING
+      i_callback_program       = &apos;YGPL_DELTA_ANALYSIS&apos;
+      i_callback_pf_status_set = &apos;PF_STATUS_SET&apos;
+      i_callback_user_command  = &apos;USER_COMMAND_USER&apos;
+      i_grid_title             = &apos;Select objects to compare&apos;(lst)
+      it_fieldcat              = t_fields
+      is_layout                = s_layout
+    TABLES
+      t_outtab                 = t_results
+    EXCEPTIONS
+      OTHERS                   = 0.
+ENDFORM.                    &quot; DISPLAY_LIST
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  pf_status_set
+*&amp;---------------------------------------------------------------------*
+FORM pf_status_set USING rt_extab TYPE slis_t_extab.
+  SET PF-STATUS &apos;ANALYSE&apos; OF PROGRAM &apos;YGPL_DELTA_ANALYSIS&apos; EXCLUDING rt_extab.
+ENDFORM.                    &quot;pf_status_set
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  user_command_user
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;R_UCOMM      text
+*      --&gt;RS_SELFIELD  text
+*----------------------------------------------------------------------*
+FORM user_command_user USING r_ucomm LIKE sy-ucomm
+                  rs_selfield TYPE slis_selfield.
+  FIELD-SYMBOLS:
+    &lt;s&gt; LIKE LINE OF t_def_loc,
+    &lt;t&gt; LIKE LINE OF t_def_dis,
+    &lt;r&gt; LIKE LINE OF t_results.
+
+  rs_selfield-exit = &apos;X&apos;.
+  CASE r_ucomm.
+    WHEN c_act_exit.
+    WHEN c_act_display.
+      LOOP AT t_results ASSIGNING &lt;r&gt;
+           WHERE select = abap_true.
+        READ TABLE t_def_loc ASSIGNING &lt;s&gt;
+             WITH TABLE KEY type = &lt;r&gt;-type
+                            name = &lt;r&gt;-name.
+        ASSERT sy-subrc = 0.
+        READ TABLE t_def_dis ASSIGNING &lt;t&gt;
+             WITH TABLE KEY type = &lt;r&gt;-type
+                            name = &lt;r&gt;-name.
+        CHECK sy-subrc = 0.   &quot; user selected a component that do not exists on target system
+
+      ENDLOOP.
+
+    WHEN OTHERS.
+      CLEAR rs_selfield-exit.
+  ENDCASE.
+ENDFORM.                    &quot;user_command_user
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DISPLAY_DELTA_DETAILS
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  --&gt;  p1        text
+*  &lt;--  p2        text
+*----------------------------------------------------------------------*
+FORM display_delta_details .
+  DATA s_src      TYPE string.
+  DATA s_dst      TYPE string.
+  DATA o_prog_src TYPE REF TO zaplink_prog_data_2. &quot;loc.
+  DATA o_prog_dst TYPE REF TO zaplink_prog_data_2. &quot;loc.
+  DATA o_raw      TYPE REF TO zaplink_raw.
+  DATA o_conn     TYPE REF TO zaplink_program.
+  DATA o_comp     TYPE REF TO zaplink_component.
+  DATA messtab    LIKE bdcmsgcoll OCCURS 0 WITH HEADER LINE.
+  FIELD-SYMBOLS:
+    &lt;rl&gt;  LIKE LINE OF t_def_loc,
+    &lt;rd&gt;  LIKE LINE OF t_def_loc,
+    &lt;i&gt;   LIKE LINE OF t_results.
+
+  LOOP AT t_results ASSIGNING &lt;i&gt;
+       WHERE select = abap_true.
+    READ TABLE t_def_loc ASSIGNING &lt;rl&gt;
+         WITH TABLE KEY type = &lt;i&gt;-type
+                        name = &lt;i&gt;-name.
+    ASSERT sy-subrc = 0.
+    READ TABLE t_def_dis ASSIGNING &lt;rd&gt;
+         WITH TABLE KEY type = &lt;i&gt;-type
+                        name = &lt;i&gt;-name.
+    ASSERT sy-subrc = 0.
+    CONCATENATE s_src cl_abap_char_utilities=&gt;newline &lt;rl&gt;-content INTO s_src.
+    CONCATENATE s_dst cl_abap_char_utilities=&gt;newline &lt;rd&gt;-content INTO s_dst.
+  ENDLOOP.
+
+**----------------------------------------------------------------------*
+**       CLASS ZAPLINK_PROG_DATA_loc  DEFINITIO
+**----------------------------------------------------------------------*
+**
+**----------------------------------------------------------------------*
+*CLASS zaplink_prog_data_loc DEFINITION
+*  INHERITING FROM zaplink_prog_data
+*  CREATE PUBLIC .
+*
+*  PUBLIC SECTION.
+*
+*    METHODS add_source_code
+*      IMPORTING
+*        !source TYPE td_abapsource .
+*    METHODS load_from_data .
+*  PROTECTED SECTION.
+*  PRIVATE SECTION.
+*    DATA _my_fm_data TYPE ts_fm_data .
+*ENDCLASS. &quot;ZAPLINK_PROG_DATA_2 definition
+*
+**----------------------------------------------------------------------*
+**       CLASS ZAPLINK_PROG_DATA_loc IMPLEMENTATION
+**----------------------------------------------------------------------*
+**
+**----------------------------------------------------------------------*
+*CLASS zaplink_prog_data_loc IMPLEMENTATION.
+*  METHOD add_source_code.
+*    CHECK source IS NOT INITIAL.
+*    CONCATENATE _my_fm_data-source cl_abap_char_utilities=&gt;newline source INTO _my_fm_data-source.
+*  ENDMETHOD.                    &quot;add_source_code
+*  METHOD load_from_data.
+*    me-&gt;from_data( _my_fm_data ).
+*  ENDMETHOD.                    &quot;LOAD_FROM_DATA
+*ENDCLASS. &quot;ZAPLINK_PROG_DATA_2 implementation
+
+  CREATE OBJECT o_prog_src.
+  CREATE OBJECT o_prog_dst.
+  o_prog_src-&gt;add_source_code( s_src ).
+  o_prog_dst-&gt;add_source_code( s_dst ).
+  o_prog_src-&gt;load_from_data( ).
+  o_prog_dst-&gt;load_from_data( ).
+  CREATE OBJECT o_conn.
+  CREATE OBJECT o_comp.
+  o_comp-&gt;set_type( &apos;PROG&apos; ).
+  o_comp-&gt;set_name( o_prog_src-&gt;_my_progname ).
+  CREATE OBJECT o_raw
+    EXPORTING
+      o_comp = o_comp.
+  o_raw-&gt;raw = o_prog_src.
+  o_conn-&gt;zaplink_connector~write_to_sap( o_raw ).
+  o_comp-&gt;set_name( o_prog_dst-&gt;_my_progname ).
+  o_raw-&gt;raw = o_prog_dst.
+  o_raw-&gt;set_component( o_comp ).       &quot; To act change of program name
+  o_conn-&gt;zaplink_connector~write_to_sap( o_raw ).
+
+  COMMIT WORK AND WAIT.
+
+  PERFORM bdc_dynpro      USING &apos;SAPLS_WB_SPLIT_EDITOR_INITIAL&apos; &apos;0220&apos;.
+  PERFORM bdc_field       USING &apos;BDC_CURSOR&apos;
+                                &apos;RSEDR-REPID&apos;.
+  PERFORM bdc_field       USING &apos;BDC_OKCODE&apos;
+                                &apos;=DISP&apos;.
+  PERFORM bdc_field       USING &apos;RSEDL-FLG_PROG&apos;
+                                &apos;X&apos;.
+  PERFORM bdc_field       USING &apos;RSEDL-REPID&apos;
+                                o_prog_src-&gt;_my_progname.
+  PERFORM bdc_field       USING &apos;RSEDL-FLG_DEFAUL&apos;
+                                &apos;&apos;.
+  PERFORM bdc_field       USING &apos;RSEDL-FLG_INACT&apos;
+                                &apos;X&apos;.
+  PERFORM bdc_field       USING &apos;RSEDR-FLG_PROG&apos;
+                                &apos;X&apos;.
+  PERFORM bdc_field       USING &apos;RSEDR-REPID&apos;
+                                o_prog_dst-&gt;_my_progname.
+  PERFORM bdc_field       USING &apos;RSEDR-FLG_DEFAUL&apos;
+                                &apos;X&apos;.
+  PERFORM bdc_dynpro      USING &apos;SAPLS_WB_SPLITCORE&apos; &apos;0100&apos;.
+  PERFORM bdc_field       USING &apos;BDC_OKCODE&apos;
+                                &apos;=EC_COMPARE&apos;.
+
+*  PARAMETERS CTUMODE LIKE CTU_PARAMS-DISMODE DEFAULT &apos;N&apos;.
+*                                      &quot;A: show all dynpros
+*                                      &quot;E: show dynpro on error only
+*                                      &quot;N: do not display dynpro
+*  PARAMETERS CUPDATE LIKE CTU_PARAMS-UPDMODE DEFAULT &apos;L&apos;.
+*                                      &quot;S: synchronously
+*                                      &quot;A: asynchronously
+*                                      &quot;L: local
+
+  CALL TRANSACTION &apos;SE39&apos; USING bdcdata
+*                MODE   CTUMODE
+                   MODE   &apos;E&apos;
+*                UPDATE CUPDATE
+                   UPDATE &apos;L&apos;
+                   MESSAGES INTO messtab.
+
+ENDFORM.                    &quot; DISPLAY_DELTA_DETAILS
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_FIELDCAT
+*&amp;---------------------------------------------------------------------*
+FORM get_fieldcat .
+  CALL FUNCTION &apos;REUSE_ALV_FIELDCATALOG_MERGE&apos;
+    EXPORTING
+*      i_program_name               = &apos;YGPL_DELTA_ANALYSIS&apos;
+*      i_internal_tabname           = &apos;T_RESULTS&apos;
+      i_structure_name             = &apos;YGPL_DELTA_ANALYSIS_RESULT&apos;
+*     I_CLIENT_NEVER_DISPLAY       = &apos;X&apos;
+*     I_INCLNAME                   =
+*     I_BYPASSING_BUFFER           =
+*     I_BUFFER_ACTIVE              =
+    CHANGING
+      ct_fieldcat                  = t_fields
+    EXCEPTIONS
+      inconsistent_interface       = 1
+      program_error                = 2
+      OTHERS                       = 3.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+ENDFORM.                    &quot; GET_FIELDCAT</SOURCE>
   <TEXTSPOOL>
    <ITEM ID="R">
     <TEXTS>

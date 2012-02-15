@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="25861023C18371A7BEA9DD554981347C" CODE_SIGNATURE="329E30DF994BF49F9D8170D1AC33990F" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_SCR" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="EDE6B452A5C515E354B252FC311B0618" CODE_SIGNATURE="FD9834496330F3FF706D643ADDA6D49F" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_SCR" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="I" LEVL="701" RSTAT="K" RMAND="220" RLOAD="E" UCCHECK="X"/>
@@ -11,7 +11,7 @@
 */------------------------SELECTION SCREEN----------------------------\
 
 *SELECTION-SCREEN BEGIN OF BLOCK main WITH FRAME.
-PARAMETER p_rfc TYPE rfcdest OBLIGATORY.
+PARAMETER p_rfc TYPE rfcdest OBLIGATORY MATCHCODE OBJECT f4_rfcdes3.
 
 SELECTION-SCREEN BEGIN OF BLOCK mode WITH FRAME TITLE text-bac.
 PARAMETER a_add_p TYPE c RADIOBUTTON GROUP r3 USER-COMMAND just_to_call_event.
@@ -58,6 +58,7 @@ DATA d_file_type        TYPE string.
 
 */----------------------selection screen events-----------------------\
 INITIALIZATION.
+  PERFORM get_fieldcat.
   PERFORM on_initialization.
 
 AT SELECTION-SCREEN.
@@ -121,31 +122,31 @@ AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_tr-high.
 *&amp;      Form  ON_INITIALIZATION
 *&amp;---------------------------------------------------------------------*
 FORM on_initialization .
-  DATA clskey TYPE seoclskey.
-  DATA not_active TYPE seox_boolean.
-  DATA t_fields TYPE  dyfatc_tab.
-  DATA _scr LIKE LINE OF s_scr_name_import.
+*  DATA clskey     TYPE seoclskey.
+*  DATA not_active TYPE seox_boolean.
+  DATA t_fields   TYPE  dyfatc_tab.
+  DATA _scr       LIKE LINE OF s_scr_name_import.
   FIELD-SYMBOLS:
     &lt;f&gt; LIKE LINE OF t_fields.
 
-  clskey-clsname = &apos;ZAPLINK_FILE_ZIP&apos;.
-  CALL FUNCTION &apos;SEO_CLASS_EXISTENCE_CHECK&apos;
-    EXPORTING
-      clskey        = clskey
-    IMPORTING
-      not_active    = not_active
-    EXCEPTIONS
-      not_specified = 1
-      not_existing  = 2
-      is_interface  = 3
-      no_text       = 4
-      inconsistent  = 5
-      OTHERS        = 6.
-  IF sy-subrc = 0 AND not_active IS INITIAL.
-    d_file_type = clskey-clsname.
-  ENDIF.
-
-  CREATE OBJECT zaplink_gui=&gt;o_options.
+*  clskey-clsname = &apos;ZAPLINK_FILE_ZIP&apos;.
+*  CALL FUNCTION &apos;SEO_CLASS_EXISTENCE_CHECK&apos;
+*    EXPORTING
+*      clskey        = clskey
+*    IMPORTING
+*      not_active    = not_active
+*    EXCEPTIONS
+*      not_specified = 1
+*      not_existing  = 2
+*      is_interface  = 3
+*      no_text       = 4
+*      inconsistent  = 5
+*      OTHERS        = 6.
+*  IF sy-subrc = 0 AND not_active IS INITIAL.
+*    d_file_type = clskey-clsname.
+*  ENDIF.
+*
+*  CREATE OBJECT zaplink_gui=&gt;o_options.
 
   CALL FUNCTION &apos;RPY_DYNPRO_READ&apos;
     EXPORTING
@@ -319,9 +320,10 @@ ENDFORM.                    &quot; SHOW_HELP_MARKUPS
 *&amp;---------------------------------------------------------------------*
 FORM on_tr_request .
   DATA:
-    d_org_type   TYPE trwbo_calling_organizer,
-    d_request TYPE trwbo_request_header,
-    d_task    TYPE trwbo_request_header.
+    d_org_type  TYPE trwbo_calling_organizer,
+    d_request   TYPE trwbo_request_header,
+    d_task      TYPE trwbo_request_header.
+
   d_org_type = &apos;W&apos;.
 *  is_selection-reqstatus = &apos;R&apos;.
   CALL FUNCTION &apos;TR_PRESENT_REQUESTS_SEL_POPUP&apos;
