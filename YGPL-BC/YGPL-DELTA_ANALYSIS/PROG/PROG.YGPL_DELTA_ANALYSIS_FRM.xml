@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="891B2B4AF4551E2944A0BDEDE4C2D06B" CODE_SIGNATURE="A7AAEE54276041B3B2313961BEE52405" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="5EEB11DEB4AC5BE545A5EA79B73A6312" CODE_SIGNATURE="B3050D039EA602742F2BC3A47D13D250" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="I" APPL="S" LEVL="701" RMAND="220" RLOAD="E" UCCHECK="X"/>
@@ -300,8 +300,8 @@ ENDFORM.                    &quot;user_command_user
 FORM display_delta_details .
   DATA s_src      TYPE string.
   DATA s_dst      TYPE string.
-  DATA o_prog_src TYPE REF TO zaplink_prog_data_2. &quot;loc.
-  DATA o_prog_dst TYPE REF TO zaplink_prog_data_2. &quot;loc.
+  DATA o_prog_src TYPE REF TO ZAPLINK_PROG_DATA_local. &quot;loc.
+  DATA o_prog_dst TYPE REF TO ZAPLINK_PROG_DATA_local. &quot;loc.
   DATA o_raw      TYPE REF TO zaplink_raw.
   DATA o_conn     TYPE REF TO zaplink_program.
   DATA o_comp     TYPE REF TO zaplink_component.
@@ -343,7 +343,7 @@ FORM display_delta_details .
 *  PROTECTED SECTION.
 *  PRIVATE SECTION.
 *    DATA _my_fm_data TYPE ts_fm_data .
-*ENDCLASS. &quot;ZAPLINK_PROG_DATA_2 definition
+*ENDCLASS. &quot;ZAPLINK_PROG_DATA_local definition
 *
 **----------------------------------------------------------------------*
 **       CLASS ZAPLINK_PROG_DATA_loc IMPLEMENTATION
@@ -358,7 +358,7 @@ FORM display_delta_details .
 *  METHOD load_from_data.
 *    me-&gt;from_data( _my_fm_data ).
 *  ENDMETHOD.                    &quot;LOAD_FROM_DATA
-*ENDCLASS. &quot;ZAPLINK_PROG_DATA_2 implementation
+*ENDCLASS. &quot;ZAPLINK_PROG_DATA_local implementation
 
   CREATE OBJECT o_prog_src.
   CREATE OBJECT o_prog_dst.
