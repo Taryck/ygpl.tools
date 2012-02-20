@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="96BACA8811B6E3945B92E87239F148F9" CODE_SIGNATURE="1E8CB9A3887DF8B17D25665B2458FC94" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TRANSPORT_REQUEST_POOL" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-TRANSPORT_REQUEST" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="S" APPL="S" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Subroutine Pool   YGPL_TRANSPORT_REQUEST_POOL
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+PROGRAM  ygpl_transport_request_pool.
+
+TYPE-POOLS : trwbo.
+TYPES t_obj_type    TYPE zaplink_gui=&gt;td_comptype.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ON_TR_REQUEST
+*&amp;---------------------------------------------------------------------*
+FORM on_tr_request USING reqstatus  TYPE trpari-w_longstat
+                CHANGING p_tr TYPE e070-trkorr.
+  DATA:
+    is_selection  TYPE trwbo_selection,
+    d_org_type    TYPE trwbo_calling_organizer,
+    d_request     TYPE trwbo_request_header,
+    d_task        TYPE trwbo_request_header.
+
+  d_org_type = &apos;W&apos;.
+  is_selection-reqstatus = reqstatus.
+  CALL FUNCTION &apos;TR_PRESENT_REQUESTS_SEL_POPUP&apos;
+    EXPORTING
+      iv_organizer_type   = d_org_type
+      is_selection        = is_selection
+    IMPORTING
+      es_selected_request = d_request
+      es_selected_task    = d_task.
+
+  p_tr = d_request-trkorr.
+ENDFORM.                    &quot; ON_TR_REQUEST
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ON_NAME_REQUEST
+*&amp;---------------------------------------------------------------------*
+FORM on_name_request  USING p_type
+                   CHANGING p_name.
+  DATA d_name TYPE zaplink_gui=&gt;td_compname.
+  DATA d_type TYPE zaplink_gui=&gt;td_comptype.
+
+  d_type = p_type.
+  d_name = p_name.
+  zaplink_gui=&gt;get_values( EXPORTING type = d_type
+                           CHANGING value = d_name ).
+  p_name = d_name.
+ENDFORM.                    &quot; ON_NAME_REQUEST</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Subroutine pool for Transport Request" LENGTH="37 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BEEBF79764A4C29E7B471CE6544A5F30" CODE_SIGNATURE="2382E33A563A344ED7BA666FFEFB0923" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TR_TOOLS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="2CCFC33012F18B1F416F6D44C4530687" CODE_SIGNATURE="BBB89199D6C15DEB8C2F5BD483CC6D6F" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TR_TOOLS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-TRANSPORT_REQUEST" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -8,6 +8,7 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="TD_SRCSYSTEM" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TD_SRCSYSTEM"/>
    <ITEM CMPNAME="TD_TRANSPORT_REQUEST" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TD_TRANSPORT_REQUEST"/>
    <ITEM CMPNAME="TT_COMPKEYS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_COMMON_TYPESPOOL" REFCMPNAME="TT_COMPKEYS"/>
   </ALIASES>
@@ -70,6 +71,106 @@
     MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
   ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHANGE_SYSTEM_SOURCE" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Mass change of system source"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
+     <ITEM SCONAME="SOURCE_SYSTEM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_SRCSYSTEM"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA src_system TYPE tadir-srcsystem.
+  DATA exists TYPE abap_bool.
+  DATA s_tadir TYPE tadir.
+  FIELD-SYMBOLS:
+    &lt;k&gt; LIKE LINE OF keys.
+
+  LOOP AT keys ASSIGNING &lt;k&gt;.
+    s_tadir-pgmid = &apos;R3TR&apos;.
+    s_tadir-object = &lt;k&gt;-type.
+    s_tadir-obj_name = &lt;k&gt;-name.
+    CALL FUNCTION &apos;TRINT_TADIR_QUERY&apos;
+      EXPORTING
+        iv_pgmid           = s_tadir-pgmid
+        iv_object          = s_tadir-object
+        iv_obj_name        = s_tadir-obj_name
+      IMPORTING
+*        EV_OBJECT          =
+        ev_srcsystem       = src_system
+*        EV_DEVCLASS        =
+*        EV_AUTHOR          =
+*        EV_GENFLAG         =
+        ev_exist           = exists.
+    CHECK exists = abap_true AND src_system &lt;&gt; source_system.
+    CALL FUNCTION &apos;TRINT_TADIR_INTERFACE&apos;
+      EXPORTING
+*       WI_DELETE_TADIR_ENTRY                = &apos; &apos;
+*       WI_REMOVE_REPAIR_FLAG                = abap_false
+        wi_set_repair_flag                   = abap_false
+        wi_test_modus                        = abap_false
+        wi_tadir_pgmid                       = s_tadir-pgmid
+        wi_tadir_object                      = s_tadir-object
+        wi_tadir_obj_name                    = s_tadir-obj_name
+*       WI_TADIR_KORRNUM                     = &apos; &apos;
+        wi_tadir_srcsystem                   = source_system
+*       WI_TADIR_AUTHOR                      = &apos; &apos;
+*       WI_TADIR_DEVCLASS                    = &apos; &apos;
+*       WI_TADIR_MASTERLANG                  = &apos; &apos;
+*       WI_TADIR_CPROJECT                    = &apos; &apos;
+*       WI_TADIR_VERSID                      = &apos; &apos;
+*       WI_REMOVE_GENFLAG                    = &apos; &apos;
+*       WI_SET_GENFLAG                       = &apos; &apos;
+*       WI_READ_ONLY                         = &apos; &apos;
+*       IV_SET_EDTFLAG                       = &apos; &apos;
+*       IV_WBO_INTERNAL                      = &apos; &apos;
+*       IV_INSERT_MODE                       = &apos; &apos;
+*       IV_TRANSL_TECH_TEXT                  = &apos; &apos;
+*       IV_DELFLAG                           = &apos; &apos;
+*       IV_NO_PAK_CHECK                      = &apos; &apos;
+*       IV_OBJ_STABILITY                     = &apos; &apos;
+*       IV_TRANSL_TECH_TEXT_SUPP             = &apos; &apos;
+*       IV_DELFLAG_SUPP                      = &apos;&apos;
+*       IV_NO_PAK_CHECK_SUPP                 = &apos; &apos;
+*       IV_OBJ_STABILITY_SUPP                = &apos; &apos;
+      IMPORTING
+*       NEW_GTADIR_ENTRY                     =
+        new_tadir_entry                      = s_tadir
+      EXCEPTIONS
+        tadir_entry_not_existing             = 1
+        tadir_entry_ill_type                 = 2
+        no_systemname                        = 3
+        no_systemtype                        = 4
+        original_system_conflict             = 5
+        object_reserved_for_devclass         = 6
+        object_exists_global                 = 7
+        object_exists_local                  = 8
+        object_is_distributed                = 9
+        obj_specification_not_unique         = 10
+        no_authorization_to_delete           = 11
+        devclass_not_existing                = 12
+        simultanious_set_remove_repair       = 13
+        order_missing                        = 14
+        no_modification_of_head_syst         = 15
+        pgmid_object_not_allowed             = 16
+        masterlanguage_not_specified         = 17
+        devclass_not_specified               = 18
+        specify_owner_unique                 = 19
+        loc_priv_objs_no_repair              = 20
+        gtadir_not_reached                   = 21
+        object_locked_for_order              = 22
+        change_of_class_not_allowed          = 23
+        no_change_from_sap_to_tmp            = 24
+        OTHERS                               = 25.
+    IF sy-subrc &lt;&gt; 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    CHECK     s_tadir-object = &lt;k&gt;-type AND s_tadir-obj_name = &lt;k&gt;-name AND s_tadir-srcsystem = source_system.
+* Has failed
+
+  ENDLOOP.</SOURCE>
    </ITEM>
   </METHODS>
  </RAW>

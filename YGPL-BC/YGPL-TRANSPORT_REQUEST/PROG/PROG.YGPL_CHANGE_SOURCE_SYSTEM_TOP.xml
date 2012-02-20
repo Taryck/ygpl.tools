@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="2FAB280F6760705F096D6C642C1EA673" CODE_SIGNATURE="9CD04C4BED7FA169EFB5E06983F9C68F" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHANGE_SOURCE_SYSTEM_TOP" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-TRANSPORT_REQUEST" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="I" APPL="S" LEVL="701" RMAND="220" RLOAD="E" UCCHECK="X"/>
+  <SOURCE>`
+*---------------------------------------------------------------------*
+*  Include           ZAPLINLK_TOP
+*---------------------------------------------------------------------*
+TABLES: sscrfields, e071, tadir.
+
+TYPE-POOLS: abap, icon, trwbo.
+TYPES td_action TYPE rsmpe-func.
+
+CONSTANTS:
+  c_act_exit    TYPE td_action VALUE &apos;EXIT&apos;,
+  c_act_display TYPE td_action VALUE &apos;DISPLAY&apos;.
+
+TYPES to_objlist    TYPE zaplink_gui=&gt;to_list.
+TYPES to_exception  TYPE REF TO zaplink_cx.
+
+DATA objlist        TYPE to_objlist.
+DATA o_exception    TYPE to_exception.
+DATA t_results      TYPE STANDARD TABLE OF ygpl_delta_analysis_result.
+DATA t_fields       TYPE slis_t_fieldcat_alv.
+DATA keys           TYPE zaplink_gui=&gt;tt_compkeys.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Include ZAPLINLK_TOP" LENGTH="20 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
