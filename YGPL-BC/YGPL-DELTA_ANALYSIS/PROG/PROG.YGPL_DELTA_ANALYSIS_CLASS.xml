@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="D930C71287DCBD17A47A76644D384D0F" CODE_SIGNATURE="26294F0F903D81098E62DD8993F00B33" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_CLASS" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA EDTX="X" VARCL="X" SUBC="I" APPL="S" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp;  Include           YGPL_DELTA_ANALYSIS_CLASS
+*&amp;---------------------------------------------------------------------*
+* class-pool .
+*&quot;* class pool for class ZAPLINK_PROG_DATA_local
+
+*&quot;* local type definitions
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature
+
+
+*&quot;* class ZAPLINK_PROG_DATA_local definition
+*&quot;* public declarations
+class ZAPLINK_PROG_DATA_local definition
+*  public
+  inheriting from ZAPLINK_PROG_DATA
+  create public .
+
+*&quot;* public components of class ZAPLINK_PROG_DATA_local
+*&quot;* do not include other source files here!!!
+public section.
+
+  data _MY_PROGNAME type PROGDIR-NAME read-only .
+
+  methods ADD_SOURCE_CODE
+    importing
+      !SOURCE type TD_ABAPSOURCE .
+  methods LOAD_FROM_DATA .
+*&quot;* protected declarations
+*&quot;* protected components of class ZAPLINK_PROG_DATA_local
+*&quot;* do not include other source files here!!!
+protected section.
+*&quot;* private declarations
+*&quot;* private components of class ZAPLINK_PROG_DATA_local
+*&quot;* do not include other source files here!!!
+private section.
+
+  data _MY_FM_DATA type TS_FM_DATA .
+endclass. &quot;ZAPLINK_PROG_DATA_local definition
+
+*&quot;* macro definitions
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class
+
+*&quot;* local class implementation
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes
+
+
+class ZAPLINK_PROG_DATA_local implementation.
+*&quot;* method&apos;s implementations
+METHOD add_source_code.
+  CHECK source IS NOT INITIAL.
+  CONCATENATE _my_fm_data-source cl_abap_char_utilities=&gt;newline source INTO _my_fm_data-source.
+ENDMETHOD.
+METHOD load_from_data.
+  DATA guid   TYPE guid_22.
+  DATA t_src  TYPE STANDARD TABLE OF string WITH DEFAULT KEY.
+  FIELD-SYMBOLS: &lt;s&gt; LIKE LINE OF t_src.
+
+  CALL FUNCTION &apos;GUID_CREATE&apos;
+   IMPORTING
+*   EV_GUID_16       =
+     ev_guid_22       = guid
+*   ev_guid_32       =
+     .
+
+  CONCATENATE &apos;ZL_&apos; sy-uname(3) &apos;_&apos; guid INTO _my_progname.
+  REPLACE ALL OCCURRENCES OF &apos;{&apos; IN _my_progname WITH &apos;1&apos;.
+  REPLACE ALL OCCURRENCES OF &apos;}&apos; IN _my_progname WITH &apos;1&apos;.
+  TRANSLATE _my_progname TO UPPER CASE.
+
+  _my_fm_data-header-name = _my_progname.
+  _my_fm_data-header-cnam = sy-uname.
+  _my_fm_data-header-cdat = sy-datum.
+
+* Code
+  SPLIT _my_fm_data-source AT cl_abap_char_utilities=&gt;newline INTO TABLE t_src.
+  DELETE t_src WHERE table_line CP &apos;&lt;?xml version=&quot;1.0&quot; encoding=&quot;*&quot;?&gt;&apos;.
+  DELETE t_src WHERE table_line IS INITIAL.
+*  zaplink_tools=&gt;conv_table_2upcase( CHANGING table = t_src ).
+  _my_fm_data-source = zaplink_tools=&gt;table_2_string( t_src ).
+  me-&gt;from_data( _my_fm_data ).
+ENDMETHOD.
+endclass. &quot;ZAPLINK_PROG_DATA_local implementation</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Include YGPL_DELTA_ANALYSIS_CLASS" LENGTH="33 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
