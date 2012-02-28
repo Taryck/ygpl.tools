@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8B87E721CBD167F53B1C70051BC64093" CODE_SIGNATURE="430380D4904E70CCB4CA38E7C5876A28" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TADIR_SEARCH" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="756AD6D994C89E1A65884CF3EE792693" CODE_SIGNATURE="32DED5316DB3E1B1428488FA1FE2047C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_TADIR_SEARCH" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="K">
@@ -157,7 +157,9 @@ AS</ITEM>
 
   IF ext = abap_true.   t_ext_pack = ygpl_devc_search=&gt;extend_packages( t_ext_pack ).    ENDIF.
 
-  r_exclu = t_ext_pack.     DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
+* Done in Extend Packages
+*  r_exclu = packages.     APPEND LINES OF t_ext_pack TO r_exclu.      &quot; t_ext_pack might have only including values if extend_packages have been applied
+*  DELETE r_exclu WHERE sign &lt;&gt; &apos;E&apos;. &quot; Keep only Devcclass to remove
 
 * Package selection
   SELECT devclass
@@ -165,22 +167,22 @@ AS</ITEM>
       INTO TABLE t_devc
       WHERE devclass IN t_ext_pack.
 
-  IF NOT ext IS INITIAL.
-    t_devc = ygpl_devc_search=&gt;extend_package( t_devc ).
-  ENDIF.
-
-* Package selection
-  IF NOT r_exclu IS INITIAL.
-    SELECT devclass
-        FROM tdevc
-        INTO TABLE t_exclu
-        WHERE NOT devclass IN r_exclu.
-
-    t_exclu = ygpl_devc_search=&gt;extend_package( t_exclu ).
-    LOOP AT t_exclu ASSIGNING &lt;p&gt;.
-      DELETE TABLE t_devc FROM &lt;p&gt;.
-    ENDLOOP.
-  ENDIF.
+*  IF NOT ext IS INITIAL.
+*    t_devc = ygpl_devc_search=&gt;extend_package( t_devc ).
+*  ENDIF.
+*
+** Package selection
+*  IF NOT r_exclu IS INITIAL.
+*    SELECT devclass
+*        FROM tdevc
+*        INTO TABLE t_exclu
+*        WHERE NOT devclass IN r_exclu.
+*
+*    t_exclu = ygpl_devc_search=&gt;extend_package( t_exclu ).
+*    LOOP AT t_exclu ASSIGNING &lt;p&gt;.
+*      DELETE TABLE t_devc FROM &lt;p&gt;.
+*    ENDLOOP.
+*  ENDIF.
 
   IF NOT t_devc IS INITIAL.
     SELECT object obj_name
