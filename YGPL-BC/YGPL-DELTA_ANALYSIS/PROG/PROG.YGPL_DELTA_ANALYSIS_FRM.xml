@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5EEB11DEB4AC5BE545A5EA79B73A6312" CODE_SIGNATURE="B3050D039EA602742F2BC3A47D13D250" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="DFF7B653729E85C672C194CEB0790E5A" CODE_SIGNATURE="35652730E4122DAF21C08DB0E3DF9335" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DELTA_ANALYSIS_FRM" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DELTA_ANALYSIS" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="I" APPL="S" LEVL="701" RMAND="220" RLOAD="E" UCCHECK="X"/>
@@ -172,6 +172,9 @@ FORM get_components .
     APPEND s_comp TO components_list.
   ENDLOOP.
   SORT components_list. DELETE ADJACENT DUPLICATES FROM components_list.
+  IF components_list IS INITIAL.
+    EXIT.
+  ENDIF.
 
 * Get local components
   CALL FUNCTION &apos;ZAPLINK_GET_COMPONENTS&apos;
@@ -194,10 +197,12 @@ ENDFORM.                    &quot; GET_COMPONENTS
 FORM display_list.
   DATA s_result LIKE LINE OF t_results.
   DATA s_layout TYPE slis_layout_alv.
+  DATA s_exit   TYPE slis_exit_by_user.
   FIELD-SYMBOLS:
     &lt;rl&gt; LIKE LINE OF t_def_loc,
     &lt;rd&gt; LIKE LINE OF t_def_loc.
 
+  REFRESH t_results.
   LOOP AT t_def_loc ASSIGNING &lt;rl&gt;.
     CLEAR s_result.
     MOVE-CORRESPONDING &lt;rl&gt; TO s_result.
@@ -240,10 +245,16 @@ FORM display_list.
       i_grid_title             = &apos;Select objects to compare&apos;(lst)
       it_fieldcat              = t_fields
       is_layout                = s_layout
+    IMPORTING
+      es_exit_caused_by_user   = s_exit
     TABLES
       t_outtab                 = t_results
     EXCEPTIONS
       OTHERS                   = 0.
+  IF s_exit IS NOT INITIAL.
+    REFRESH t_results.
+    gv_exit = abap_true.
+  ENDIF.
 ENDFORM.                    &quot; DISPLAY_LIST
 
 *&amp;---------------------------------------------------------------------*
@@ -271,6 +282,11 @@ FORM user_command_user USING r_ucomm LIKE sy-ucomm
   rs_selfield-exit = &apos;X&apos;.
   CASE r_ucomm.
     WHEN c_act_exit.
+      LOOP AT t_results ASSIGNING &lt;r&gt;       &quot; remove selection
+           WHERE select = abap_true.
+        CLEAR &lt;r&gt;-select.
+      ENDLOOP.
+      gv_exit = abap_true.
     WHEN c_act_display.
       LOOP AT t_results ASSIGNING &lt;r&gt;
            WHERE select = abap_true.
@@ -300,8 +316,8 @@ ENDFORM.                    &quot;user_command_user
 FORM display_delta_details .
   DATA s_src      TYPE string.
   DATA s_dst      TYPE string.
-  DATA o_prog_src TYPE REF TO ZAPLINK_PROG_DATA_local. &quot;loc.
-  DATA o_prog_dst TYPE REF TO ZAPLINK_PROG_DATA_local. &quot;loc.
+  DATA o_prog_src TYPE REF TO zaplink_prog_data_local. &quot;loc.
+  DATA o_prog_dst TYPE REF TO zaplink_prog_data_local. &quot;loc.
   DATA o_raw      TYPE REF TO zaplink_raw.
   DATA o_conn     TYPE REF TO zaplink_program.
   DATA o_comp     TYPE REF TO zaplink_component.
@@ -316,49 +332,18 @@ FORM display_delta_details .
     READ TABLE t_def_loc ASSIGNING &lt;rl&gt;
          WITH TABLE KEY type = &lt;i&gt;-type
                         name = &lt;i&gt;-name.
-    ASSERT sy-subrc = 0.
+    CHECK sy-subrc = 0.
     READ TABLE t_def_dis ASSIGNING &lt;rd&gt;
          WITH TABLE KEY type = &lt;i&gt;-type
                         name = &lt;i&gt;-name.
-    ASSERT sy-subrc = 0.
+    CHECK sy-subrc = 0.
     CONCATENATE s_src cl_abap_char_utilities=&gt;newline &lt;rl&gt;-content INTO s_src.
     CONCATENATE s_dst cl_abap_char_utilities=&gt;newline &lt;rd&gt;-content INTO s_dst.
   ENDLOOP.
 
-**----------------------------------------------------------------------*
-**       CLASS ZAPLINK_PROG_DATA_loc  DEFINITIO
-**----------------------------------------------------------------------*
-**
-**----------------------------------------------------------------------*
-*CLASS zaplink_prog_data_loc DEFINITION
-*  INHERITING FROM zaplink_prog_data
-*  CREATE PUBLIC .
-*
-*  PUBLIC SECTION.
-*
-*    METHODS add_source_code
-*      IMPORTING
-*        !source TYPE td_abapsource .
-*    METHODS load_from_data .
-*  PROTECTED SECTION.
-*  PRIVATE SECTION.
-*    DATA _my_fm_data TYPE ts_fm_data .
-*ENDCLASS. &quot;ZAPLINK_PROG_DATA_local definition
-*
-**----------------------------------------------------------------------*
-**       CLASS ZAPLINK_PROG_DATA_loc IMPLEMENTATION
-**----------------------------------------------------------------------*
-**
-**----------------------------------------------------------------------*
-*CLASS zaplink_prog_data_loc IMPLEMENTATION.
-*  METHOD add_source_code.
-*    CHECK source IS NOT INITIAL.
-*    CONCATENATE _my_fm_data-source cl_abap_char_utilities=&gt;newline source INTO _my_fm_data-source.
-*  ENDMETHOD.                    &quot;add_source_code
-*  METHOD load_from_data.
-*    me-&gt;from_data( _my_fm_data ).
-*  ENDMETHOD.                    &quot;LOAD_FROM_DATA
-*ENDCLASS. &quot;ZAPLINK_PROG_DATA_local implementation
+  IF sy-subrc &lt;&gt; 0.   &quot; no data
+    EXIT.
+  ENDIF.
 
   CREATE OBJECT o_prog_src.
   CREATE OBJECT o_prog_dst.
@@ -382,6 +367,7 @@ FORM display_delta_details .
 
   COMMIT WORK AND WAIT.
 
+  REFRESH bdcdata.
   PERFORM bdc_dynpro      USING &apos;SAPLS_WB_SPLIT_EDITOR_INITIAL&apos; &apos;0220&apos;.
   PERFORM bdc_field       USING &apos;BDC_CURSOR&apos;
                                 &apos;RSEDR-REPID&apos;.
@@ -420,6 +406,15 @@ FORM display_delta_details .
 *                UPDATE CUPDATE
                    UPDATE &apos;L&apos;
                    MESSAGES INTO messtab.
+
+  o_comp-&gt;set_name( o_prog_src-&gt;_my_progname ).
+  IF o_conn-&gt;zaplink_connector~delete_from_sap( o_comp ) = abap_false.
+    MESSAGE w118(33) WITH o_prog_src-&gt;_my_progname.
+  ENDIF.
+  o_comp-&gt;set_name( o_prog_dst-&gt;_my_progname ).
+  IF o_conn-&gt;zaplink_connector~delete_from_sap( o_comp ) = abap_false.
+    MESSAGE w118(33) WITH o_prog_src-&gt;_my_progname.
+  ENDIF.
 
 ENDFORM.                    &quot; DISPLAY_DELTA_DETAILS
 *&amp;---------------------------------------------------------------------*
