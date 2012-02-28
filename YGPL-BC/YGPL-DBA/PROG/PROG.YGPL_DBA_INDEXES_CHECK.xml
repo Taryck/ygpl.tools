@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5F42BF4588EA8FFF9F0D8F3EDF541E71" CODE_SIGNATURE="F294FCFC49832159CE01E1FE303BFD93" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="72E74FBACD9C33A0157E6F19C34434C8" CODE_SIGNATURE="F294FCFC49832159CE01E1FE303BFD93" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_INDEXES_CHECK" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" UCCHECK="X"/>
@@ -111,7 +111,7 @@ form DISPLAY_RESULT  using    o_check TYPE ygpl_dba_interfaces=&gt;ti_check_inde
 endform.                    &quot; DISPLAY_RESULT</SOURCE>
   <TEXTS>
    <ITEM LANGU="E">
-    <LONG_TXT TDFRELES="701" TDLRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+    <LONG_TXT TDLINESIZE="072">U1&amp;PURPOSE&amp;
 ASCheck that tables with a client field as part of the primary key also
   have this client field in every indexes of the table.
 U1&amp;INTEGRATION&amp;
@@ -145,7 +145,7 @@ U1&amp;EXAMPLE&amp;
 AS</LONG_TXT>
    </ITEM>
    <ITEM LANGU="F">
-    <LONG_TXT TDFRELES="701" TDLRELES="701" TDLINESIZE="072">U1&amp;PURPOSE&amp;
+    <LONG_TXT TDLINESIZE="072">U1&amp;PURPOSE&amp;
 ASContrôle que les tables avec un mandant (faisant partie de la clé de
   table) ont bien la même zone mandant dans tout les indexes.
 U1&amp;INTEGRATION&amp;
