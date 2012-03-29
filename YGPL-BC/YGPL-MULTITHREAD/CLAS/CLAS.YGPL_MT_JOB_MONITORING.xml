@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="96C84C425FC76072118FB12A1EEE448D" CODE_SIGNATURE="D289F25FFFEB18527504DBE62B2E853D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6A2068315ABB28A940A7CDE33F3AD541" CODE_SIGNATURE="F064CBEA291F19F2BE8A06D773D71EDD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -110,6 +110,21 @@
       <SOURCE>`
   DATA _job       LIKE LINE OF thread_launched.
   DATA job_info   TYPE ts_job_info.
+  DATA _jobinfo   TYPE tbtcm.
+
+* Adding security do not add yourself
+  IF NOT sy-batch IS INITIAL.
+* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
+    CALL &apos;GetRuntimeInfo&apos;                                 &quot;#EC CI_CCALL
+      ID &apos;JOB&apos; FIELD _jobinfo.
+    ASSERT sy-subrc = 0.
+    IF _jobinfo-jobname = jobname AND _jobinfo-jobcount = jobcount.
+      RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
+            EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;cant_monitor_yourself
+                      name = jobname
+                      id = jobcount.
+    ENDIF.
+  ENDIF.
 
   _job-jobcount = jobcount.
   _job-jobname = jobname.

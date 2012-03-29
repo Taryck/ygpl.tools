@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6E0E434A762E862060E540A4A11100E4" CODE_SIGNATURE="0A45FDEE059EF1C09E980521D119CC2C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="A50E5551F2E5674ADC6ACD39D39FD525" CODE_SIGNATURE="F5F589D325702BF5B06CB6020F800FB9" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -570,8 +570,12 @@
          WITH KEY jobname = task_definition-batch_info-jobname
                  jobcount = task_definition-batch_info-jobcount.
     IF sy-subrc &lt;&gt; 0.                                 &quot; Unexpected
-      o_job_monitoring-&gt;add_thread( jobname = task_definition-batch_info-jobname
-                                   jobcount = task_definition-batch_info-jobcount ).
+      TRY.
+          o_job_monitoring-&gt;add_thread( jobname = task_definition-batch_info-jobname
+                                       jobcount = task_definition-batch_info-jobcount ).
+        CATCH YGPL_MT_CX_MONITOR_YOURSELF.     &quot; Issue 3
+* Case when a task in launched within a run : Ignore this
+      ENDTRY.
       t_joblist = o_job_monitoring-&gt;get_job_list( ).
       READ TABLE t_joblist ASSIGNING &lt;j&gt;
            WITH KEY jobname = task_definition-batch_info-jobname
