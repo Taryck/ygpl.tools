@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="473FAF196BD436759D3083145960202C" CODE_SIGNATURE="F7B840EF32ACF154F5D757E18FDBE380" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4262CD16552DE6233F3D8A6735AC0F42" CODE_SIGNATURE="C8528AE3434A8EC09A535E26F8D90F45" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -242,7 +242,7 @@
 *          ignore_table_sharing       =
         IMPORTING
 *          bound_size_alloc           =
-          bound_size_used            = result
+*          bound_size_used            = result
 *          referenced_size_alloc      =
 *          referenced_size_used       =
 *          is_part_of_non_trivial_szk =
@@ -251,12 +251,13 @@
 *          low_mem                    =
 *          is_in_shared_memory        =
 *          sizeof_alloc               =
-*          sizeof_used                = size
+           sizeof_used                = result
           .
     CATCH cx_root.
       EXPORT x = object TO DATA BUFFER xstr COMPRESSION OFF.
       result = XSTRLEN( xstr ).
-  ENDTRY.</SOURCE>
+  ENDTRY.
+  IF result &lt; 0.    result = 0.   ENDIF.</SOURCE>
    </ITEM>
   </METHODS>
   <TYPES>
