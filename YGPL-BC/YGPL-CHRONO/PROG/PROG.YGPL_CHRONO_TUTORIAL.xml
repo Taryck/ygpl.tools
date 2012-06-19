@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="F96D0D953C9FB7B6403D2A3414C98DE4" CODE_SIGNATURE="EC6E4030F70516EE4209A0F13C1BA0BE" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO_TUTORIAL" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-CHRONO" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="1" RSTAT="T" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YGPL_CHRONO_TUTORIAL
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ygpl_chrono_tutorial.
+
+PARAMETERS:
+  p_delay TYPE i DEFAULT 5,
+  p_read  TYPE i DEFAULT 100,
+  p_ret   TYPE i DEFAULT 5 OBLIGATORY.
+
+START-OF-SELECTION.
+  ygpl_chrono=&gt;start( ).
+  ygpl_chrono=&gt;add( processed = p_read
+                    returned = p_ret ).
+  WAIT UP TO p_delay SECONDS.
+  ygpl_chrono=&gt;stop( ).
+END-OF-SELECTION.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Demo program for Chrono Framework" LENGTH="33 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

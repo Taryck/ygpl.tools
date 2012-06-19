@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="863C6BA25DF93E854677BF045E496753" CODE_SIGNATURE="1F8E1FCEAD5727F3B7DADAFFB5DA686E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_CHRONO"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-CHRONO" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Chrono Framework"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="DATA_PROCESSED" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_DATA_PROCESSED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Count of data processed (read, ...)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="DATA_RETURNED" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_DATA_RETURNED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Count of data returned as a result of process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_DATA" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TS_DATA"/>
+   <ITEM CMPNAME="_ID" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_CHRONO_ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_OFFSET" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_DELTA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Natural number"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="YGPL_CHRONO" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="ADD" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Add to counter"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="PROCESSED" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DATA_PROCESSED" PARVALUE="YGPL_CHRONO=&gt;DATA_PROCESSED">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Count of data processed (read, ...)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RETURNED" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DATA_RETURNED" PARVALUE="YGPL_CHRONO=&gt;DATA_RETURNED">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Count of data returned as a result of process"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  ADD returned TO data_returned.
+  ADD processed TO data_processed.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONVERT_SELECT_OPTION" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convert Select-Option into Generic type"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_SELECT_OPTIONS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Generic Selection Store"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SELECT_OPTION" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY TABLE"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA s_line LIKE LINE OF result.
+  FIELD-SYMBOLS:
+    &lt;l&gt; TYPE ANY.
+
+  LOOP AT select_option ASSIGNING &lt;l&gt;.
+    CLEAR s_line.
+    MOVE-CORRESPONDING &lt;l&gt; TO s_line.
+    APPEND s_line TO result.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_ID" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create Chrono ID"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_CHRONO_ID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CALL FUNCTION &apos;GUID_CREATE&apos;
+    IMPORTING
+      ev_guid_16       = result
+*      EV_GUID_22       =
+*      EV_GUID_32       =
+  .</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_BATCH_INFO" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Batch Informations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_BATCH_INFO"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _jobinfo TYPE tbtcm.
+  CHECK sy-batch IS NOT INITIAL.
+* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
+  CALL &apos;GetRuntimeInfo&apos;
+    ID &apos;JOB&apos; FIELD _jobinfo.
+  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+  MOVE-CORRESPONDING _jobinfo TO result.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_PARAMETERS_LIST" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get parameters List"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="REPORT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="RSVAR-REPORT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Report Name"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_PARAMS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Parameters list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA selctab TYPE STANDARD TABLE OF rsscr.
+  DATA l_subrc TYPE sy-subrc.
+  DATA s_param LIKE LINE OF result.
+  FIELD-SYMBOLS:
+    &lt;f&gt; LIKE LINE OF selctab.
+
+* From MF RS_SELSCREEN_INFO
+  PERFORM load_sscr IN PROGRAM rsdbrunt
+          TABLES    selctab
+           USING    report
+        CHANGING    l_subrc.
+  CHECK l_subrc = 0.
+
+  DELETE selctab WHERE kind &lt;&gt; &apos;P&apos; AND kind &lt;&gt; &apos;S&apos;.
+  SORT selctab BY name.
+  LOOP AT selctab ASSIGNING &lt;f&gt;.
+    CLEAR s_param.
+    s_param-name = &lt;f&gt;-name.
+    s_param-kind = &lt;f&gt;-kind.
+    APPEND s_param TO result.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_WP_INFO" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get WorkProcess Infortmations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_WP_INFO"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA subrc    TYPE sy-subrc.
+
+  CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
+    IMPORTING
+      server_name        = result-wp_server
+    EXCEPTIONS
+      error_reading_name = 1
+      OTHERS             = 2.
+  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+
+  CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
+    IMPORTING
+      subrc    = subrc
+      wp_no    = result-wp_no
+      wp_pid   = result-wp_pid
+      wp_index = result-wp_index.
+  ASSERT ID ygpl_chrono CONDITION subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="RESET" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Reset counter"/>
+    </TEXTS>
+    <SOURCE>`
+  CLEAR: _id, _data, data_returned, data_processed.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="RESTART" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Restart Chrono"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA _sec     TYPE td_delta.
+  DATA now      TYPE timestampl.
+
+  ASSERT ID ygpl_chrono CONDITION _id IS NOT INITIAL.
+  CHECK _id IS NOT INITIAL.
+  GET TIME STAMP FIELD now.
+  _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = now
+                                  tstmp2 = _data-ts_end ).
+  ADD _sec TO _offset.
+  CLEAR: _data-ts_end, _data-elapse.
+  update_db( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="START" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Start Chrono"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA l_report TYPE sy-cprog.
+  DATA t_params TYPE tt_params.
+*  DATA o_store  TYPE ygpl_ds_engine=&gt;to_store.
+  DATA l_str    TYPE string.
+*  DATA l_name   TYPE ygpl_ds_typespool=&gt;td_info_name.
+  DATA o_conv   TYPE REF TO cl_abap_conv_out_ce.
+  DATA x_string TYPE xstring.
+  DATA len      TYPE i.
+  FIELD-SYMBOLS:
+    &lt;store&gt;   TYPE ANY,
+    &lt;value&gt;   TYPE ANY,
+    &lt;p&gt;       LIKE LINE OF t_params.
+
+  CLEAR _data.
+  _data-wp = get_wp_info( ).
+  _data-batch = get_batch_info( ).
+  _data-username = sy-uname.
+  _data-main_program = l_report = sy-cprog.      &quot; sy-repid.
+  _data-variant_name = sy-slset.
+  _id = create_id( ).
+
+* Parameters
+  t_params = get_parameters_list( l_report ).
+*  o_store = ygpl_ds_engine=&gt;new_store( ).
+*  ASSERT ID ygpl_chrono CONDITION o_store IS BOUND.
+
+*  IF o_store IS BOUND.
+  LOOP AT t_params ASSIGNING &lt;p&gt;.
+*      l_name = &lt;p&gt;-name.
+    CONCATENATE &apos;(&apos; l_report &apos;)&apos; &lt;p&gt;-name INTO l_str.
+    IF &lt;p&gt;-kind = &apos;S&apos;.      CONCATENATE l_str &apos;[]&apos; INTO l_str.      ENDIF.
+    ASSIGN (l_str) TO &lt;value&gt;.
+    CHECK sy-subrc = 0.
+
+    IF &lt;p&gt;-kind = &apos;P&apos;.
+      CREATE DATA &lt;p&gt;-data LIKE &lt;value&gt;.
+      ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+      CHECK sy-subrc = 0.
+
+      ASSIGN &lt;p&gt;-data-&gt;* TO &lt;store&gt;.
+      ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+      CHECK sy-subrc = 0.
+      &lt;store&gt; = &lt;value&gt;.
+    ELSEIF &lt;p&gt;-kind = &apos;S&apos;.
+      CREATE DATA &lt;p&gt;-data TYPE tt_select_options.
+      ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+      CHECK sy-subrc = 0.
+
+      ASSIGN &lt;p&gt;-data-&gt;* TO &lt;store&gt;.
+      ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+      CHECK sy-subrc = 0.
+
+      &lt;store&gt; = convert_select_option( &lt;value&gt; ).
+    ELSE.
+      ASSERT &lt;p&gt;-kind = &apos;S&apos; OR &lt;p&gt;-kind = &apos;P&apos;.      &quot; unexpecte kind
+    ENDIF.
+    IF &lt;store&gt; IS INITIAL.      CLEAR &lt;p&gt;-data.       ENDIF.
+
+  ENDLOOP.
+
+  CALL TRANSFORMATION id SOURCE parameters = t_params
+       RESULT XML l_str.
+
+  o_conv = cl_abap_conv_out_ce=&gt;create( ).
+  o_conv-&gt;convert( EXPORTING   data = l_str
+                   IMPORTING buffer = x_string ).
+
+  len = XSTRLEN( x_string ).
+  cl_abap_gzip=&gt;compress_binary(
+    EXPORTING raw_in       = x_string
+              raw_in_len   = len
+    IMPORTING gzip_out     = x_string
+              gzip_out_len = len ).
+*  ENDIF.
+
+  GET TIME STAMP FIELD _data-ts_start.
+  update_db( x_string ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="STOP" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Stop Chrono"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA _sec     TYPE td_delta.
+
+  ASSERT ID ygpl_chrono CONDITION _id IS NOT INITIAL.
+  CHECK _id IS NOT INITIAL.
+  GET TIME STAMP FIELD _data-ts_end.
+  _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _data-ts_end
+                                  tstmp2 = _data-ts_start ).
+  _data-elapse = _sec - _offset.
+  update_db( ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="UPDATE_DB" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Update database and commit"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="CONTENT" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COMPRESSEDDATA" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="GZip Compressed Data"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA db_track   TYPE ygplchrono.
+  DATA db_data    TYPE ygplchrono_data.
+
+  db_data-id = db_track-id = _id.
+  IF content IS SUPPLIED AND content IS NOT INITIAL.
+    db_data-data = content.
+    MODIFY ygplchrono_data FROM db_data.
+    ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+  ENDIF.
+  db_track-data = _data.
+  MODIFY ygplchrono FROM db_track.
+  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+  COMMIT WORK.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TD_CHRONO_ID" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPLCHRONO-ID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_COMPRESSEDDATA" STATE="1" EDITORDER="9 " TYPTYPE="1" TYPE="RSRAWSTRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="GZip Compressed Data"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_DATA_PROCESSED" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_CHRONO_DATA_PROCESSED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Count of data processed (read, ...)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_DATA_RETURNED" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_CHRONO_DATA_RETURNED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Count of data returned as a result of process"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_DELTA" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="TZNTSTMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC time stamp in long form (YYYYMMDDhhmmss,mmmuuun)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_BATCH_INFO" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPLCHRONO-BATCH"/>
+   <ITEM CMPNAME="TS_DATA" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLCHRONO-DATA"/>
+   <ITEM CMPNAME="TS_PARAM" STATE="1" EDITORDER="5 " TYPTYPE="4">
+    BEGIN OF ts_param,
+      name  TYPE rsscr_name,
+      kind  TYPE rsscr_kind,
+      data  TYPE REF TO data,
+    END OF ts_param
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Parameter definition"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_SELECT_OPTION" STATE="1" EDITORDER="7 " TYPTYPE="4">
+    BEGIN OF ts_select_option,
+      sign    TYPE tvarvc-sign,
+      option  TYPE tvarvc-opti,
+      low     TYPE string,
+      high    TYPE string,
+    END OF ts_select_option
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Select Option structure"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_WP_INFO" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLCHRONO-WP"/>
+   <ITEM CMPNAME="TT_PARAMS" STATE="1" EDITORDER="6 " TYPTYPE="4">
+    tt_params TYPE SORTED TABLE OF ts_param WITH UNIQUE KEY name
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Parameters list"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_SELECT_OPTIONS" STATE="1" EDITORDER="8 " TYPTYPE="4">
+    tt_select_options TYPE STANDARD TABLE OF ts_select_option WITH DEFAULT KEY
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Generic Selection Store">U1&amp;MEANING&amp;
+ASDue to exception CX_XSLT_SERIALIZATION_ERROR in XML Transformation for
+  the reason:
+ASThe following data objects cannot be serialized: Data references to data
+  objects that have only a technical type - for example, substructures of
+  structures
+ASAll Selection option (that are technical types) should be converted into
+  a standard table to be able to be converted into string
+U1&amp;HINTS&amp;
+AS</ITEM>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
