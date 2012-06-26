@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="863C6BA25DF93E854677BF045E496753" CODE_SIGNATURE="1F8E1FCEAD5727F3B7DADAFFB5DA686E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="9AD8D2CCC517B119A8307A0717ECF52C" CODE_SIGNATURE="1F34C6F198BBCE32A3B6210A19DC10ED" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_CHRONO"/>
  </DEPENDENCIES>
@@ -226,9 +226,7 @@
     <SOURCE>`
   DATA l_report TYPE sy-cprog.
   DATA t_params TYPE tt_params.
-*  DATA o_store  TYPE ygpl_ds_engine=&gt;to_store.
   DATA l_str    TYPE string.
-*  DATA l_name   TYPE ygpl_ds_typespool=&gt;td_info_name.
   DATA o_conv   TYPE REF TO cl_abap_conv_out_ce.
   DATA x_string TYPE xstring.
   DATA len      TYPE i.
@@ -238,6 +236,7 @@
     &lt;p&gt;       LIKE LINE OF t_params.
 
   CLEAR _data.
+  _data-client = sy-mandt.
   _data-wp = get_wp_info( ).
   _data-batch = get_batch_info( ).
   _data-username = sy-uname.
