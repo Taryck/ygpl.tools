@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="DD6C3D7CB4101B28B300263B8133E649" CODE_SIGNATURE="516B2399B7889F375210E38BD0E3FF6E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="1323C7BEE381BD3544153306E54239B6" CODE_SIGNATURE="8E84A77851EEDF6464EEDBB599986096" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -17,6 +17,7 @@
    <ITEM CMPNAME="JOB_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="JOB_STATUS"/>
    <ITEM CMPNAME="LOCK_MODES" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="LOCK_MODES"/>
    <ITEM CMPNAME="NO_MESSAGE" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="NO_MESSAGE"/>
+   <ITEM CMPNAME="OTHER_INFOS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="OTHER_INFOS"/>
    <ITEM CMPNAME="PROCESS_ID" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="PROCESS_ID"/>
    <ITEM CMPNAME="READ" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="READ"/>
    <ITEM CMPNAME="REFRESH" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="REFRESH"/>
@@ -44,12 +45,14 @@
    <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
    <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIMESTAMP"/>
    <ITEM CMPNAME="TD_USER_STATUS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_USER_STATUS"/>
+   <ITEM CMPNAME="TRANSACTION" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="TRANSACTION"/>
    <ITEM CMPNAME="TS_BATCH_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_BATCH_INFO"/>
    <ITEM CMPNAME="TS_CHRONO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_CHRONO"/>
    <ITEM CMPNAME="TS_MODE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_MODE"/>
    <ITEM CMPNAME="TS_PROCESS_DEFINITION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_PROCESS_DEFINITION"/>
    <ITEM CMPNAME="TS_PROGRESSION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_PROGRESSION"/>
    <ITEM CMPNAME="TS_RUN" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_RUN"/>
+   <ITEM CMPNAME="TS_TRANS_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_TRANS_INFO"/>
    <ITEM CMPNAME="TS_WP_INFO" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TS_WP_INFO"/>
    <ITEM CMPNAME="USER_STATUS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="USER_STATUS"/>
    <ITEM CMPNAME="WORKPROCESS" EXPOSURE="2" REFCLSNAME="YGPLIMT_PROCESS" REFCMPNAME="WORKPROCESS"/>
@@ -185,7 +188,7 @@
   SELECT SINGLE * INTO _data
     FROM ygplmt_process
     WHERE process_id = me-&gt;process_id.
-  IF sy-subrc &lt;&gt; 0.
+  IF sy-subrc &lt;&gt; 0 OR _data-client &lt;&gt; sy-mandt.
     RAISE EXCEPTION TYPE ygpl_mt_cx_process
           EXPORTING textid = ygpl_mt_cx_process=&gt;do_not_exists
                 process_id = me-&gt;process_id.
@@ -193,6 +196,8 @@
   status = _data-int_status.
   user_status = _data-usr_status.
   workprocess = _data-workprocess.
+  transaction = _data-transaction.
+  other_infos = _data-other.
   batch_info = _data-batch.
 
   IF NOT f_is_final IS INITIAL.   unlock_with_share( ).   ENDIF.</SOURCE>
@@ -208,9 +213,12 @@
   lock_exclusive( ).
 * Lock release at commit.
   _process-process_id = process_id.
+  _process-client = sy-mandt.
   _process-int_status = status.
   _process-usr_status = user_status.
   _process-workprocess = workprocess.
+  _process-transaction = transaction.
+  _process-other = other_infos.
   _process-batch = batch_info.
   _process-timestamp = times-start.
   MODIFY ygplmt_process FROM _process.
@@ -285,40 +293,23 @@
     <SOURCE>`
   DATA length   TYPE i.
   DATA subrc    TYPE sy-subrc.
-  DATA _jobinfo TYPE tbtcm.
 
   length = XSTRLEN( process_id ).
   ASSERT process_id IS INITIAL OR length = 16.
 
   IF process_id IS INITIAL.
     f_has_changed = abap_true.
-    CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
-      IMPORTING
-        server_name        = workprocess-wp_server
-      EXCEPTIONS
-        error_reading_name = 1
-        OTHERS             = 2.
-    ASSERT sy-subrc = 0.
-
-    CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
-      IMPORTING
-        subrc    = subrc
-        wp_no    = workprocess-wp_no
-        wp_pid   = workprocess-wp_pid
-        wp_index = workprocess-wp_index.
+    workprocess = get_wp_info( ).
+    transaction = get_transaction_info( ).
 
     me-&gt;process_id = generate_new_process_id( ).
     GET TIME STAMP FIELD times-start.
-    workprocess-username = sy-uname.
-    workprocess-main_program = sy-cprog.      &quot; sy-repid.
+    other_infos-username = sy-uname.
+    other_infos-main_program = sy-cprog.      &quot; sy-repid.
     status = system_status-process-started.
 
     IF NOT sy-batch IS INITIAL.
-* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
-      CALL &apos;GetRuntimeInfo&apos;
-        ID &apos;JOB&apos; FIELD _jobinfo.
-      ASSERT sy-subrc = 0.
-      batch_info = _jobinfo.
+      batch_info = get_batch_info( ).
     ENDIF.
     IF no_message IS INITIAL AND sy-batch IS NOT INITIAL.
 * This processus in on server (&amp;1/&amp;2) with jobname : &amp;3(&amp;4)
@@ -348,6 +339,91 @@
       ev_guid_16 = result.
 *     EV_GUID_22       =
 *     EV_GUID_32       = RUN_ID</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_BATCH_INFO" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Batch Informations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_BATCH_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Batch Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _jobinfo TYPE tbtcm.
+  CHECK sy-batch IS NOT INITIAL.
+* From     CALL FUNCTION &apos;GET_JOB_RUNTIME_INFO&apos;
+  CALL &apos;GetRuntimeInfo&apos;
+    ID &apos;JOB&apos; FIELD _jobinfo.
+  ASSERT sy-subrc = 0.
+  MOVE-CORRESPONDING _jobinfo TO result.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_TRANSACTION_INFO" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Transaction Infortmations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_TRANS_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Transaction Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA tid      TYPE th_cliid_transid.
+
+  CALL FUNCTION &apos;TH_GET_CLIENT_ID&apos;
+    IMPORTING
+*     IS_REMOTE               =
+*     SYSID                   =
+*     PRE_SYSID               =
+*     USERID                  =
+      transid                 = tid
+*     ACTION                  =
+*     ACTION_TYPE             =
+*     SERVICE                 =
+*     TRCFLAG1                =
+*     TRCFLAG2                =
+    EXCEPTIONS
+      parameter_missing       = 1
+      internal_error          = 2
+      parameter_wrong         = 3
+      OTHERS                  = 4.
+  ASSERT sy-subrc = 0.
+
+  result-trans_id = tid.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_WP_INFO" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get WorkProcess Infortmations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_WP_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="WorkProcess Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA subrc    TYPE sy-subrc.
+
+  CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
+    IMPORTING
+      server_name        = result-wp_server
+    EXCEPTIONS
+      error_reading_name = 1
+      OTHERS             = 2.
+  ASSERT sy-subrc = 0.
+
+  CALL FUNCTION &apos;TH_GET_OWN_WP_NO&apos;
+    IMPORTING
+      subrc    = subrc
+      wp_no    = result-wp_no
+      wp_pid   = result-wp_pid
+      wp_index = result-wp_index.
+  ASSERT subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="LOCK_EXCLUSIVE" EXPOSURE="1" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -595,7 +671,6 @@
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_PROCESS&apos;
       EXPORTING
         mode_ygplmt_process = my_lock-mode_ygplmt_process
-        mandt               = sy-mandt
         process_id          = my_lock-process_id
         x_process_id        = abap_true
         _scope              = my_lock-_scope
@@ -674,7 +749,6 @@
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_PROCESS&apos;
     EXPORTING
       mode_ygplmt_process = mode-lock
-      mandt               = sy-mandt
       process_id          = process_id
       x_process_id        = abap_true
       _scope              = mode-scope

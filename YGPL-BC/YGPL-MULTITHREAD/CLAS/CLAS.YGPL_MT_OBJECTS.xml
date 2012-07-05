@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AFA19DB79936DAF1A01FA547BE8DF736" CODE_SIGNATURE="BA2A72B0DF3518FB0C89A451A2FE7C16" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="63C20D092FCA99B2914AC90AB46B27A8" CODE_SIGNATURE="3A229571DBAA13CCB6B584BD271E59EC" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_OBJECTS" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_RUN"/>
  </DEPENDENCIES>
@@ -1663,7 +1663,6 @@
   CALL FUNCTION &apos;ENQUEUE_EYGPLMT_OBJECTS&apos;
     EXPORTING
       mode_ygplmt_objects = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
-      mandt               = sy-mandt
       bloc_id             = bloc_id
       x_bloc_id           = abap_true
       _scope              = &apos;1&apos;
@@ -1987,13 +1986,12 @@
     <SOURCE>`
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_OBJECTS&apos;
     EXPORTING
-      MODE_YGPLMT_OBJECTS       = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
-      MANDT                     = SY-MANDT
-      BLOC_ID                   = bloc_id
-      X_BLOC_ID                 = abap_true
-      _SCOPE                    = &apos;1&apos;
-      _SYNCHRON                 = &apos; &apos;
-      _COLLECT                  = &apos; &apos;.</SOURCE>
+      mode_ygplmt_objects = ygpl_mt_lock_managment=&gt;lock_modes-exclusive
+      bloc_id             = bloc_id
+      x_bloc_id           = abap_true
+      _scope              = &apos;1&apos;
+      _synchron           = &apos; &apos;
+      _collect            = &apos; &apos;.</SOURCE>
    </ITEM>
   </METHODS>
   <TEXTSPOOL>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7ABB1232A90A599E6F70D5E6AAEAA082" CODE_SIGNATURE="C333EBAF089E0019A59B7620002B8115" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="48F98D21FA1D4D366F8AE7E5E5069D46" CODE_SIGNATURE="2489824A03F1F698636D7517C96E7E6B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PARENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -319,7 +319,6 @@
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_RUNS&apos;
       EXPORTING
         mode_ygplmt_runs = my_lock-mode_ygplmt_runs
-        mandt            = sy-mandt
         run_id           = my_lock-run_id
         x_run_id         = abap_true
         _scope           = my_lock-_scope
@@ -509,7 +508,6 @@
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_RUNS&apos;
     EXPORTING
       mode_ygplmt_runs = lock_mode
-      mandt            = sy-mandt
       run_id           = process_id
       x_run_id         = abap_true
       _scope           = lock_scope

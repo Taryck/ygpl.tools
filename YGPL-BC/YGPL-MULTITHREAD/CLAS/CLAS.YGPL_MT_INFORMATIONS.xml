@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F7830742F3D04745364F3975824E5638" CODE_SIGNATURE="30DC2A8F0EA12857B36BFF1837F354F1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="CC76995089F235BB077A696F6DE119CF" CODE_SIGNATURE="EAC963B737C451A2FA47866DC2306D63" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_INFORMATIONS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -436,7 +436,6 @@
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_INFOS&apos;
       EXPORTING
         mode_ygplmt_infos = my_lock-mode_ygplmt_infos
-        mandt             = sy-mandt
         process_id        = my_lock-process_id
         category          = my_lock-category
         x_process_id      = abap_true
@@ -567,7 +566,6 @@
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_INFOS&apos;
     EXPORTING
       mode_ygplmt_infos = lock_mode
-      mandt             = sy-mandt
       process_id        = process_id
       category          = category
       x_process_id      = abap_true

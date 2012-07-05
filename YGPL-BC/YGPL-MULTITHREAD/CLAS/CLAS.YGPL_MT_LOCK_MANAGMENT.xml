@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4DDFA75C982FD03BB5000FB95EC15F6C" CODE_SIGNATURE="3610DDAABB18987D849BDB8946F6E550" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="6EC2020720592CF4E6FDCF5F9B42FBFB" CODE_SIGNATURE="EB8FCBCD4874DA4C211351F27C197640" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX_LOCKS"/>
  </DEPENDENCIES>
@@ -334,7 +334,6 @@
     CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
       EXPORTING
         mode_ygplmt_locks       = my_lock-mode_ygplmt_locks
-        mandt                   = sy-mandt
         process_id              = my_lock-process_id
         action                  = my_lock-action
         x_process_id            = abap_true
@@ -420,7 +419,6 @@
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_LOCKS&apos;
     EXPORTING
       mode_ygplmt_locks       = lock_modes-write
-      mandt                   = sy-mandt
       process_id              = process_id
       action                  = actions-existence
       x_process_id            = abap_true
@@ -516,7 +514,6 @@
   CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
     EXPORTING
       mode_ygplmt_locks       = lock_modes-write
-      mandt                   = sy-mandt
       process_id              = process_id
       action                  = actions-existence
       x_process_id            = abap_true
@@ -633,7 +630,6 @@
   CALL FUNCTION &apos;DEQUEUE_EYGPLMT_LOCKS&apos;
     EXPORTING
       mode_ygplmt_locks = mode-lock
-      mandt             = sy-mandt
       process_id        = process_id
       action            = action
       x_process_id      = abap_true
