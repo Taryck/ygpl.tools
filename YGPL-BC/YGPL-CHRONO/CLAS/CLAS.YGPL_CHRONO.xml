@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9AD8D2CCC517B119A8307A0717ECF52C" CODE_SIGNATURE="1F34C6F198BBCE32A3B6210A19DC10ED" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="AC7C385CA1DC0FE8739DC4E2D5BF5E65" CODE_SIGNATURE="FABC78BCAAB758F5095A6486447C9D58" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_CHRONO"/>
  </DEPENDENCIES>
@@ -119,7 +119,11 @@
      <ITEM LANG="E" TEXT="Get Batch Informations"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_BATCH_INFO"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_BATCH_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Batch Informations"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <SOURCE>`
   DATA _jobinfo TYPE tbtcm.
@@ -169,12 +173,51 @@
     APPEND s_param TO result.
   ENDLOOP.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="GET_TRANSACTION_INFO" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Transaction Infortmations"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_TRANS_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Transaction Informations"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA tid      TYPE th_cliid_transid.
+
+  CALL FUNCTION &apos;TH_GET_CLIENT_ID&apos;
+    IMPORTING
+*     IS_REMOTE               =
+*     SYSID                   =
+*     PRE_SYSID               =
+*     USERID                  =
+      transid                 = tid
+*     ACTION                  =
+*     ACTION_TYPE             =
+*     SERVICE                 =
+*     TRCFLAG1                =
+*     TRCFLAG2                =
+    EXCEPTIONS
+      parameter_missing       = 1
+      internal_error          = 2
+      parameter_wrong         = 3
+      OTHERS                  = 4.
+  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+
+  result-trans_id = tid.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="GET_WP_INFO" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get WorkProcess Infortmations"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_WP_INFO"/>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TS_WP_INFO">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="WorkProcess Informations"/>
+      </TEXTS>
+     </ITEM>
     </PARAMETERS>
     <SOURCE>`
   DATA subrc    TYPE sy-subrc.
@@ -238,6 +281,7 @@
   CLEAR _data.
   _data-client = sy-mandt.
   _data-wp = get_wp_info( ).
+  _data-trans = get_transaction_info( ).
   _data-batch = get_batch_info( ).
   _data-username = sy-uname.
   _data-main_program = l_report = sy-cprog.      &quot; sy-repid.
@@ -314,6 +358,8 @@
   _sec = cl_abap_tstmp=&gt;subtract( tstmp1 = _data-ts_end
                                   tstmp2 = _data-ts_start ).
   _data-elapse = _sec - _offset.
+  _data-data_processed = data_processed.
+  _data-data_returned = data_returned.
   update_db( ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="UPDATE_DB" STATE="1" MTDDECLTYP="1">
@@ -349,7 +395,7 @@
      <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_COMPRESSEDDATA" STATE="1" EDITORDER="9 " TYPTYPE="1" TYPE="RSRAWSTRING">
+   <ITEM CMPNAME="TD_COMPRESSEDDATA" STATE="1" EDITORDER="10 " TYPTYPE="1" TYPE="RSRAWSTRING">
     <TEXTS>
      <ITEM LANG="E" TEXT="GZip Compressed Data"/>
     </TEXTS>
@@ -364,14 +410,22 @@
      <ITEM LANG="E" TEXT="Count of data returned as a result of process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_DELTA" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="TZNTSTMPL">
+   <ITEM CMPNAME="TD_DELTA" STATE="1" EDITORDER="5 " TYPTYPE="1" TYPE="TZNTSTMPL">
     <TEXTS>
      <ITEM LANG="E" TEXT="UTC time stamp in long form (YYYYMMDDhhmmss,mmmuuun)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_BATCH_INFO" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPLCHRONO-BATCH"/>
-   <ITEM CMPNAME="TS_DATA" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLCHRONO-DATA"/>
-   <ITEM CMPNAME="TS_PARAM" STATE="1" EDITORDER="5 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_BATCH_INFO" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLCHRONO-BATCH">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Batch Informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_DATA" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="YGPLCHRONO-DATA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Chrono datas"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_PARAM" STATE="1" EDITORDER="6 " TYPTYPE="4">
     BEGIN OF ts_param,
       name  TYPE rsscr_name,
       kind  TYPE rsscr_kind,
@@ -382,7 +436,7 @@
      <ITEM LANG="E" TEXT="Parameter definition"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_SELECT_OPTION" STATE="1" EDITORDER="7 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_SELECT_OPTION" STATE="1" EDITORDER="8 " TYPTYPE="4">
     BEGIN OF ts_select_option,
       sign    TYPE tvarvc-sign,
       option  TYPE tvarvc-opti,
@@ -394,15 +448,24 @@
      <ITEM LANG="E" TEXT="Select Option structure"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_WP_INFO" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLCHRONO-WP"/>
-   <ITEM CMPNAME="TT_PARAMS" STATE="1" EDITORDER="6 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_TRANS_INFO" STATE="1" EDITORDER="2 " TYPTYPE="1" TYPE="YGPLCHRONO-TRANS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Transaction Informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TS_WP_INFO" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YGPLCHRONO-WP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="WorkProcess Informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_PARAMS" STATE="1" EDITORDER="7 " TYPTYPE="4">
     tt_params TYPE SORTED TABLE OF ts_param WITH UNIQUE KEY name
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Parameters list"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_SELECT_OPTIONS" STATE="1" EDITORDER="8 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_SELECT_OPTIONS" STATE="1" EDITORDER="9 " TYPTYPE="4">
     tt_select_options TYPE STANDARD TABLE OF ts_select_option WITH DEFAULT KEY
 `
     <TEXTS>
