@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="67962CBF2F314A4B37F285B250F30F24" CODE_SIGNATURE="F8632553986FC16F016BD3BCD98B5C95" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="AA8220707107B492A069457AD02719D3" CODE_SIGNATURE="E96453F527208BC473A0733D6BD52BEB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -17,6 +17,7 @@
    <ITEM CMPNAME="DEBUG" EXPOSURE="2" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="DEBUG"/>
    <ITEM CMPNAME="GET_AS_LOAD" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="GET_AS_LOAD"/>
    <ITEM CMPNAME="GET_JOB_LIST" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="GET_JOB_LIST"/>
+   <ITEM CMPNAME="JOB_PRIORITIES" EXPOSURE="2" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="JOB_PRIORITIES"/>
    <ITEM CMPNAME="NEW_JOB" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="NEW_JOB"/>
    <ITEM CMPNAME="ON_THREAD_END" EXPOSURE="2" CMPTYPE="2" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="ON_THREAD_END"/>
    <ITEM CMPNAME="SLEEP" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="SLEEP"/>
@@ -35,6 +36,7 @@
    <ITEM CMPNAME="TD_THREAD_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_THREAD_COUNT"/>
    <ITEM CMPNAME="TD_TIME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIME"/>
    <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_TIMESTAMP"/>
+   <ITEM CMPNAME="TD_WP_COUNT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_TYPESPOOL" REFCMPNAME="TD_WP_COUNT"/>
    <ITEM CMPNAME="THREADS" EXPOSURE="2" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="THREADS"/>
    <ITEM CMPNAME="TIMES" EXPOSURE="2" REFCLSNAME="YGPLIMT_JOB_MONITORING" REFCMPNAME="TIMES"/>
    <ITEM CMPNAME="TI_JOB_MONITORING_CONDITIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_MT_INTERFACES" REFCMPNAME="TI_JOB_MONITORING_CONDITIONS"/>
@@ -61,17 +63,37 @@
      <ITEM LANG="E" TEXT="Job key (Name &amp; ID)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="JOB_STATUS" STATE="1" ATTDECLTYP="2" TYPTYPE="4">Begin of JOB_STatus,
-      RUNNING       type TBTCO-STATUS value &apos;R&apos;, &quot;#EC NOTEXT
-      READY         type TBTCO-STATUS value &apos;Y&apos;, &quot;#EC NOTEXT
-      SCHEDULED     type TBTCO-STATUS value &apos;P&apos;, &quot;#EC NOTEXT
-      RELEASED      type TBTCO-STATUS value &apos;S&apos;, &quot;#EC NOTEXT
-      ABORTED       type TBTCO-STATUS value &apos;A&apos;, &quot;#EC NOTEXT
-      FINISHED      type TBTCO-STATUS value &apos;F&apos;, &quot;#EC NOTEXT
-      PUT_ACTIVE    type TBTCO-STATUS value &apos;Z&apos;, &quot;#EC NOTEXT
-      UNKNOWN_STATE type TBTCO-STATUS value &apos;X&apos;, &quot;#EC NOTEXT
-    end of JOB_STatus
+   <ITEM CMPNAME="GET_LOAD_DELAY" STATE="1" ATTDECLTYP="2" ATTVALUE="60" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Minimum time between 2 calls to _GET_AS_LOAD"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="GET_WP_DELAY" STATE="1" ATTDECLTYP="2" ATTVALUE="60" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Minimum time between 2 calls to _GET_WP_LOAD"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="JOB_STATUS" STATE="1" ATTDECLTYP="2" TYPTYPE="4">BEGIN OF job_status,
+      running       TYPE tbtco-status VALUE &apos;R&apos;,            &quot;#EC NOTEXT
+      ready         TYPE tbtco-status VALUE &apos;Y&apos;,            &quot;#EC NOTEXT
+      scheduled     TYPE tbtco-status VALUE &apos;P&apos;,            &quot;#EC NOTEXT
+      released      TYPE tbtco-status VALUE &apos;S&apos;,            &quot;#EC NOTEXT
+      aborted       TYPE tbtco-status VALUE &apos;A&apos;,            &quot;#EC NOTEXT
+      finished      TYPE tbtco-status VALUE &apos;F&apos;,            &quot;#EC NOTEXT
+      put_active    TYPE tbtco-status VALUE &apos;Z&apos;,            &quot;#EC NOTEXT
+      unknown_state TYPE tbtco-status VALUE &apos;X&apos;,            &quot;#EC NOTEXT
+    END OF job_status
 `</ITEM>
+   <ITEM CMPNAME="LAST_GET_LOAD" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_DELAY_TIMESTAMP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="LAST_GET_WP" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_DELAY_TIMESTAMP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="MY_AS_LIST" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_AS">
     <TEXTS>
      <ITEM LANG="E" TEXT="List of Application Server with load"/>
@@ -102,6 +124,8 @@
      <ITEM LANG="E" TEXT="Monitored Thread list"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="T_ACTIVMODES" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_ACTIVMODE"/>
+   <ITEM CMPNAME="T_INSTANCES" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_INSTANCE"/>
   </ATTRIBUTS>
   <INTERFACES>
    <ITEM REFCLSNAME="YGPLIMT_JOB_MONITORING" EXPOSURE="2" STATE="1" RELTYPE="1">
@@ -291,6 +315,7 @@
      </ITEM>
      <ITEM MTDNAME="GET_AS_LOAD">
       <SOURCE>`
+  CLEAR last_get_load.    &quot; always get load whatever the delay is
   _get_as_load( CHANGING as_list = all_as_list ).
   result = all_as_list.</SOURCE>
      </ITEM>
@@ -556,15 +581,54 @@
           EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;no_server.
   ENDIF.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="CHECK_DELAY" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Check Minimum delay"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DELAY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DELAY">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Delays in second"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="True if minimum delay is OK"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TIME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_DELAY_TIMESTAMP">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA now TYPE td_delay_timestamp.
+  DATA dur TYPE td_delay.
+
+  IF NOT time IS INITIAL.
+    GET TIME STAMP FIELD now.
+    dur = cl_abap_tstmp=&gt;subtract( tstmp1 = now
+                                   tstmp2 = time ).
+    CHECK dur &gt; delay.
+  ENDIF.
+  result = abap_true.</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
     </TEXTS>
     <SOURCE>`
-  DATA lt_list   TYPE STANDARD TABLE OF msxxlist_v6.
-  DATA ls_srv    LIKE LINE OF all_as_list.
-  DATA lt_wp     TYPE STANDARD TABLE OF wpinfo.
-  FIELD-SYMBOLS &lt;fs_line&gt; LIKE LINE OF lt_list.
+  DATA lt_list    TYPE STANDARD TABLE OF msxxlist_v6.
+  DATA ls_srv     LIKE LINE OF all_as_list.
+  DATA lt_wp      TYPE STANDARD TABLE OF wpinfo.
+  DATA r_mode     TYPE RANGE OF btcomset-modename.
+  DATA s_mode     LIKE LINE OF r_mode.
+  DATA d_subrc    TYPE sy-subrc.
+  DATA t_modes    TYPE STANDARD TABLE OF spfba WITH DEFAULT KEY .
+  FIELD-SYMBOLS:
+    &lt;fs_line&gt; LIKE LINE OF lt_list,
+    &lt;mode&gt;    LIKE LINE OF t_activmodes.
 
 * Determine AS list
   CALL FUNCTION &apos;TH_SERVER_LIST&apos;
@@ -583,6 +647,38 @@
     APPEND ls_srv TO all_as_list.
 
   ENDLOOP.
+
+* Class A WP reserved
+* Prioritization Strategies for Class A Jobs
+* http://help.sap.com/saphelp_nw70/helpdata/en/9e/8f8438e181b855e10000009b38f842/content.htm
+* From transation RZ04 =&gt; FORM select_betriebsart(RSRZLST2)
+  CALL FUNCTION &apos;OMS_NORMAL_OMSET_READ&apos;
+*   EXPORTING
+*     NORMAL_OMSET_NAME         = BTC_OMSET_NORMAL
+    TABLES
+      normal_omset_tbl          = t_activmodes
+    EXCEPTIONS
+      no_omset_data_found       = 1
+      OTHERS                    = 2.
+  ASSERT sy-subrc = 0.
+
+  LOOP AT t_activmodes ASSIGNING &lt;mode&gt;.
+    s_mode-low = &lt;mode&gt;-modename.
+    APPEND s_mode TO r_mode.
+  ENDLOOP.
+
+  CALL FUNCTION &apos;RZL_GET_BA_LIST&apos;
+*   EXPORTING
+*     WITH_INACTIVE_INSTANCES       = &apos; &apos;
+    IMPORTING
+      subrc                         = d_subrc
+    TABLES
+      ba_tbl                        = t_modes
+      id_tbl                        = t_instances.
+  ASSERT d_subrc = 0.
+* Cleaning from unused mode
+  DELETE t_modes WHERE baname NOT IN r_mode.
+  DELETE t_instances WHERE baname NOT IN r_mode.
 
   _get_as_wp( CHANGING as_list = all_as_list ).</SOURCE>
    </ITEM>
@@ -685,6 +781,11 @@
      <ITEM LANG="E" TEXT="Get AS using Round Robin technic"/>
     </TEXTS>
     <PARAMETERS>
+     <ITEM SCONAME="PRIORITY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PRIORITY" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Job priority (A, B or C)"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_AS_NAME">
       <TEXTS>
        <ITEM LANG="E" TEXT="Application Server Name"/>
@@ -692,20 +793,100 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
+  DATA rr_index_save TYPE i.
   FIELD-SYMBOLS: &lt;fs_as&gt; LIKE LINE OF my_as_list.
 
-  READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
+* Save index
+  rr_index_save = roundrobin_as_index.
+
+* Try to find first server with free slot
+  DO.
+    READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
+    IF sy-subrc = 0 AND priority &lt;&gt; job_priorities-high.
+* Class A WP reserved
+* Prioritization Strategies for Class A Jobs
+* http://help.sap.com/saphelp_nw70/helpdata/en/9e/8f8438e181b855e10000009b38f842/content.htm
+      IF &lt;fs_as&gt;-free &lt;= &lt;fs_as&gt;-res_a.
+        ADD 1 TO roundrobin_as_index.     &quot; skip server no free slot for job priority B or C (reserved for A)
+        CONTINUE.
+      ENDIF.
+    ENDIF.
+    EXIT.
+  ENDDO.
+
+* Reach end of list
   IF sy-subrc &lt;&gt; 0.
     _get_as_load( CHANGING as_list = my_as_list ).
     _get_as_wp( CHANGING as_list = my_as_list ).
     SORT my_as_list BY free DESCENDING load ASCENDING.
     roundrobin_as_index = 1.
-    READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
-    ASSERT sy-subrc = 0.
+    DO.
+      READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
+      IF sy-subrc = 0 AND priority &lt;&gt; job_priorities-high.
+        IF &lt;fs_as&gt;-free &lt;= &lt;fs_as&gt;-res_a.
+          ADD 1 TO roundrobin_as_index.     &quot; skip server no free slot for job priority B or C (reserved for A)
+          CONTINUE.
+        ENDIF.
+      ELSEIF sy-subrc &lt;&gt; 0.
+* No server seems to have any slot free
+        roundrobin_as_index = rr_index_save.              &quot; restore value
+        IF LINES( my_as_list ) = LINES( all_as_list ).    &quot; no server restriction
+          RETURN.   &quot; Return no server name, let system decide
+        ELSE.
+          READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
+          IF sy-subrc &lt;&gt; 0.
+* Reach end of list &quot;again&quot;
+            roundrobin_as_index = 1.
+            READ TABLE my_as_list ASSIGNING &lt;fs_as&gt; INDEX roundrobin_as_index.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+      EXIT.
+    ENDDO.
   ENDIF.
+
+  ASSERT &lt;fs_as&gt; IS ASSIGNED.
   MOVE &lt;fs_as&gt;-name TO result.
 
   ADD 1 TO roundrobin_as_index.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_RESERVED_CLASS_A" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get number of reserved Class A WP for a AS"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_AS_NAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Application Server Name"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_WP_COUNT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Reserverd Class A Jobs"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS:
+    &lt;mode&gt; LIKE LINE OF t_activmodes,
+    &lt;inst&gt; LIKE LINE OF t_instances.
+
+  LOOP AT t_activmodes ASSIGNING &lt;mode&gt;
+       WHERE startdate IS INITIAL AND enddate IS INITIAL.   &quot; case when ony time is important
+    CHECK ( &lt;mode&gt;-starttime &lt; &lt;mode&gt;-endtime AND
+            sy-uzeit BETWEEN &lt;mode&gt;-starttime AND &lt;mode&gt;-endtime
+          ) OR (
+            &lt;mode&gt;-starttime &gt; &lt;mode&gt;-endtime AND
+            NOT sy-uzeit BETWEEN &lt;mode&gt;-starttime AND &lt;mode&gt;-endtime
+          ).
+    EXIT.   &quot; Get the right mode
+  ENDLOOP.
+  ASSERT &lt;mode&gt; IS ASSIGNED.
+
+  READ TABLE t_instances ASSIGNING &lt;inst&gt;
+       WITH KEY baname = &lt;mode&gt;-modename
+                host = name.
+  CHECK sy-subrc = 0.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_THREAD" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
     <TEXTS>
@@ -917,7 +1098,6 @@
      <ITEM SCONAME="AS_LIST" CMPTYPE="1" PARDECLTYP="2" TYPTYPE="1" TYPE="TT_AS"/>
     </PARAMETERS>
     <SOURCE>`
-
   DATA:
     lt_cpu   TYPE STANDARD TABLE OF cpu_all,
     lv_ok    TYPE def_par_fu-no_yes,
@@ -927,6 +1107,9 @@
   FIELD-SYMBOLS:
     &lt;fs_cpu&gt; LIKE LINE OF lt_cpu,
     &lt;fs_srv&gt; LIKE LINE OF as_list.
+
+  CHECK check_delay( time = last_get_load
+                     delay = get_load_delay ) = abap_true.
 
   LOOP AT as_list ASSIGNING &lt;fs_srv&gt;.
 
@@ -976,7 +1159,9 @@
 
     &lt;fs_srv&gt;-load = &lt;fs_srv&gt;-load / lv_nbcpu.
 
-  ENDLOOP.</SOURCE>
+  ENDLOOP.
+
+  GET TIME STAMP FIELD last_get_load.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GET_AS_WP" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -986,10 +1171,12 @@
      <ITEM SCONAME="AS_LIST" CMPTYPE="1" PARDECLTYP="2" TYPTYPE="1" TYPE="TT_AS"/>
     </PARAMETERS>
     <SOURCE>`
-
   DATA lt_wp     TYPE STANDARD TABLE OF wpinfo.
   FIELD-SYMBOLS:
     &lt;fs_srv&gt; LIKE LINE OF as_list.
+
+  CHECK check_delay( time = last_get_wp
+                     delay = get_wp_delay ) = abap_true.
 
   LOOP AT as_list ASSIGNING &lt;fs_srv&gt;.
 
@@ -1035,10 +1222,24 @@
     DELETE lt_wp WHERE wp_istatus &lt;&gt; 2.     &quot; Waiting
     DESCRIBE TABLE lt_wp LINES &lt;fs_srv&gt;-free.
 
-  ENDLOOP.</SOURCE>
+    &lt;fs_srv&gt;-res_a = get_reserved_class_a( &lt;fs_srv&gt;-name ).
+
+  ENDLOOP.
+
+  GET TIME STAMP FIELD last_get_wp.</SOURCE>
    </ITEM>
   </METHODS>
   <TYPES>
+   <ITEM CMPNAME="TD_DELAY" STATE="1" EDITORDER="7 " TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Delays in second"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_DELAY_TIMESTAMP" STATE="1" EDITORDER="6 " TYPTYPE="1" TYPE="TIMESTAMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="TO_ME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPL_MT_JOB_MONITORING">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT : Job monitoring"/>
@@ -1054,7 +1255,11 @@
      <ITEM LANG="E" TEXT="Description of step values (BI-API)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_STEPINFO" STATE="1" EDITORDER="3 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_ACTIVMODE" STATE="1" EDITORDER="3 " TYPTYPE="4">tt_activmode     TYPE STANDARD TABLE OF btcomset WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_INSTANCE" STATE="1" EDITORDER="4 " TYPTYPE="4">tt_instance TYPE STANDARD TABLE OF spfid WITH DEFAULT KEY
+`</ITEM>
+   <ITEM CMPNAME="TT_STEPINFO" STATE="1" EDITORDER="5 " TYPTYPE="4">
     tt_stepinfo TYPE STANDARD TABLE OF ts_stepinfo
 `
     <TEXTS>

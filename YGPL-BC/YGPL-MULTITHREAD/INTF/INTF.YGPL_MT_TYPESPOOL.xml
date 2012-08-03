@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="7EA3EAEC4287E8122BE200C3C4189339" CODE_SIGNATURE="1E33E5C237A98E5C75F5990D3084D30E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPESPOOL" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="0B410BB2A625FD9086E29557CD2634DF" CODE_SIGNATURE="62435417E32180E58BC4FBC97A1278EC" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TYPESPOOL" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -7,6 +7,14 @@
     <ITEM LANG="E" TEXT="MultyThreads data Types"/>
    </TEXTS>
   </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="JOB_PRIORITIES" EXPOSURE="2" STATE="1" ATTDECLTYP="2" TYPTYPE="4">BEGIN OF job_priorities,
+      high    TYPE td_priority VALUE &apos;A&apos;,
+      normal  TYPE td_priority VALUE &apos;B&apos;,
+      low     TYPE td_priority VALUE &apos;C&apos;,
+    END OF job_priorities
+`</ITEM>
+  </ATTRIBUTS>
   <TYPEGROUPS>
    <ITEM TYPEGROUP="ABAP" EXPLICIT="X" IMPLICIT="X"/>
   </TYPEGROUPS>
@@ -200,7 +208,8 @@
     BEGIN OF ts_as,
         name     TYPE td_as_name,
         wp       TYPE td_wp_count,
-        free     TYPE td_wp_count,        &quot; Issue 6
+        free     TYPE td_wp_count,                          &quot; Issue 6
+        res_a    TYPE td_wp_count,        &quot; Issue 6 : Class A reserved job
         load     TYPE td_as_load,
       END OF ts_as
 `

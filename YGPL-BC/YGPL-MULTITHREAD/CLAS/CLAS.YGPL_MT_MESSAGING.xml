@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="555F52A6B02853A41917F5335C243305" CODE_SIGNATURE="26B99F5D56208F329120AFA7D4A6DD6C" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="F6B6BA19958D049C22906EC31288219C" CODE_SIGNATURE="2BD25870FCADCABC2723F3A73E4E1776" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -498,48 +498,6 @@
     </PARAMETERS>
     <SOURCE>`
   me-&gt;o_process = o_process.</SOURCE>
-   </ITEM>
-   <ITEM CMPNAME="_DEL_MSG_OFF" STATE="1" MTDDECLTYP="1">
-    <TEXTS>
-     <ITEM LANG="E" TEXT="Delete messages records"/>
-    </TEXTS>
-    <PARAMETERS>
-     <ITEM SCONAME="RUN_ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_ID">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="ID unique de l&apos;exécution"/>
-      </TEXTS>
-     </ITEM>
-    </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="FAILED" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="Delete has failed"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
-    <SOURCE>`
-**********************************************************************
-* Author : Al&apos;oustad Taryck BENSIALI (taryck.bensiali@gmail.com)     *
-* Date : 2008 December                                               *
-**********************************************************************
-
-*  CALL METHOD _lock
-*    EXPORTING
-*      run_id       = run_id
-*    EXCEPTIONS
-*      foreign_lock = 1
-*      sys_failure  = 2
-*      OTHERS       = 3.
-*  IF sy-subrc &lt;&gt; 0.
-*    RAISE failed.
-*  ENDIF.
-
-*  IF _run-run_id &lt;&gt; run_id.
-  DELETE FROM ygplmt_messages WHERE process_id = run_id.
-
-*  COMMIT WORK AND WAIT.
-*
-*  CALL METHOD _unlock( run_id = run_id ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="_GENERATE_MSG_ID" STATE="1" MTDDECLTYP="1">
     <TEXTS>
