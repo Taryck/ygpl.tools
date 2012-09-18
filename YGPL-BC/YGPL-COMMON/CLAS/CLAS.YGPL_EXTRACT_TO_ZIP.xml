@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="930DC537F93B68D6F5E04E1A8AF0CE0F" CODE_SIGNATURE="636CBC05EDA8328EC58BBCE6C247FA5D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_EXTRACT_TO_ZIP" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="DEA783D6920B482499CF03EBB46DA6C2" CODE_SIGNATURE="03717FAEF1E9FD3BAAAB7789FD4EF4F1" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_EXTRACT_TO_ZIP" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="CL_ABAP_CHAR_UTILITIES"/>
  </DEPENDENCIES>
@@ -19,8 +19,8 @@
    <ITEM CMPNAME="SAVE_DIALOG" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SAVE_DIALOG"/>
    <ITEM CMPNAME="SET_FILENAME" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SET_FILENAME"/>
    <ITEM CMPNAME="SET_FILETYPE" EXPOSURE="2" CMPTYPE="1" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="SET_FILETYPE"/>
-   <ITEM CMPNAME="TD_FILENAME" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILENAME"/>
-   <ITEM CMPNAME="TD_FILETYPE" EXPOSURE="1" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILETYPE"/>
+   <ITEM CMPNAME="TD_FILENAME" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILENAME"/>
+   <ITEM CMPNAME="TD_FILETYPE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPLIEXTRACT_TO_ZIP" REFCMPNAME="TD_FILETYPE"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="CR" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;CR_LF" TYPTYPE="1" TYPE="ABAP_CHAR1">
@@ -153,10 +153,27 @@
   DATA file_type  TYPE char10.
   DATA file_size  TYPE i.
   DATA o_conv     TYPE REF TO cl_abap_conv_out_ce.
+  DATA file_Ext   type String.
+  Data zip_ext    type string.
   FIELD-SYMBOLS:
     &lt;s&gt; LIKE LINE OF tmptable.
 
   x_string = o_zip-&gt;save( ).
+
+* Add extention... or not
+  pos = STRLEN( _filename ) - STRLEN( zip_file_extension ).
+  IF pos &gt; 0.
+    zip_ext = zip_file_extension.
+    TRANSLATE zip_ext TO UPPER CASE.
+    file_Ext = _filename+pos.
+    TRANSLATE file_Ext TO UPPER CASE.
+    IF file_Ext = zip_ext.
+      filename = _filename.
+    ENDIF.
+  ENDIF.
+  IF filename IS INITIAL.
+    CONCATENATE _filename zip_file_extension INTO filename.
+  ENDIF.
 
   IF _filetype = filetypes-local.
     IF _filename IS INITIAL.
@@ -170,17 +187,6 @@
          output_length         = file_size
         TABLES
           binary_tab            =  tmptable.
-
-* Add extention... or not
-      pos = STRLEN( _filename ) - STRLEN( zip_file_extension ).
-      IF pos &gt; 0.
-        IF _filename+pos = zip_file_extension.
-          filename = _filename.
-        ENDIF.
-      ENDIF.
-      IF filename IS INITIAL.
-        CONCATENATE _filename zip_file_extension INTO filename.
-      ENDIF.
 
       file_type = &apos;BIN&apos;.      &quot; change in debug
       CALL METHOD cl_gui_frontend_services=&gt;gui_download
@@ -252,7 +258,7 @@
     ENDIF.
   ELSEIF _filetype = filetypes-server.
     TRY.
-        OPEN DATASET _filename FOR OUTPUT IN BINARY MODE.
+        OPEN DATASET filename FOR OUTPUT IN BINARY MODE.
       CATCH cx_root INTO cx.
 * Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
         CREATE OBJECT _cx
@@ -274,7 +280,7 @@
     ENDIF.
 
     TRY.
-        TRANSFER x_string TO _filename.
+        TRANSFER x_string TO filename.
       CATCH cx_root INTO cx.
 * Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
         CREATE OBJECT _cx
@@ -289,7 +295,7 @@
     ENDTRY.
 
     TRY.
-        CLOSE DATASET _filename.
+        CLOSE DATASET filename.
       CATCH cx_root INTO cx.
 * Exception &amp;cx_name&amp; while saving file &amp;filename&amp; (&amp;filetype&amp;)
         CREATE OBJECT _cx

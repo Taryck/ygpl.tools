@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="0CC67C35E4C7CD5DCCDCA83A3EC1D39B" CODE_SIGNATURE="8E5C702F2467D9DE8D3347EFB065BBB5" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_TABLE_DUMP" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VARCL="X" SUBC="1" RSTAT="K" RMAND="200" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YGPL_TABLE_DUMP
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ygpl_table_dump LINE-size 512.
+
+TYPE-POOLS: rsdrs, abap, icon.
+
+PARAMETERS p_table TYPE tabname16 MEMORY ID dtb.
+PARAMETERS p_size TYPE i DEFAULT 10000.
+*PARAMETERS f_local TYPE c RADIOBUTTON GROUP fil MODIF ID fil USER-COMMAND just_to_call_event.
+*PARAMETERS f_server TYPE c RADIOBUTTON GROUP fil MODIF ID fil DEFAULT &apos;X&apos;.
+PARAMETERS p_file LOWER CASE TYPE string MODIF ID fil.
+
+SELECTION-SCREEN:
+BEGIN OF LINE,
+  PUSHBUTTON 3(15) text-whr USER-COMMAND edit,
+END OF LINE.
+PARAMETER t_where    TYPE rsdrs_t_abapsource NO-DISPLAY.    &quot; For save into variants
+
+DATA i_rank(5)  TYPE n.
+DATA o_zip      TYPE REF TO ygpl_extract_to_zip.
+DATA s_where    TYPE string.
+DATA f_error    TYPE abap_bool.
+DATA f_table    TYPE tabname16.
+DATA t_fields   TYPE STANDARD TABLE OF dd03p WITH DEFAULT KEY.
+
+AT SELECTION-SCREEN.
+
+  CASE sy-ucomm.
+    WHEN &apos;EDIT&apos;.
+      CALL FUNCTION &apos;RSDU_EDITOR&apos;
+      EXPORTING
+        i_display_only = abap_false
+*        i_sx_query     = i_sx_query
+      CHANGING
+        c_t_stmt       = t_where.
+  ENDCASE.
+  IF f_table &lt;&gt; p_table OR  t_fields IS INITIAL.
+    PERFORM check_table.
+    f_table = p_table.
+  ENDIF.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_file.
+  PERFORM on_file_request.
+
+START-OF-SELECTION.
+  DATA dref_t TYPE REF TO data.
+  FIELD-SYMBOLS :
+    &lt;t&gt; TYPE ANY TABLE.
+
+  IF t_fields IS INITIAL.       PERFORM check_table.      ENDIF.
+
+  CREATE DATA dref_t TYPE STANDARD TABLE OF (p_table).
+  ASSIGN dref_t-&gt;* TO &lt;t&gt;.
+  ASSERT sy-subrc = 0.
+
+  PERFORM check_sql.
+
+  IF f_error IS INITIAL.
+    SELECT *
+      INTO TABLE &lt;t&gt; PACKAGE SIZE p_size
+      FROM (p_table)
+      WHERE (s_where).
+      PERFORM data_to_file USING &lt;t&gt;.
+    ENDSELECT.
+  ENDIF.
+
+END-OF-SELECTION.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  New_File
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM new_file.
+  DATA d_filename TYPE ygpl_extract_to_zip=&gt;td_filename.
+  DATA count      TYPE string.
+
+  CREATE OBJECT o_zip.
+*  IF NOT f_local IS INITIAL.
+*    o_zip-&gt;set_filetype( ygpl_extract_to_zip=&gt;filetypes-local ).
+*  ELSEIF NOT f_server IS INITIAL.
+  o_zip-&gt;set_filetype( ygpl_extract_to_zip=&gt;filetypes-server ).
+*  ENDIF.
+  ADD 1 TO i_rank.
+  d_filename = i_rank.
+  CONCATENATE p_file &apos;.&apos; d_filename &apos;.zip&apos; INTO d_filename.    &quot; .zip may be added by object
+  o_zip-&gt;set_filename( d_filename ).
+  count = LINES( &lt;t&gt; ).
+  WRITE:/ icon_export AS ICON, d_filename, icon_arrow_right AS ICON, count, text-rec.
+ENDFORM.                    &quot;New_File
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DATA_TO_FILE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;P_&lt;T&gt;  text
+*----------------------------------------------------------------------*
+FORM data_to_file  USING    t TYPE ANY TABLE.
+  DATA d_filename TYPE ygpl_extract_to_zip=&gt;td_filename.
+
+  d_filename = p_table.
+  PERFORM new_file.
+  o_zip-&gt;add_table_as_file_to_zip( any_table = t
+                                    filename = d_filename ).
+  o_zip-&gt;save( ).
+
+ENDFORM.                    &quot; DATA_TO_FILE
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  on_file_request
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM on_file_request .
+  DATA o_file     TYPE REF TO ygpl_extract_to_zip.
+  DATA l_file     TYPE string.
+
+*  IF f_local IS NOT INITIAL.
+*    CREATE OBJECT o_file.
+*    o_file-&gt;set_filetype( ygpl_extract_to_zip=&gt;filetypes-local ).
+*    o_file-&gt;save_dialog( p_file ).
+*    p_file = o_file-&gt;get_filename( ).
+*  ELSEIF f_server IS NOT INITIAL.
+  CALL FUNCTION &apos;/SAPDMC/LSM_F4_SERVER_FILE&apos;
+*     EXPORTING
+*       DIRECTORY              = &apos; &apos;
+*       FILEMASK               = &apos; &apos;
+    IMPORTING
+      serverfile             = l_file
+    EXCEPTIONS
+      canceled_by_user       = 1
+      OTHERS                 = 2.
+  IF sy-subrc = 0.
+    p_file = l_file.
+  ENDIF.
+*  ENDIF.
+ENDFORM.                    &quot; ON_FILE_REQUEST
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHECK_SQL
+*&amp;---------------------------------------------------------------------*
+*       text
+FORM check_sql .
+  DATA _cx        TYPE REF TO cl_abap_classdescr.
+  DATA str        TYPE string.
+  DATA field      TYPE string.
+  DATA s_where_t  TYPE string.
+  DATA o_cx       TYPE REF TO cx_root.
+  FIELD-SYMBOLS:
+    &lt;c&gt; LIKE LINE OF t_fields.
+
+  PERFORM convert_whereclause.
+  CHECK s_where IS NOT INITIAL.
+
+  READ TABLE t_fields ASSIGNING &lt;c&gt; INDEX 1.
+  field = &lt;c&gt;-fieldname.
+  CONCATENATE &apos;(&apos; field &apos;is null AND not&apos; field &apos;is null ) AND (&apos; s_where &apos;)&apos; INTO s_where_t SEPARATED BY space.
+
+  TRY.
+      SELECT * UP TO 1 ROWS
+        INTO TABLE &lt;t&gt;
+        FROM (p_table)
+        WHERE (s_where_t).
+    CATCH cx_root INTO o_cx.
+      f_error = abap_true.
+      _cx ?= cl_abap_typedescr=&gt;describe_by_object_ref( p_object_ref = o_cx ).
+      str = _cx-&gt;absolute_name.
+      WRITE:/ icon_failure AS ICON, &apos;Error in where clause : &apos;,str , icon_message_error_small AS ICON, o_cx-&gt;kernel_errid.
+      str = o_cx-&gt;get_text( ).
+      IF str IS NOT INITIAL.      WRITE:/ icon_arrow_right AS ICON, str.      ENDIF.
+      str = o_cx-&gt;get_longtext( ).
+      IF str IS NOT INITIAL.      WRITE:/ icon_arrow_right AS ICON, str.      ENDIF.
+      EXIT.
+  ENDTRY.
+  CLEAR &lt;t&gt;.
+ENDFORM.                    &quot; CHECK_SQL
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CONVERT_WHERECLAUSE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  --&gt;  p1        text
+*  &lt;--  p2        text
+*----------------------------------------------------------------------*
+FORM convert_whereclause .
+  FIELD-SYMBOLS: &lt;i&gt; LIKE LINE OF t_where.
+  LOOP AT t_where ASSIGNING &lt;i&gt;.
+    &quot;    CONCATENATE s_where &lt;i&gt; cl_abap_char_utilities=&gt;newline INTO s_where.
+    CONCATENATE s_where &lt;i&gt; space INTO s_where.
+  ENDLOOP.
+ENDFORM.                    &quot; CONVERT_WHERECLAUSE
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHECK_TABLE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM check_table .
+  DATA l_table TYPE ddobjname.
+  Data _state  type DDGOTSTATE.
+
+  l_table = p_table.
+  CALL FUNCTION &apos;DDIF_TABL_GET&apos;
+    EXPORTING
+      name                = l_table
+*       STATE               = &apos;A&apos;
+*       LANGU               = &apos; &apos;
+    IMPORTING
+      GOTSTATE            = _state
+*       DD02V_WA            =
+*       DD09L_WA            =
+    TABLES
+      dd03p_tab           = t_fields
+*       DD05M_TAB           =
+*       DD08V_TAB           =
+*       DD12V_TAB           =
+*       DD17V_TAB           =
+*       DD35V_TAB           =
+*       DD36M_TAB           =
+      EXCEPTIONS
+        illegal_input       = 1
+        OTHERS              = 2.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  elseif _state is INITIAL.
+    MESSAGE text-tbl TYPE &apos;E&apos;.
+  ENDIF.
+  DELETE t_fields WHERE inttype IS INITIAL.
+  READ TABLE t_fields TRANSPORTING NO FIELDS WITH KEY keyflag = abap_true.
+  IF sy-subrc = 0.
+    DELETE t_fields WHERE keyflag IS INITIAL.
+  ENDIF.
+  IF t_fields IS INITIAL.
+    MESSAGE text-fld TYPE &apos;E&apos;.
+  ENDIF.
+
+ENDFORM.                    &quot; CHECK_TABLE</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="I" KEY="FLD">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="No valid fields could be found for this Table/view" LENGTH="100 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="REC">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Records" LENGTH="15 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="TBL">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="This Table/view does not exists" LENGTH="100 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="I" KEY="WHR">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Where clause" LENGTH="20 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Dump Table to File" LENGTH="18 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="P_FILE">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="        Filename on application server" LENGTH="38 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="P_SIZE">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="        File size (records)" LENGTH="27 "/>
+    </TEXTS>
+   </ITEM>
+   <ITEM ID="S" KEY="P_TABLE">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="D       ." LENGTH="18 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
