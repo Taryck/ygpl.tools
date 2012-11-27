@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="CF9A7837A893E7353E15A0A6CF7748CE" CODE_SIGNATURE="A47F0C323A9AB812BD04AF4780F0F372" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="BD042F59F294DE400B7EE515B1E840FE" CODE_SIGNATURE="55F53FA51D2BEA28F67C9F767C903C63" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-GENERATION" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -968,9 +968,32 @@ AS</ITEM>
      <ITEM SCONAME="OBJ_LIST" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS"/>
     </PARAMETERS>
     <SOURCE>`
+  DATA local_list TYPE tt_compkeys.
+  DATA flag       TYPE abap_bool.
+  FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF local_list.
+
   CALL METHOD super-&gt;constructor( ).
-  component_list = obj_list.
-  it_obj_list = compkeys_2_objlist( obj_list ).
+* Issue 137 : Remove unvalid (that is not supposed to be activated) object types
+  local_list = obj_list.
+  SORT local_list.
+  LOOP AT local_list ASSIGNING &lt;wa&gt;.
+    AT NEW type.
+      CALL FUNCTION &apos;RS_OBJ_SUPPORTS_INACTIVE&apos;
+        EXPORTING
+          obj_type          = space
+          sub_type          = &lt;wa&gt;-type
+        IMPORTING
+          supports_inactive = flag.
+      IF flag IS INITIAL.   &quot; If Not activable =&gt; Remove
+        DELETE local_list WHERE type = &lt;wa&gt;-type.
+      ENDIF.
+    ENDAT.
+  ENDLOOP.
+
+  component_list = local_list.
+*  APPEND LINES OF obj_list TO component_list.
+*  SORT component_list BY type name.   DELETE ADJACENT DUPLICATES FROM component_list COMPARING type name.
+  it_obj_list = compkeys_2_objlist(  component_list ).
   SORT it_obj_list BY object obj_name.
   DELETE ADJACENT DUPLICATES FROM it_obj_list COMPARING object obj_name.</SOURCE>
    </ITEM>
