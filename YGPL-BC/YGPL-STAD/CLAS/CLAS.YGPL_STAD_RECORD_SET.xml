@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="7EF96A23EBC6F70062DD955048095766" CODE_SIGNATURE="18B7246832F340C2247F4A3AF5A754FA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_STAD_RECORD_SET" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="CL_SWNC_STATREC_SET"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="CL_SWNC_STATREC_SET" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="STAD record Set"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="OUT_FILENAME" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TD_FILENAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename where to write"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_DATA_PARSING" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_DATA_PARSING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="STAD Data Parsing engine"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OUTPUT_FILENAME" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_FILENAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Filename"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="O_DATA_PARSING" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_DATA_PARSING">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="STAD Data Parsing Interface voir CL_SWNC_READER_WLOAD"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="STAD_FILENAME" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="SWNCSTATFILENAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="SAP Workload NW Collector: Name of the Statistics File"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA o_filter TYPE REF TO if_swnc_records_filter.
+  DATA o_reader TYPE REF TO ygpl_stad_reader.
+
+  CREATE OBJECT o_filter TYPE ygpl_stad_no_filter.
+  CREATE OBJECT o_reader TYPE ygpl_stad_reader
+    EXPORTING
+      i_filename = stad_filename.
+
+  CALL METHOD super-&gt;constructor
+    EXPORTING
+      i_filter = o_filter
+      i_reader = o_reader.
+
+  me-&gt;out_filename = output_filename.
+  me-&gt;o_data_parsing = o_data_parsing.
+  SET HANDLER initialize_read finalize_read FOR o_reader.
+  ASSERT sy-subrc = 0.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="FINALIZE_READ" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_STAD_READER" REFCMPNAME="ON_FINALIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Reconnect to parent finalize_read method"/>
+    </TEXTS>
+    <SOURCE>`
+  CLOSE DATASET out_filename.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="INITIALIZE_READ" STATE="1" MTDTYPE="1" REFCLSNAME="YGPL_STAD_READER" REFCMPNAME="ON_INITIALIZE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Reconnect to parent initialize_read method"/>
+    </TEXTS>
+    <SOURCE>`
+  OPEN DATASET out_filename FOR OUTPUT IN TEXT MODE ENCODING DEFAULT.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_cx_file_save_error
+      EXPORTING
+        filetype = &apos;S&apos;
+        filename = out_filename.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="CL_SWNC_STATREC_SET" MTDNAME="APPEND_RECORD" EXPOSURE="2">
+    <SOURCE>`
+  DATA lv_string TYPE string.
+  lv_string = o_data_parsing-&gt;convert_objrec_to_string( i_mainrecord ).
+  TRANSFER lv_string TO out_filename.
+  IF sy-subrc &lt;&gt; 0.
+    RAISE EXCEPTION TYPE ygpl_cx_file_save_error
+      EXPORTING
+        filetype = &apos;S&apos;
+        filename = out_filename.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+  <TYPES>
+   <ITEM CMPNAME="TD_FILENAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="STRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Filename"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_DATA_PARSING" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLISTAD_DATA_PARSING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="STAD Data Parsing Interface voir CL_SWNC_READER_WLOAD"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

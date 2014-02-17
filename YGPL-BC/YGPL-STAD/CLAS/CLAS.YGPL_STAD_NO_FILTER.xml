@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="6B4E73C25A72B1D9EF3D4791957C0919" CODE_SIGNATURE="99CD1A6C4DD26D21138BEE411AE875C2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_STAD_NO_FILTER" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Filter with Basic Selection Criteria"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="TIMEZONE" STATE="1" TYPTYPE="1" TYPE="SWNCTIMEZONE">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="SAP Workload NW Collector: Time Zone"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="IF_SWNC_RECORDS_FILTER" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="GET_ENDTIME"/>
+     <ITEM MTDNAME="GET_STARTTIME"/>
+     <ITEM MTDNAME="GET_TIMEZONE">
+      <SOURCE>`
+  return = timezone.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="RECORD_FIT">
+      <SOURCE>`
+  return = &apos;X&apos;.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature
+
+*CLASS unit_test DEFINITION FOR TESTING.
+*
+*  PUBLIC SECTION.
+*    CLASS-METHODS: class_setup.
+*
+*    METHODS: test_filter FOR TESTING.
+*
+*  PRIVATE SECTION.
+*
+*ENDCLASS.                    &quot;unit_test DEFINITION</TYPES>
+   <IMPLEMENTATIONS>`
+**&quot;* local class implementation for public class
+**&quot;* use this source file for the implementation part of
+**&quot;* local helper classes
+*
+*CLASS unit_test IMPLEMENTATION.
+*
+**--------------------------------------------------------------------
+** Global Test Preparation
+**--------------------------------------------------------------------
+*  METHOD class_setup.
+**   obsolete
+*  ENDMETHOD.                    &quot;class_setup
+**--------------------------------------------------------------------
+*
+*
+**--------------------------------------------------------------------
+** Filtern von MAIN-Records
+**--------------------------------------------------------------------
+*  METHOD test_filter.
+*
+*    DATA: diarec   TYPE pfdiarec.
+*
+*    CONSTANTS: c_timezone TYPE timezone VALUE &apos;UTC&apos;.
+*
+**---------------------------------
+** create object to filter with time interval 00:00:01 - 00:00:02
+**---------------------------------
+*
+*    DATA: filter TYPE REF TO cl_swnc_filter.
+*
+*    CREATE OBJECT filter
+*                        EXPORTING
+*                            i_startdate = sy-datum
+*                            i_starttime = &apos;000001&apos;
+*                            i_enddate = sy-datum
+*                            i_endtime = &apos;000002&apos;
+*                            i_max_records2read = 3.
+*
+**------------------------------------------------------------------
+** create mainrec objects with different endtime between 00:00:00 and 00:00:03
+**------------------------------------------------------------------
+*
+*    DATA:  mainrec1 TYPE REF TO cl_swnc_record_wload,
+*           mainrec2 TYPE REF TO cl_swnc_record_wload,
+*           mainrec3 TYPE REF TO cl_swnc_record_wload,
+*           mainrec4 TYPE REF TO cl_swnc_record_wload,
+*           mainrec5 TYPE REF TO cl_swnc_record_wload,
+*           mainrec6 TYPE REF TO cl_swnc_record_wload,
+*           mainrec7 TYPE REF TO cl_swnc_record_wload,
+*           mainrec8 TYPE REF TO cl_swnc_record_wload
+*           .
+*
+*
+**   Check all methods
+*
+** 1 - 00:00:00
+*    diarec-endtime1 =   ( sy-datum - cl_swnc_constants=&gt;zero_day ) * cl_swnc_constants=&gt;seconds_per_day + 0.
+*
+*    CREATE OBJECT mainrec1
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone.
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec1 ).
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (1) is not in interval!&apos; ).
+*      CATCH cx_swnc_max_records_read.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (1) is not out of max record to read!&apos; ).
+*      CATCH cx_swnc_not_in_interval.
+*    ENDTRY.
+*
+*
+*
+** 2 - 00:00:01
+*    diarec-endtime1 =   ( sy-datum - cl_swnc_constants=&gt;zero_day ) * cl_swnc_constants=&gt;seconds_per_day + 1.
+*
+*    CREATE OBJECT mainrec2
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                   .
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec2 ).
+*      CATCH cx_swnc_max_records_read.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (1) is not out of max record to read!&apos; ).
+*      CATCH cx_swnc_not_in_interval.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (2) is in interval!&apos; ).
+*
+*    ENDTRY.
+*
+*
+*
+*
+** 3 - 00:00:01
+*
+*    CREATE OBJECT mainrec3
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                  .
+*
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec3 ).
+*      CATCH cx_swnc_max_records_read.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (1) is not out of max record to read!&apos; ).
+*      CATCH cx_swnc_not_in_interval.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (3) is in interval!&apos; ).
+*
+*    ENDTRY.
+*
+*
+** 4 - 00:00:01
+*
+*    CREATE OBJECT mainrec4
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                   .
+*
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec4 ).
+*      CATCH cx_swnc_max_records_read.
+*      CATCH cx_swnc_not_in_interval.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (4) is in interval!&apos; ).
+*
+*    ENDTRY.
+*
+*
+** 5 - 00:00:02
+*    diarec-endtime1 =   ( sy-datum - cl_swnc_constants=&gt;zero_day ) * cl_swnc_constants=&gt;seconds_per_day + 2.
+*
+*    CREATE OBJECT mainrec5
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                    .
+*
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec5 ).
+*      CATCH cx_swnc_max_records_read.
+*      CATCH cx_swnc_not_in_interval.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (5) is in interval!&apos; ).
+*    ENDTRY.
+*
+** 00:00:02
+*    CREATE OBJECT mainrec6
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                    .
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec6 ).
+*      CATCH cx_swnc_max_records_read.
+*      CATCH cx_swnc_not_in_interval.
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (6) is in interval!&apos; ).
+*
+*    ENDTRY.
+*
+*
+** 00:00:03
+*    diarec-endtime1 =   ( sy-datum - cl_swnc_constants=&gt;zero_day ) * cl_swnc_constants=&gt;seconds_per_day + 3.
+*
+*    CREATE OBJECT mainrec7
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                   .
+*
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec7 ).
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (7) is not fit!&apos; ).
+*      CATCH cx_swnc_max_records_read.
+*      CATCH cx_swnc_not_in_interval.
+*
+*    ENDTRY.
+*
+*
+** 00:00:03
+*    diarec-endtime1 =   ( sy-datum - cl_swnc_constants=&gt;zero_day ) * cl_swnc_constants=&gt;seconds_per_day + 3.
+*
+*    CREATE OBJECT mainrec8
+*                          EXPORTING i_pfdiarec         = diarec
+*                                    i_timezone     = c_timezone
+*                                    .
+*
+*    TRY.
+*        filter-&gt;if_swnc_records_filter~record_fit( mainrec8 ).
+*        cl_aunit_assert=&gt;abort( msg = &apos;This main record (7) is not fit!&apos; ).
+*      CATCH cx_swnc_max_records_read.
+*      CATCH cx_swnc_not_in_interval.
+*    ENDTRY.
+*
+*
+*
+*
+*
+*  ENDMETHOD.                    &quot;test_filter
+**--------------------------------------------------------------------
+*
+**--------------------------------------------------------------------
+**--------------------------------------------------------------------
+**--------------------------------------------------------------------
+*
+**--------------------------------------------------------------------
+**--------------------------------------------------------------------
+**--------------------------------------------------------------------
+*
+*ENDCLASS.                    &quot;unit_test IMPLEMENTATION</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="I_TIMEZONE" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TIMEZONE" PARVALUE="&apos;UTC   &apos;">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Time Zone"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  me-&gt;timezone = i_timezone.</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>

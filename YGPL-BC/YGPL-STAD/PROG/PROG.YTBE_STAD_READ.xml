@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="F9CE3AA2D13977E2757060A4A3A472AC" CODE_SIGNATURE="949DCDB0DF42585548AC8FE9385BB5F1" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YTBE_STAD_READ" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="T" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YTBE_STAD_READ
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ytbe_stad_read.
+
+PARAMETERS:
+  p_wfile TYPE string LOWER CASE DEFAULT &apos;D:\usr\sap\S21\DVEBMGS00\data\stat.DAT391.txt&apos;,
+  p_file TYPE pfdict-file LOWER CASE DEFAULT &apos;D:\usr\sap\S21\DVEBMGS00\data\stat.DAT391&apos;.
+
+START-OF-SELECTION.
+  DATA o_set     TYPE REF TO if_swnc_statrec.
+  DATA o_parsing TYPE ygpl_stad_record_set=&gt;to_data_parsing.
+  DATA:
+    lv_count TYPE i,
+    lv_start TYPE timestampl,
+    lv_end   TYPE timestampl.
+
+* Exceptions
+  DATA: ex_read_error TYPE REF TO cx_swnc_read_error,
+        ex_maxread    TYPE REF TO cx_swnc_max_records_read.
+
+  GET TIME STAMP FIELD lv_start.
+  CREATE OBJECT o_parsing TYPE ygpl_stad_parsing_default
+    EXPORTING
+      line_structure = &apos;YGPL_STAD_DATA_FULL&apos;.
+
+  CREATE OBJECT o_set TYPE ygpl_stad_record_set_full
+    EXPORTING
+      stad_filename   = p_file
+      output_filename = p_wfile
+      o_data_parsing  = o_parsing.
+* Read Standard Statistic -------------------------------------------
+  TRY.
+      o_set-&gt;do_read( ).
+    CATCH cx_swnc_read_error INTO ex_read_error.
+*     Kernel error when reading records.
+      RAISE read_error.
+*      CATCH cx_swnc_max_records_read INTO ex_maxread.
+*     Reached limit of maximal number of records.
+* No filter frovide no max reccord exception
+  ENDTRY.
+
+  GET TIME STAMP FIELD lv_end.
+  lv_count = o_set-&gt;get_mainrecords_count( ).
+  lv_end = lv_end - lv_start.
+
+  WRITE:/ lv_count, lv_end.</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Lecture STAD" LENGTH="12 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>

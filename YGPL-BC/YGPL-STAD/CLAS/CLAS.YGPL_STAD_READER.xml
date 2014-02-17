@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="88F9D7BA56B54015807840A09ADF7EAF" CODE_SIGNATURE="8924ED552821CD765FD544065ED72EBE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_STAD_READER" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="CL_SWNC_READER_WLOAD"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <INHERITANCE REFCLSNAME="CL_SWNC_READER_WLOAD" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Reader engine with write function"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <EVENTS>
+   <ITEM CMPNAME="ON_FINALIZE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raise at Finalize"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="ON_INITIALIZE" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raise at Initialize"/>
+    </TEXTS>
+   </ITEM>
+  </EVENTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="CL_SWNC_READER_WLOAD" MTDNAME="IF_SWNC_READER~FINALIZE" EXPOSURE="2">
+    <SOURCE>`
+  CALL METHOD super-&gt;if_swnc_reader~finalize.
+  RAISE EVENT on_finalize.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="CL_SWNC_READER_WLOAD" MTDNAME="IF_SWNC_READER~INITIALIZE" EXPOSURE="2">
+    <SOURCE>`
+  CALL METHOD super-&gt;if_swnc_reader~initialize
+    EXPORTING
+      i_starttime = i_starttime
+      i_timezone  = i_timezone.
+  RAISE EVENT on_initialize.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+ </RAW>
+</ZL_OBJECT>

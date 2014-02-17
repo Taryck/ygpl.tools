@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="DE42C8FCCF09B79E5B4E14829B5E4C46" CODE_SIGNATURE="E3DAB41EB312B6458A0A5DDF7824C1E5" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLISTAD_DATA_PARSING" TYPE="INTF" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="STAD Data Parsing Interface voir CL_SWNC_READER_WLOAD"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <METHODS>
+   <ITEM CMPNAME="CONVERT_MAINREC_TO_STRING" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convert Record &amp; Subrecords as Structure to String"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RETURN" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Records encoded as string"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="S_MAINRECORD" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="SWNCSTATREC">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Statistics Record &amp; sub records"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="CONVERT_OBJREC_TO_STRING" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convert Record as Object to String"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="O_MAINRECORD" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="3" TYPE="IF_SWNC_MAINREC">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Interface for Statistics Record Objects"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="RETURN" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Main record encoded as string"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+   <ITEM CMPNAME="GET_HEADER" EXPOSURE="2" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get header fields of structure"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RETURN" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Get fields list as string"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>
