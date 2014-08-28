@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="A91A5BA2AA00F7D80A9883289B9E2A36" CODE_SIGNATURE="14D8FEB52E852D8F26F7E90783DFB1BC" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_STAD_PARSING_BASE" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="CL_ABAP_CHAR_UTILITIES"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSABSTRCT="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="STAD Data Parsing Engine"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="CR" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;CR_LF" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='&quot;New'/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="CRLF" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;CR_LF" TYPTYPE="1" TYPE="ABAP_CR_LF">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Cariage Return + Line Feed"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="FF" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;FORM_FEED" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT='&quot;Page Break Character&quot;'/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="LINE" STATE="1" TYPTYPE="3" TYPE="DATA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Statistic data structure"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SERVER_NAME" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="MSXXLIST-NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Application Server Name"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="SYSID" EXPOSURE="2" STATE="1" ATTRDONLY="X" TYPTYPE="1" TYPE="SY-SYSID">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Name of the SAP System"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TABULATION" EXPOSURE="1" STATE="1" ATTDECLTYP="2" ATTVALUE="CL_ABAP_CHAR_UTILITIES=&gt;HORIZONTAL_TAB" TYPTYPE="1" TYPE="ABAP_CHAR1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Tabluation"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <DEFERRED>
+   <CLASSES>
+    <ITEM TYPEGROUP="CL_ABAP_CHAR_UTILITIES" TPUTYPE="1" EXPLICIT="X"/>
+   </CLASSES>
+  </DEFERRED>
+  <INTERFACES>
+   <ITEM REFCLSNAME="YGPLISTAD_DATA_PARSING" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
+    <COMPONENTS>
+     <ITEM MTDNAME="CONVERT_MAINREC_TO_STRING">
+      <SOURCE>`
+  FIELD-SYMBOLS:
+    &lt;l&gt; TYPE any.
+
+* Assign FS
+  ASSIGN me-&gt;line-&gt;* TO &lt;l&gt;.     ASSERT sy-subrc = 0.
+
+  CALL METHOD me-&gt;ygplistad_data_parsing~convert_mainrec_to_structure
+    EXPORTING
+      s_mainrecord = s_mainrecord
+    CHANGING
+      structure    = &lt;l&gt;.
+
+* Convert Structure to string
+  return = convert_structure_to_string( &lt;l&gt; ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CONVERT_MAINREC_TO_STRUCTURE">
+      <SOURCE>`
+  DATA lv_dref TYPE REF TO data.
+  DATA lv_string TYPE string.
+  DATA lv_len TYPE i.
+  DATA lv_hash TYPE md5_fields-hash.
+  FIELD-SYMBOLS:
+    &lt;xvalue&gt;  TYPE x,
+    &lt;l&gt;       TYPE any,
+    &lt;struct&gt;  TYPE any,
+    &lt;f&gt;       TYPE any,
+    &lt;guid&gt;    TYPE ygpl_stad_hash_code,
+    &lt;dbrec&gt;   LIKE LINE OF s_mainrecord-dbrecs.
+
+* Assign FS
+  ASSIGN structure TO &lt;l&gt;.     ASSERT sy-subrc = 0.
+
+* Map fieds
+  CLEAR &lt;l&gt;.
+  ASSIGN COMPONENT &apos;MAINREC&apos; OF STRUCTURE &lt;l&gt; TO &lt;struct&gt;.
+  IF sy-subrc = 0.
+    MOVE-CORRESPONDING s_mainrecord-mainrec TO &lt;struct&gt;.
+  ELSE.
+    MOVE-CORRESPONDING s_mainrecord-mainrec TO &lt;l&gt;.
+  ENDIF.
+
+  ASSIGN COMPONENT &apos;DBRECS&apos; OF STRUCTURE &lt;l&gt; TO &lt;struct&gt;.
+  IF sy-subrc = 0 AND s_mainrecord-dbrecs IS NOT INITIAL.
+    lv_len = lines( s_mainrecord-dbrecs ).
+    IF lv_len = 1.
+      READ TABLE s_mainrecord-dbrecs ASSIGNING &lt;dbrec&gt; INDEX 1.
+      MOVE-CORRESPONDING &lt;dbrec&gt; TO &lt;struct&gt;.
+    ENDIF.
+  ENDIF.
+
+* Compute Stat signature
+  ASSIGN COMPONENT &apos;GUID&apos; OF STRUCTURE &lt;l&gt; TO &lt;guid&gt;.
+  IF sy-subrc = 0.
+*  lv_xstring = &lt;s&gt;.
+    DESCRIBE FIELD s_mainrecord-mainrec LENGTH lv_len IN BYTE MODE.
+    ASSIGN s_mainrecord-mainrec TO &lt;xvalue&gt; CASTING.
+    CALL FUNCTION &apos;MD5_CALCULATE_HASH_FOR_RAW&apos;
+      EXPORTING
+        data                 = &lt;xvalue&gt;
+        length               = lv_len
+*       VERSION              = 1
+      IMPORTING
+        hash                 = lv_hash
+*     TABLES
+*       DATA_TAB             =
+      EXCEPTIONS
+        INTERNAL_ERROR       = 1
+        OTHERS               = 2.
+*    cl_abap_container_utilities=&gt;fill_container_c(
+*        EXPORTING
+*            im_value = s_mainrecord-mainrec
+*        IMPORTING
+*            ex_container = lv_string ) .
+*    lv_len = strlen( lv_string ).
+*    CALL FUNCTION &apos;MD5_CALCULATE_HASH_FOR_CHAR&apos;
+*      EXPORTING
+*        data                 = lv_string
+*        length               = lv_len
+**     VERSION              = 1
+*      IMPORTING
+*        hash                 = lv_hash
+**   TABLES
+**     DATA_TAB             =
+*      EXCEPTIONS
+*        internal_error       = 1
+*        OTHERS               = 2.
+    IF sy-subrc &lt;&gt; 0.
+    ELSE.
+      &lt;guid&gt; = lv_hash.
+    ENDIF.
+  ENDIF.
+
+* SET System ID if present
+  ASSIGN COMPONENT &apos;SYSTEM&apos; OF STRUCTURE &lt;l&gt; TO &lt;f&gt;.
+  IF sy-subrc = 0.
+    &lt;f&gt; = me-&gt;sysid.
+  ENDIF.
+
+* SET Server if present
+  ASSIGN COMPONENT &apos;SERVER&apos; OF STRUCTURE &lt;l&gt; TO &lt;f&gt;.
+  IF sy-subrc = 0.
+    &lt;f&gt; = me-&gt;server_name.
+  ENDIF.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CONVERT_OBJREC_TO_STRING">
+      <SOURCE>`
+  FIELD-SYMBOLS:
+    &lt;l&gt; TYPE any.
+
+* Assign FS
+  ASSIGN me-&gt;line-&gt;* TO &lt;l&gt;.     ASSERT sy-subrc = 0.
+
+  CALL METHOD me-&gt;YGPLISTAD_DATA_PARSING~CONVERT_OBJREC_TO_STRUCUTRE
+    EXPORTING
+      O_MAINRECORD = O_MAINRECORD
+    CHANGING
+      structure    = &lt;l&gt;.
+
+* Convert Structure to string
+  return = convert_structure_to_string( &lt;l&gt; ).</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="CONVERT_OBJREC_TO_STRUCUTRE">
+      <SOURCE>`
+  DATA lv_dref TYPE REF TO data.
+  DATA s_mainrecord TYPE swncstatrec.
+  FIELD-SYMBOLS:
+    &lt;s&gt; TYPE swncmainrec.
+
+* Get Data
+  lv_dref = o_mainrecord-&gt;get_mainrecord( ).
+  ASSIGN lv_dref-&gt;* TO &lt;s&gt;.     ASSERT sy-subrc = 0.
+  s_mainrecord-mainrec = &lt;s&gt;.
+  CALL METHOD me-&gt;ygplistad_data_parsing~convert_mainrec_to_structure
+    EXPORTING
+      s_mainrecord = s_mainrecord
+    CHANGING
+      structure    = structure.</SOURCE>
+     </ITEM>
+     <ITEM MTDNAME="GET_HEADER">
+      <SOURCE>`
+  FIELD-SYMBOLS:
+    &lt;l&gt; TYPE any.
+
+* Assign FS
+  ASSIGN me-&gt;line-&gt;* TO &lt;l&gt;.     ASSERT sy-subrc = 0.
+  return = get_structure_fields( &lt;l&gt; ).</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="LINE_STRUCTURE" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="STRUKNAME">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Name of a structure"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SERVER_NAME" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="MSXXLIST-NAME" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Application Server Name"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="SYSID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="SY-SYSID" PARVALUE="SY-SYSID">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Name of the SAP System"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  CREATE DATA line TYPE (line_structure).
+  me-&gt;sysid = sysid.
+  me-&gt;server_name = server_name.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CONVERT_STRUCTURE_TO_STRING" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Convert Struture to string"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="I_STRUCTURE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY"/>
+     <ITEM SCONAME="RETURN" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _line      TYPE REF TO cl_abap_structdescr.
+  DATA line       TYPE string.
+  DATA value      TYPE string.
+  FIELD-SYMBOLS:
+    &lt;c&gt; LIKE LINE OF _line-&gt;components,
+    &lt;f&gt; TYPE any.
+
+  _line ?= cl_abap_typedescr=&gt;describe_by_data( p_data = i_structure ).
+  ASSERT _line-&gt;kind = cl_abap_datadescr=&gt;kind_struct.
+
+  LOOP AT _line-&gt;components ASSIGNING &lt;c&gt;.
+    ASSIGN COMPONENT &lt;c&gt;-name OF STRUCTURE i_structure TO &lt;f&gt;.
+    ASSERT sy-subrc = 0.
+    value = &lt;f&gt;.
+    REPLACE ALL OCCURRENCES OF tabulation IN value WITH ``.     &quot; Prevent CRLF to jump to next field
+    REPLACE ALL OCCURRENCES OF crlf IN value WITH ``.           &quot; Prevent CRLF to jump to next line
+    REPLACE ALL OCCURRENCES OF cr IN value WITH ``.             &quot; Prevent CR to jump to next line
+    CONCATENATE line value tabulation INTO line.
+  ENDLOOP.
+
+  return = line.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_STRUCTURE_FIELDS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Structure header"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="I_STRUCTURE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY"/>
+     <ITEM SCONAME="RETURN" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="STRING"/>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA _line      TYPE REF TO cl_abap_structdescr.
+  DATA line       TYPE string.
+  FIELD-SYMBOLS:
+    &lt;c&gt; LIKE LINE OF _line-&gt;components.
+
+  _line ?= cl_abap_typedescr=&gt;describe_by_data( p_data = i_structure ).
+  ASSERT _line-&gt;kind = cl_abap_datadescr=&gt;kind_struct.
+
+  LOOP AT _line-&gt;components ASSIGNING &lt;c&gt;.
+    CONCATENATE line &lt;c&gt;-name tabulation INTO line.
+  ENDLOOP.
+
+  return = line.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+ </RAW>
+</ZL_OBJECT>
