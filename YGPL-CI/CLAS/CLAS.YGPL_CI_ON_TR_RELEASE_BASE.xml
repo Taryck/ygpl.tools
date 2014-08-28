@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="D8EE200C9A0EB5DCE32A8893E25ECAED" CODE_SIGNATURE="7FF988678E381E5D8B309E727B84CB88" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CI_ON_TR_RELEASE_BASE" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-CI" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSABSTRCT="X" FIXPT="X" UNICODE="X" MSG_ID="YPGL_CI_ON_TR_RELEAS">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Imp. class for BAdI imp. YGPL_ON_TR_RELEASE"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="O_CHECK_VARIANT" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_CHECK_VARIANT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Administering Check Variants"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_INSPECTION" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_INSPECTION">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Inspection"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="O_OBJECT_SET" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TO_OBJECT_SET">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Object Set Handling (New)"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="IF_EX_CTS_REQUEST_CHECK" EXPOSURE="2" STATE="1" RELTYPE="1">
+    <COMPONENTS>
+     <ITEM MTDNAME="CHECK_BEFORE_ADD_OBJECTS"/>
+     <ITEM MTDNAME="CHECK_BEFORE_CHANGING_OWNER"/>
+     <ITEM MTDNAME="CHECK_BEFORE_CREATION"/>
+     <ITEM MTDNAME="CHECK_BEFORE_RELEASE">
+      <SOURCE>`
+*  DATA s_result_filter TYPE scisrest.
+*  DATA t_errors TYPE scit_objs.
+  DATA i_count TYPE i.
+  DATA f_bypass TYPE abap_bool.
+  DATA f_noresult TYPE abap_bool.
+
+  IF bypass_control( request         = request
+      type            = type
+      owner           = owner
+      objects         = objects
+      keys            = keys
+      dialog          = dialog
+      ) = abap_true.
+    RETURN.
+  ENDIF.
+
+  o_check_variant = me-&gt;define_check_variant(
+      request         = request
+      type            = type
+      owner           = owner
+      objects         = objects
+      keys            = keys
+      dialog          = dialog
+      ).
+  IF o_check_variant IS NOT BOUND.
+    MESSAGE e000 RAISING cancel.
+  ENDIF.
+
+  o_object_set = me-&gt;define_object_set(
+      request         = request
+      type            = type
+      owner           = owner
+      objects         = objects
+      keys            = keys
+      dialog          = dialog
+      ).
+  IF o_object_set IS NOT BOUND.
+    MESSAGE e001 RAISING cancel.
+  ENDIF.
+
+  o_inspection = me-&gt;create_inspection(
+      request         = request
+      type            = type
+      owner           = owner
+      objects         = objects
+      keys            = keys
+      dialog          = dialog
+      ).
+  IF o_inspection IS NOT BOUND.
+    MESSAGE e002 RAISING cancel.
+  ENDIF.
+
+  IF sy-batch IS INITIAL.
+    IF 1 = 2.   MESSAGE i005.   ENDIF.
+    CALL FUNCTION &apos;PROGRESS_INDICATOR&apos;
+      EXPORTING
+*       I_TEXT                     =
+        i_msgid                    = &apos;YPGL_CI_ON_TR_RELEAS&apos;
+        i_msgno                    = &apos;005&apos;
+*       I_MSGV1                    =
+*       I_MSGV2                    =
+*       I_MSGV3                    =
+*       I_MSGV4                    =
+        i_processed                = 0
+        i_total                    = 100
+        i_output_immediately       = abap_true
+*     IMPORTING
+*       E_PROGRESS_SENT            =
+              .
+  ENDIF.
+
+  CALL METHOD o_inspection-&gt;run
+    EXPORTING
+      p_howtorun             = &apos;D&apos;      &quot; Direct run
+    EXCEPTIONS
+      missing_information    = 1
+      cancel_popup           = 2
+      insp_already_run       = 3
+      no_object              = 4        &quot; Ignore this error TR is empty
+      too_many_objects       = 5
+      could_not_read_variant = 6
+      locked                 = 7
+      objs_locked            = 8
+      error_in_objs_build    = 9
+      invalid_check_version  = 10
+      just_running           = 11
+      error_in_batch         = 12
+      not_authorized         = 13
+      no_server_found        = 14
+      OTHERS                 = 15.
+  IF sy-subrc = 3.
+* Should not happend
+  ELSEIF sy-subrc = 4.
+    f_noresult = abap_true.
+  ELSEIF sy-subrc &gt; 0.
+    MESSAGE e004 RAISING cancel.
+  ENDIF.
+
+  IF sy-batch IS INITIAL.
+    IF 1 = 2.   MESSAGE i005.   ENDIF.
+    CALL FUNCTION &apos;PROGRESS_INDICATOR&apos;
+      EXPORTING
+*       I_TEXT                     =
+        i_msgid                    = &apos;YPGL_CI_ON_TR_RELEAS&apos;
+        i_msgno                    = &apos;005&apos;
+*       I_MSGV1                    =
+*       I_MSGV2                    =
+*       I_MSGV3                    =
+*       I_MSGV4                    =
+        i_processed                = 100
+        i_total                    = 100
+        i_output_immediately       = abap_true
+*     IMPORTING
+*       E_PROGRESS_SENT            =
+              .
+  ENDIF.
+
+  IF f_noresult &lt;&gt; abap_true.
+    o_inspection-&gt;get_results( ).
+
+*  CALL METHOD o_inspection-&gt;get_err_objects
+*    EXPORTING
+*      p_rest    = S_Result_filter
+*    IMPORTING
+*      p_errobjs = T_Errors.
+
+*  IF T_Errors IS NOT INITIAL.
+    IF o_inspection-&gt;scirestps IS NOT INITIAL.
+      i_count = lines( o_inspection-&gt;scirestps ).
+      o_inspection-&gt;enter_change( ).
+      o_inspection-&gt;save( ).
+      MESSAGE e006
+         WITH o_inspection-&gt;inspecinf-inspecname o_inspection-&gt;inspecinf-inspecvers o_inspection-&gt;inspecinf-ciuser i_count
+         RAISING cancel.
+    ENDIF.
+  ENDIF.</SOURCE>
+     </ITEM>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <METHODS>
+   <ITEM CMPNAME="BYPASS_CONTROL" EXPOSURE="2" STATE="1" MTDABSTRCT="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define whenever the control should be by passed"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DIALOG" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRBOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Call Made in Dialog"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="F_BYPASS" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="ABAP_BOOL">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Bypass the control"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_KEYS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request key"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_OBJECTS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects in Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OWNER" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AS4USER" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Owner"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="REQUEST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRKORR" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRFUNCTION" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request type"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CANCEL" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Cancel"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="CREATE_INSPECTION" EXPOSURE="2" STATE="1" MTDABSTRCT="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define the Check Variant"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DIALOG" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRBOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Call Made in Dialog"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_KEYS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request key"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_OBJECTS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects in Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OWNER" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AS4USER" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Owner"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="O_INSPECTION" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_INSPECTION">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Code Inspector: Inspection"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="REQUEST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRKORR" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRFUNCTION" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request type"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CANCEL" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Cancel"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="DEFINE_CHECK_VARIANT" EXPOSURE="2" STATE="1" MTDABSTRCT="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define the Check Variant"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DIALOG" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRBOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Call Made in Dialog"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_KEYS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request key"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_OBJECTS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects in Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OWNER" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AS4USER" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Owner"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="O_CHECK_VARIANT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_CHECK_VARIANT">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Code Inspector: Administering Check Variants"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="REQUEST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRKORR" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRFUNCTION" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request type"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CANCEL" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Cancel"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+   <ITEM CMPNAME="DEFINE_OBJECT_SET" EXPOSURE="2" STATE="1" MTDABSTRCT="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Define the Object set"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="DIALOG" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRBOOLEAN" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Call Made in Dialog"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="KEYS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_KEYS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request key"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OBJECTS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_OBJECTS" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects in Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="OWNER" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AS4USER" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Owner"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="O_OBJECT_SET" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TO_OBJECT_SET">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Code Inspector: Object Set Handling (New)"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="REQUEST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRKORR" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="TYPE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TRFUNCTION" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Request type"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="CANCEL" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Cancel"/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_CHECK_VARIANT_NAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="SCI_CHKV">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Element Name of a Check Variant"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_OBJECT_SET_NAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="SCI_OBJS">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Element Name of an Object Set"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_CHECK_VARIANT" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="CL_CI_CHECKVARIANT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Administering Check Variants"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_INSPECTION" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="CL_CI_INSPECTION">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Inspection"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TO_OBJECT_SET" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="CL_CI_OBJECTSET">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Code Inspector: Object Set Handling (New)"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

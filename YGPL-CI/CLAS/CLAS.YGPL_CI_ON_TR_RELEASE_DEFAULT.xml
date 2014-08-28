@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="0EE3DA1F6A255F08B815633617CCCD09" CODE_SIGNATURE="2C4380BB4DB4B34F236B200BB4B3CECA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CI_ON_TR_RELEASE_DEFAULT" TYPE="CLAS" VERSION="1.01">
+ <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YGPL_CI_ON_TR_RELEASE_BASE"/>
+ </DEPENDENCIES>
+ <DIRECTORY DEVCLASS="YGPL-CI" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YPGL_CI_ON_TR_RELEAS">
+   <INHERITANCE REFCLSNAME="YGPL_CI_ON_TR_RELEASE_BASE" STATE="1"/>
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Check performed on TR Release"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="P_CHECK_VARIANT_NAME" EXPOSURE="1" STATE="1" ATTVALUE="&apos;TEST&apos;" TYPTYPE="1" TYPE="TD_CHECK_VARIANT_NAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Name of the Check Variant the will be used"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="P_USER_CHECK_VARIANT" EXPOSURE="1" STATE="1" ATTVALUE="&apos;TBENSIALI&apos;" TYPTYPE="1" TYPE="SY-UNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User Name of the user that belong the Check Variant"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="P_USER_INSPECTION" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="SY-UNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User Name of the user that belong the INSPECTION"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="P_USER_OBJECT_SET" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="SY-UNAME">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="User Name of the user that belong OBJECT_SET"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <REDEFINITIONS>
+   <ITEM REFCLSNAME="YGPL_CI_ON_TR_RELEASE_BASE" MTDNAME="BYPASS_CONTROL" EXPOSURE="2">
+    <SOURCE>`
+  f_bypass = abap_true.
+  IF sy-uname = &apos;TBENSIALI&apos; OR owner = &apos;TBENSIALI&apos;.
+    f_bypass = abap_false.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_CI_ON_TR_RELEASE_BASE" MTDNAME="CREATE_INSPECTION" EXPOSURE="2">
+    <SOURCE>`
+  DATA p_user TYPE sci_user.
+  DATA p_name TYPE sci_insp.
+  DATA p_text TYPE sci_text.
+  DATA p_date TYPE sci_text.
+  DATA p_time TYPE sci_text.
+  DATA p_deldate TYPE sci_deldat.
+
+  IF p_user_inspection IS NOT INITIAL.
+    p_user = p_user_inspection.
+  ELSE.
+    p_user = sy-uname.
+  ENDIF.
+
+  p_name = request.
+  WRITE sy-datlo TO p_date.
+  WRITE sy-timlo TO p_time.
+  MESSAGE i003 WITH sy-uname p_date p_time INTO p_text.
+
+  CALL METHOD cl_ci_inspection=&gt;create
+    EXPORTING
+      p_user              = p_user
+      p_name              = p_name
+      p_text              = p_text
+*      p_new_version       = abap_true
+    RECEIVING
+      p_ref               = o_inspection
+    EXCEPTIONS
+      insp_already_exists = 1
+      insp_not_exists     = 2
+      locked              = 3
+      error_in_enqueue    = 4
+      not_authorized      = 5
+      limit_reached       = 6
+      OTHERS              = 7.
+  ASSERT sy-subrc &lt;= 1.
+  IF sy-subrc &lt;&gt; 0.
+    CLEAR o_inspection.
+  ENDIF.
+
+  CHECK o_inspection IS BOUND.
+  p_deldate = sy-datum + 91.
+
+  CALL METHOD o_inspection-&gt;set
+    EXPORTING
+      p_chkv       = me-&gt;o_check_variant
+      p_objs       = me-&gt;o_object_set
+*     p_text       =
+      p_deldate    = p_deldate
+*     p_sotables   =
+*     p_nosuppress =
+*     p_noaunit    =
+*     p_ocignore   =
+    EXCEPTIONS
+      not_enqueued = 1
+      OTHERS       = 2.
+  IF sy-subrc &lt;&gt; 0.
+    CLEAR o_inspection.
+    EXIT.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_CI_ON_TR_RELEASE_BASE" MTDNAME="DEFINE_CHECK_VARIANT" EXPOSURE="2">
+    <SOURCE>`
+  DATA p_user TYPE sci_user.
+  DATA p_name TYPE sci_chkv.
+
+  IF p_user_check_variant IS NOT INITIAL.
+    p_user = p_user_check_variant.
+  ELSE.
+    p_user = sy-uname.
+  ENDIF.
+
+  IF p_check_variant_name IS NOT INITIAL.
+    p_name = p_check_variant_name.
+*  ELSE.
+*    p_name = &apos;DEFAULT&apos;.
+  ENDIF.
+
+  CALL METHOD cl_ci_checkvariant=&gt;get_ref
+    EXPORTING
+      p_user                   = p_user
+      p_name                   = p_name
+*     p_id                     =
+*     p_dont_look_for_new_chkv = &apos;&apos;
+    RECEIVING
+      p_ref                    = o_check_variant
+    EXCEPTIONS
+      chkv_not_exists          = 1
+      missing_parameter        = 2
+      OTHERS                   = 3.
+  ASSERT sy-subrc &lt;= 1.
+  IF sy-subrc &lt;&gt; 0.
+    CLEAR o_check_variant.
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM REFCLSNAME="YGPL_CI_ON_TR_RELEASE_BASE" MTDNAME="DEFINE_OBJECT_SET" EXPOSURE="2">
+    <SOURCE>`
+  DATA p_user TYPE sci_user.
+  DATA p_name TYPE sci_objs.
+  DATA p_text TYPE sci_text.
+  DATA p_date TYPE sci_text.
+  DATA p_time TYPE sci_text.
+  DATA s_korr TYPE sciskorr.
+
+  IF p_user_object_set IS NOT INITIAL.
+    p_user = p_user_object_set.
+  ELSE.
+    p_user = sy-uname.
+  ENDIF.
+
+  p_name = request.
+
+  CALL METHOD cl_ci_objectset=&gt;create
+    EXPORTING
+      p_user              = p_user
+      p_name              = p_name
+      p_new_version       = abap_false
+    RECEIVING
+      p_ref               = o_object_set
+    EXCEPTIONS
+      objs_already_exists = 1
+      objs_not_exists     = 2
+      locked              = 3
+      error_in_enqueue    = 4
+      not_authorized      = 5
+      OTHERS              = 6.
+*  ASSERT sy-subrc &lt;= 1.
+  IF sy-subrc &lt;&gt; 0.
+    CLEAR o_object_set.
+    EXIT.
+  ENDIF.
+
+  WRITE sy-datlo TO p_date.
+  WRITE sy-timlo TO p_time.
+  MESSAGE i003 WITH sy-uname p_date p_time INTO p_text.
+  s_korr-korr = request.
+
+  CALL METHOD o_object_set-&gt;save_from_order
+    EXPORTING
+      p_korr        = s_korr
+      p_text        = p_text
+*     p_deldate     =
+*     p_temporary   = abap_true
+    EXCEPTIONS
+      invalid_input = 1
+      not_enqueued  = 2
+      OTHERS        = 3.
+  ASSERT sy-subrc = 0.
+  IF sy-subrc &lt;&gt; 0.
+    CLEAR o_object_set.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </REDEFINITIONS>
+ </RAW>
+</ZL_OBJECT>
