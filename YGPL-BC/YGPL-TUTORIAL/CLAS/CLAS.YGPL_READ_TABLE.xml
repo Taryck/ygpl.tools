@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6524112F78BC2BC190B2A54C80371186" CODE_SIGNATURE="15CCE9EEBD72A4D6C4920AF954B807AA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_READ_TABLE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="8D4887D880D30C843C39C24F68F9F96C" CODE_SIGNATURE="2D8826D2CF59D244C546D43A0574B494" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_READ_TABLE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -8,14 +8,24 @@
    </TEXTS>
   </A0_MAINDATA>
   <ATTRIBUTS>
+   <ITEM CMPNAME="COMMIT_EVERY" STATE="1" TYPTYPE="1" TYPE="I">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Commit every x Seconds"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="DURATION" STATE="1" ATTDECLTYP="2" ATTVALUE="3" TYPTYPE="1" TYPE="I">
     <TEXTS>
-     <ITEM LANG="E" TEXT="Read duration by cycle"/>
+     <ITEM LANG="E" TEXT="Read duration (in second) by cycle"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="KEYS_COUNT" STATE="1" ATTDECLTYP="2" ATTVALUE="20" TYPTYPE="1" TYPE="I">
     <TEXTS>
      <ITEM LANG="E" TEXT="Number of key"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="NEXT_COMMIT" STATE="1" TYPTYPE="1" TYPE="TD_TIMESTAMP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="next commit Time Stamp"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="READ_COUNT" STATE="1" TYPTYPE="1" TYPE="I">
@@ -25,7 +35,7 @@
    </ITEM>
    <ITEM CMPNAME="START_TIME" STATE="1" TYPTYPE="1" TYPE="TD_TIMESTAMP">
     <TEXTS>
-     <ITEM LANG="E" TEXT="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+     <ITEM LANG="E" TEXT="Start Time Stamp"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="STEP" STATE="1" TYPTYPE="1" TYPE="I">
@@ -35,12 +45,12 @@
    </ITEM>
    <ITEM CMPNAME="STOP_TIME" STATE="1" TYPTYPE="1" TYPE="TD_TIMESTAMP">
     <TEXTS>
-     <ITEM LANG="E" TEXT="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+     <ITEM LANG="E" TEXT="Stop Time Stamp"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="TIME_LIMIT" STATE="1" TYPTYPE="1" TYPE="TD_TIMESTAMP">
     <TEXTS>
-     <ITEM LANG="E" TEXT="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+     <ITEM LANG="E" TEXT="Limit Time Stamp"/>
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="T_KEYS" STATE="1" TYPTYPE="1" TYPE="TT_STD">
@@ -82,15 +92,16 @@
   DO count TIMES.
     CALL FUNCTION &apos;GUID_CREATE&apos;
       IMPORTING
-        ev_guid_16       = s_key-key
-*       EV_GUID_22       =
-*       EV_GUID_32       =
-              .
+        ev_guid_16 = s_key-key
+*       EV_GUID_22 =
+*       EV_GUID_32 =
+      .
     APPEND s_key TO t_std.
+    perform_commit_if_needed( ).
   ENDDO.
 
   CLEAR t_keys.
-  lines = LINES( t_std ).
+  lines = lines( t_std ).
   _step = lines / me-&gt;keys_count.
   pos = 1.
   DO me-&gt;keys_count TIMES.
@@ -118,6 +129,7 @@
       GET TIME STAMP FIELD stop_time.
       IF stop_time &gt; time_limit.      EXIT.       ENDIF.
     ENDLOOP.
+    perform_commit_if_needed( ).
     IF stop_time &gt; time_limit.      EXIT.       ENDIF.
   ENDDO.</SOURCE>
    </ITEM>
@@ -139,6 +151,7 @@
       GET TIME STAMP FIELD stop_time.
       IF stop_time &gt; time_limit.      EXIT.       ENDIF.
     ENDLOOP.
+    perform_commit_if_needed( ).
     IF stop_time &gt; time_limit.      EXIT.       ENDIF.
   ENDDO.</SOURCE>
    </ITEM>
@@ -159,23 +172,30 @@
       GET TIME STAMP FIELD stop_time.
       IF stop_time &gt; time_limit.      EXIT.       ENDIF.
     ENDLOOP.
+    perform_commit_if_needed( ).
     IF stop_time &gt; time_limit.      EXIT.       ENDIF.
   ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DO_TEST" EXPOSURE="2" STATE="1">
     <PARAMETERS>
+     <ITEM SCONAME="COMMIT_EVERY" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PAROPTIONL="X">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Commit everyx Seconds to prevent time out"/>
+      </TEXTS>
+     </ITEM>
      <ITEM SCONAME="FROM" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PARVALUE="100" PAROPTIONL="X"/>
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TT_RESULT"/>
      <ITEM SCONAME="STEP" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PARVALUE="2" PAROPTIONL="X"/>
-     <ITEM SCONAME="TO" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PARVALUE="100000" PAROPTIONL="X"/>
+     <ITEM SCONAME="TO" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PARVALUE="100000000"/>
     </PARAMETERS>
     <SOURCE>`
   DATA lines TYPE i.
   DATA s_result LIKE LINE OF result.
 
   me-&gt;step = step.
+  me-&gt;commit_every = commit_every.
   add_lines( from ).
-  lines = LINES( t_std ).
+  lines = lines( t_std ).
   DO.
     do_read_std( ).
     s_result-number = lines.
@@ -183,21 +203,24 @@
     s_result-read = read_count.
     s_result-duration = elapse( ).
     APPEND s_result TO result.
+
     do_read_sorted( ).
     s_result-number = lines.
     s_result-type = &apos;S&apos;.
     s_result-read = read_count.
     s_result-duration = elapse( ).
     APPEND s_result TO result.
+
     do_read_hashed( ).
     s_result-number = lines.
     s_result-type = &apos;H&apos;.
     s_result-read = read_count.
     s_result-duration = elapse( ).
     APPEND s_result TO result.
+
     IF lines &gt; to.    EXIT.     ENDIF.
     up_scale_table( ).
-    lines = LINES( t_std ).
+    lines = lines( t_std ).
   ENDDO.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ELAPSE" STATE="1">
@@ -210,6 +233,51 @@
     <SOURCE>`
   result = cl_abap_tstmp=&gt;subtract( tstmp1 = stop_time
                                     tstmp2 = start_time ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_AS_TIMEOUT" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get Application serveur ABAP time-out"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="I">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Timeout"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA l_value TYPE spfpflpar-pvalue.
+  CALL FUNCTION &apos;RSAN_SYSTEM_PARAMETER_READ&apos;
+    EXPORTING
+      i_name     = &apos;abap/timeout&apos;
+    IMPORTING
+      e_value    = l_value
+    EXCEPTIONS
+      read_error = 1
+      OTHERS     = 2.
+  IF sy-subrc &lt;&gt; 0.
+* assuming default value is used
+    result = 600.
+    EXIT.
+  ENDIF.
+
+  result = l_value.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="PERFORM_COMMIT_IF_NEEDED" STATE="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Perform a commit if it&apos;s time to"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA now TYPE td_timestamp.
+  CHECK commit_every &gt; 0.
+  GET TIME STAMP FIELD now.
+  IF me-&gt;next_commit IS INITIAL OR now &gt;= me-&gt;next_commit.
+    IF NOT me-&gt;next_commit IS INITIAL.
+      COMMIT WORK. &quot; to reinit timeout
+    ENDIF.
+    next_commit = cl_abap_tstmp=&gt;add( tstmp = now
+                                       secs = me-&gt;commit_every ).
+  ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="RESET_TIME" STATE="1">
     <TEXTS>
