@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AC7C385CA1DC0FE8739DC4E2D5BF5E65" CODE_SIGNATURE="FABC78BCAAB758F5095A6486447C9D58" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="C75A12F4DA8578033C6C843816506371" CODE_SIGNATURE="0332302EA6DD1FE2994777A01E4E1D13" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_CHRONO"/>
  </DEPENDENCIES>
@@ -21,7 +21,17 @@
      <ITEM LANG="E" TEXT="Count of data returned as a result of process"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="_DATA" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TS_DATA"/>
+   <ITEM CMPNAME="R_UNAME" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TR_UNAME"/>
+   <ITEM CMPNAME="_BATCH" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TS_BATCH_INFO">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Batch Informations"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="_DATA" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TS_DATA">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Chrono datas"/>
+    </TEXTS>
+   </ITEM>
    <ITEM CMPNAME="_ID" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TD_CHRONO_ID">
     <TEXTS>
      <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
@@ -72,6 +82,49 @@
   ADD returned TO data_returned.
   ADD processed TO data_processed.</SOURCE>
    </ITEM>
+   <ITEM CMPNAME="AT_REPORT_START" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raised"/>
+    </TEXTS>
+    <SOURCE>`
+* From SYSTEM_CALLSTACK
+  TYPES: BEGIN OF abap_callstack_line_c,
+           mainprogram TYPE abap_callstack_line-mainprogram,
+           include     TYPE abap_callstack_line-include,
+           line        TYPE abap_callstack_line-line,
+           blocktype   TYPE abap_callstack_line-blocktype,
+           blockname   TYPE abdbg-levent,
+           flag_system TYPE char01,
+         END   OF abap_callstack_line_c.
+  DATA lt_callstack_c       TYPE TABLE OF abap_callstack_line_c.
+
+  CALL &apos;ABAP_CALLSTACK&apos; ID &apos;DEPTH&apos;     FIELD 5      &quot; should be enought
+                        ID &apos;CALLSTACK&apos; FIELD lt_callstack_c.
+****************************************************************
+* Exeample :
+*1  YGPL_CHRONO===================CP  YGPL_CHRONO===================CM00D 13  METHOD  AT_REPORT_START
+*2  RSDBRUNT  YGPL_CHRONO_AT_REPORT_START===E 5 FORM  POP_SCREEN  X
+*3  RSDBRUNT  RSDBRUNT  5354  FORM  %_START_REPORT  X
+*4  RSDBRUNT  RSDBRUNT  5135  FORM  %_OK_CODE_1000  X
+  READ TABLE lt_callstack_c TRANSPORTING NO FIELDS WITH KEY
+        mainprogram = &apos;RSDBRUNT&apos;
+        include = &apos;RSDBRUNT&apos;
+        blocktype = &apos;FORM&apos;
+        blockname = &apos;%_START_REPORT&apos;
+        flag_system = &apos;X&apos;.
+  CHECK sy-subrc = 0.
+***********************************
+  IF _id IS INITIAL AND sy-uname IN r_uname.
+    start( ).
+  ENDIF.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="CLASS_CONSTRUCTOR"/>
+    </TEXTS>
+    <SOURCE>`
+  get_autorecord_ranges( ).</SOURCE>
+   </ITEM>
    <ITEM CMPNAME="CONVERT_SELECT_OPTION" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Convert Select-Option into Generic type"/>
@@ -113,6 +166,18 @@
 *      EV_GUID_22       =
 *      EV_GUID_32       =
   .</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="GET_AUTORECORD_RANGES" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Create ranges for automatic records of report"/>
+    </TEXTS>
+    <SOURCE>`
+  DATA s_uname LIKE LINE OF r_uname.
+
+  s_uname-sign = &apos;I&apos;.
+  s_uname-option = &apos;EQ&apos;.
+  s_uname-low = &apos;TBENSIALI&apos;.
+  APPEND s_uname TO r_uname.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_BATCH_INFO" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -185,28 +250,33 @@
      </ITEM>
     </PARAMETERS>
     <SOURCE>`
-  DATA tid      TYPE th_cliid_transid.
+  DATA tid      TYPE vbhdr-vbkey.
 
-  CALL FUNCTION &apos;TH_GET_CLIENT_ID&apos;
+  CALL FUNCTION &apos;TH_GET_TRANSACTION_ID&apos;
     IMPORTING
-*     IS_REMOTE               =
-*     SYSID                   =
-*     PRE_SYSID               =
-*     USERID                  =
-      transid                 = tid
-*     ACTION                  =
-*     ACTION_TYPE             =
-*     SERVICE                 =
-*     TRCFLAG1                =
-*     TRCFLAG2                =
-    EXCEPTIONS
-      parameter_missing       = 1
-      internal_error          = 2
-      parameter_wrong         = 3
-      OTHERS                  = 4.
-  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+      transaction_id = tid.
 
-  result-trans_id = tid.</SOURCE>
+*  CALL FUNCTION &apos;TH_GET_CLIENT_ID&apos;
+*    IMPORTING
+**     IS_REMOTE         =
+**     SYSID             =
+**     PRE_SYSID         =
+**     USERID            =
+*      transid           = tid
+**     ACTION            =
+**     ACTION_TYPE       =
+**     SERVICE           =
+**     TRCFLAG1          =
+**     TRCFLAG2          =
+*    EXCEPTIONS
+*      parameter_missing = 1
+*      internal_error    = 2
+*      parameter_wrong   = 3
+*      OTHERS            = 4.
+*  ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+
+  result-trans_id = tid.
+  result-trans_code = sy-tcode.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_WP_INFO" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -274,19 +344,19 @@
   DATA x_string TYPE xstring.
   DATA len      TYPE i.
   FIELD-SYMBOLS:
-    &lt;store&gt;   TYPE ANY,
-    &lt;value&gt;   TYPE ANY,
+    &lt;store&gt;   TYPE any,
+    &lt;value&gt;   TYPE any,
     &lt;p&gt;       LIKE LINE OF t_params.
 
   CLEAR _data.
   _data-client = sy-mandt.
   _data-wp = get_wp_info( ).
   _data-trans = get_transaction_info( ).
-  _data-batch = get_batch_info( ).
   _data-username = sy-uname.
   _data-main_program = l_report = sy-cprog.      &quot; sy-repid.
   _data-variant_name = sy-slset.
   _id = create_id( ).
+  _batch = get_batch_info( ).
 
 * Parameters
   t_params = get_parameters_list( l_report ).
@@ -334,7 +404,7 @@
   o_conv-&gt;convert( EXPORTING   data = l_str
                    IMPORTING buffer = x_string ).
 
-  len = XSTRLEN( x_string ).
+  len = xstrlen( x_string ).
   cl_abap_gzip=&gt;compress_binary(
     EXPORTING raw_in       = x_string
               raw_in_len   = len
@@ -375,12 +445,19 @@
     </PARAMETERS>
     <SOURCE>`
   DATA db_track   TYPE ygplchrono.
+  DATA db_batch   TYPE ygplchrono_batch.
   DATA db_data    TYPE ygplchrono_data.
 
   db_data-id = db_track-id = _id.
   IF content IS SUPPLIED AND content IS NOT INITIAL.
     db_data-data = content.
     MODIFY ygplchrono_data FROM db_data.
+    ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
+  ENDIF.
+  IF _batch IS NOT INITIAL.
+    db_batch-id = _id.
+    db_batch-data = _batch.
+    MODIFY ygplchrono_batch FROM db_batch.
     ASSERT ID ygpl_chrono CONDITION sy-subrc = 0.
   ENDIF.
   db_track-data = _data.
@@ -395,7 +472,7 @@
      <ITEM LANG="E" TEXT="Chrono ID in raw format"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_COMPRESSEDDATA" STATE="1" EDITORDER="10 " TYPTYPE="1" TYPE="RSRAWSTRING">
+   <ITEM CMPNAME="TD_COMPRESSEDDATA" STATE="1" EDITORDER="11 " TYPTYPE="1" TYPE="RSRAWSTRING">
     <TEXTS>
      <ITEM LANG="E" TEXT="GZip Compressed Data"/>
     </TEXTS>
@@ -415,11 +492,34 @@
      <ITEM LANG="E" TEXT="UTC time stamp in long form (YYYYMMDDhhmmss,mmmuuun)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_BATCH_INFO" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLCHRONO-BATCH">
+   <ITEM CMPNAME="TR_UNAME" STATE="1" EDITORDER="12 " TYPTYPE="4">tr_uname TYPE RANGE OF sy-uname
+`</ITEM>
+   <ITEM CMPNAME="TS_BATCH_INFO" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLCHRONO_BATCH-DATA">
     <TEXTS>
      <ITEM LANG="E" TEXT="Batch Informations"/>
     </TEXTS>
    </ITEM>
+   <ITEM CMPNAME="TS_CALLER" STATE="1" EDITORDER="7 " TYPTYPE="4">BEGIN OF ts_caller,
+      destination TYPE rfcdisplay-rfcdest,
+      ip TYPE rfcdisplay-rfcdest,
+      trusted TYPE rfcdisplay-rfcslogin,
+      rfc_type TYPE rfcdes-rfctype,
+      client TYPE rfcdisplay-rfcclient,
+      whoami TYPE rfcdisplay-rfcuser,
+      start_info TYPE rfcdisplay-rfcdest,
+      tcode TYPE sy-tcode,
+      program TYPE sy-cprog,
+      system_id TYPE sy-sysid,
+      system_release TYPE sy-saprl,
+      kernel_release TYPE sy-saprl,
+      async_type TYPE sy-batch,
+      trans_type TYPE sy-batch,
+      pcs TYPE sy-batch,
+      codepage TYPE tcp00-cpcodepage,
+      mdmp TYPE char1,
+      installation_number TYPE  slic_inst,
+    END OF ts_caller
+`</ITEM>
    <ITEM CMPNAME="TS_DATA" STATE="1" EDITORDER="4 " TYPTYPE="1" TYPE="YGPLCHRONO-DATA">
     <TEXTS>
      <ITEM LANG="E" TEXT="Chrono datas"/>
@@ -436,7 +536,7 @@
      <ITEM LANG="E" TEXT="Parameter definition"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_SELECT_OPTION" STATE="1" EDITORDER="8 " TYPTYPE="4">
+   <ITEM CMPNAME="TS_SELECT_OPTION" STATE="1" EDITORDER="9 " TYPTYPE="4">
     BEGIN OF ts_select_option,
       sign    TYPE tvarvc-sign,
       option  TYPE tvarvc-opti,
@@ -458,14 +558,14 @@
      <ITEM LANG="E" TEXT="WorkProcess Informations"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_PARAMS" STATE="1" EDITORDER="7 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_PARAMS" STATE="1" EDITORDER="8 " TYPTYPE="4">
     tt_params TYPE SORTED TABLE OF ts_param WITH UNIQUE KEY name
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Parameters list"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TT_SELECT_OPTIONS" STATE="1" EDITORDER="9 " TYPTYPE="4">
+   <ITEM CMPNAME="TT_SELECT_OPTIONS" STATE="1" EDITORDER="10 " TYPTYPE="4">
     tt_select_options TYPE STANDARD TABLE OF ts_select_option WITH DEFAULT KEY
 `
     <TEXTS>

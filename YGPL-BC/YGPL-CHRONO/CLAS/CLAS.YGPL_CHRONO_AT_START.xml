@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="D6EC2E3260F703E8ACEC75FE805C2274" CODE_SIGNATURE="1C99706CCA7C24AB1A92587E8882C00E" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CHRONO_AT_START" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-CHRONO" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" RSTAT="S">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Isolation from Kernel to Specific (DO NOT CHANGE)"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="AT_REPORT_START" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event raised"/>
+    </TEXTS>
+    <SOURCE>`
+* From SYSTEM_CALLSTACK
+  TYPES: BEGIN OF abap_callstack_line_c,
+           mainprogram TYPE abap_callstack_line-mainprogram,
+           include     TYPE abap_callstack_line-include,
+           line        TYPE abap_callstack_line-line,
+           blocktype   TYPE abap_callstack_line-blocktype,
+           blockname   TYPE abdbg-levent,
+           flag_system TYPE char01,
+         END   OF abap_callstack_line_c.
+  DATA lt_callstack_c       TYPE TABLE OF abap_callstack_line_c.
+
+  CALL &apos;ABAP_CALLSTACK&apos; ID &apos;DEPTH&apos;     FIELD 5      &quot; should be enought
+                        ID &apos;CALLSTACK&apos; FIELD lt_callstack_c.
+****************************************************************
+* Exeample :
+*1  YGPL_CHRONO===================CP  YGPL_CHRONO===================CM00D 13  METHOD  AT_REPORT_START
+*2  RSDBRUNT  YGPL_CHRONO_AT_REPORT_START===E 5 FORM  POP_SCREEN  X
+*3  RSDBRUNT  RSDBRUNT  5354  FORM  %_START_REPORT  X
+*4  RSDBRUNT  RSDBRUNT  5135  FORM  %_OK_CODE_1000  X
+  READ TABLE lt_callstack_c TRANSPORTING NO FIELDS WITH KEY
+        mainprogram = &apos;RSDBRUNT&apos;
+        include = &apos;RSDBRUNT&apos;
+        blocktype = &apos;FORM&apos;
+        blockname = &apos;%_START_REPORT&apos;
+        flag_system = &apos;X&apos;.
+  CHECK sy-subrc = 0.
+***********************************</SOURCE>
+   </ITEM>
+  </METHODS>
+ </RAW>
+</ZL_OBJECT>
