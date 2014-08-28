@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="262C608F1EA6909A928F3BDD22E41D5D" CODE_SIGNATURE="276954B580361F143DCD4FC6F2D1C9DE" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_ARCHIVE" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-ADK" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Archive event handler"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="LD_COMPRESSED" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="XSTRING">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="GZIP Compressed data"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="LO_GZIP_HANDLER" EXPOSURE="1" STATE="1" ATTDECLTYP="1" TYPTYPE="3" TYPE="LCL_GZIP_HANDLER">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="GZIP Handler"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="LO_SESSION_ADMIN" EXPOSURE="2" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TO_SESSION_ADMIN">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="To store cl_session_admin from function group ARCH"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="T_FILES" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TT_FILES">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of archived files"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <INTERFACES>
+   <ITEM REFCLSNAME="IF_ABAP_GZIP_BINARY_HANDLER" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
+    <COMPONENTS>
+     <ITEM MTDNAME="USE_OUT_BUF"/>
+    </COMPONENTS>
+   </ITEM>
+  </INTERFACES>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section
+
+CLASS lcl_gzip_handler DEFINITION.
+  PUBLIC SECTION.
+  INTERFACES if_abap_gzip_binary_handler.
+ENDCLASS.                    &quot;LCL_GZIP_HANDLER DEFINITION</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations
+
+*----------------------------------------------------------------------*
+*       CLASS LCL_GZIP_HANDLER IMPLEMENTATION
+*----------------------------------------------------------------------*
+*
+*----------------------------------------------------------------------*
+CLASS lcl_gzip_handler IMPLEMENTATION.
+  METHOD IF_ABAP_GZIP_BINARY_HANDLER~USE_OUT_BUF.
+    CALL METHOD ygpl_archive=&gt;if_abap_gzip_binary_handler~use_out_buf
+      EXPORTING
+        out_buf     = out_buf
+        out_buf_len = out_buf_len
+        part        = part
+        gzip_stream = gzip_stream.
+  ENDMETHOD.                    &quot;
+ENDCLASS.                    &quot;LCL_GZIP_HANDLER IMPLEMENTATION</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="ON_CREATE" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Called from ARCHIVE_OPEN_FOR_WRITE"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="SESSION_ADMIN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_SESSION_ADMIN">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="To store cl_session_admin from function group ARCH"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  lo_session_admin = session_admin.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="ON_FINISH" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Called from ARCHIVE_WRITE_STATISTICS"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="FILES" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TTA_FILES">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="List of archived files"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  FIELD-SYMBOLS:
+    &lt;f&gt; LIKE LINE OF t_files.
+  CONSTANTS block_size TYPE i VALUE 10485760. &quot; 10Mo
+  DATA f_filesys TYPE abap_bool.
+  DATA f_archsys TYPE abap_bool.
+  DATA l_filename TYPE admi_files-filename.
+  DATA l_filedata TYPE xstring.
+  DATA l_datalen  TYPE i.
+  DATA o_gzip TYPE REF TO cl_abap_gzip_binary_stream.
+
+  t_files = files.
+  LOOP AT t_files ASSIGNING &lt;f&gt;.
+    CALL FUNCTION &apos;ARCHIVE_ADMIN_GET_FILE_INFO&apos;
+      EXPORTING
+        archive_name                 = &lt;f&gt;-archiv_key
+*       ARCHIVE_SYSTEM_ONLY          = &apos; &apos;
+*       FILESYSTEM_ONLY              = &apos; &apos;
+*       CONTENT_REPOSITORY           = &apos; &apos;
+*       DOCUMENT_ID                  = &apos; &apos;
+*       PHYSICAL_FILENAME            = &apos; &apos;
+*       LOGICAL_PATHNAME             = &apos; &apos;
+*       EXCEPTION_ON_ACCESS_ERROR    = &apos;X&apos;
+*       WEBDAV_SYSTEM_ONLY           = &apos; &apos;
+*       WEBDAV_DEST                  =
+*       URI                          =
+      IMPORTING
+*       VALUES_CONSISTENT            =
+        filesystem                   = f_filesys
+        archive_system               = f_archsys
+*       OBJECT                       =
+*       ARCHIVE_KEY                  =
+*       ARCHIVE_CREATION_CLIENT      =
+*       ARCHIVE_CREATION_DATE        =
+*       ARCHIVE_CREATION_RELEASE     =
+*       ARCHIVE_CREATION_SYSTEM      =
+*       ARCHIVE_CODE_PAGE            =
+*       ARCHIVE_NUMBER_FORMAT        =
+        physical_file_with_path      = l_filename
+*       STORED_IN_CONTENT_REPOSITORY =
+*       STORED_AS_DOCUMENT_ID        =
+*       WEBDAV_SYSTEM                =
+*       STORED_IN_WEBDAV_DEST        =
+*       STORED_AS_URI                =
+*       INVALID                      =
+      EXCEPTIONS
+        no_archive_file              = 1
+        file_not_found               = 2
+        open_error                   = 3
+        file_io_error                = 4
+        OTHERS                       = 5.
+    ASSERT sy-subrc = 0.
+    CHECK f_filesys = abap_true.
+    OPEN DATASET l_filename FOR INPUT IN BINARY MODE.
+    IF sy-subrc = 0.
+* File exists
+      CREATE OBJECT lo_gzip_handler.
+*      TRY.
+      CREATE OBJECT o_gzip
+        EXPORTING
+          compress_level = 9
+          output_handler = lo_gzip_handler.
+*      CATCH cx_parameter_invalid_range.
+*      ENDTRY.
+      l_datalen = -1.
+*      TRY.
+      CALL METHOD o_gzip-&gt;set_out_buf
+        IMPORTING
+          out_buf     = ld_compressed
+          out_buf_len = l_datalen.
+*       CATCH cx_parameter_invalid_range .
+*      ENDTRY.
+      DO.
+        READ DATASET l_filename INTO l_filedata MAXIMUM LENGTH block_size.
+        IF sy-subrc &lt;&gt; 0.
+          EXIT.
+        ENDIF.
+        l_datalen = xstrlen( l_filedata ).
+*        TRY.
+        CALL METHOD o_gzip-&gt;compress_binary_stream
+          EXPORTING
+            raw_in     = l_filedata
+            raw_in_len = l_datalen.
+*         CATCH cx_parameter_invalid_range .
+*         CATCH cx_sy_conversion_codepage .
+*        ENDTRY.
+      ENDDO.
+      l_datalen = xstrlen( l_filedata ).
+*      TRY.
+      CALL METHOD o_gzip-&gt;compress_binary_stream_end
+        EXPORTING
+          raw_in     = l_filedata
+          raw_in_len = l_datalen.
+*       CATCH cx_sy_compression_error .
+*      ENDTRY.
+      CLOSE DATASET l_filename.
+    ENDIF.
+    l_datalen = xstrlen( ld_compressed ).
+    WRITE:/ l_filename, &apos;GZIPPED&apos;, l_datalen.
+    CLEAR: l_filedata, ld_compressed.
+  ENDLOOP.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPES>
+   <ITEM CMPNAME="TO_SESSION_ADMIN" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="OBJECT">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="To store cl_session_admin from function group ARCH"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TTA_FILES" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="4">
+    tta_files TYPE ANY TABLE OF arch_files
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of archived files (any table)"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TT_FILES" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="4">
+    tt_files TYPE SORTED TABLE OF arch_files WITH UNIQUE KEY document archiv_key
+`
+    <TEXTS>
+     <ITEM LANG="E" TEXT="List of archived files"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>

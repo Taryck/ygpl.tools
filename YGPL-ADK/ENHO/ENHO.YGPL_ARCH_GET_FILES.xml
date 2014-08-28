@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="A5F046248D3AE84AD3819A28AC512858" CONNECTOR="4181014E2AC27D33E1000000AC1201D6" NAME="YGPL_ARCH_GET_FILES" TYPE="ENHO" VERSION="0.0">
+ <DIRECTORY DEVCLASS="YGPL-ADK" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="A" LANGU="E" TYPE="RDEF" TOOL_TYPE="HOOK_IMPL">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Get files created by archiving process"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <HOOK_IMPLEMENTATIONS>
+   <ITEM PGMID="R3TR" ORG_OBJ_TYPE="FUGR" ORG_OBJ_NAME="ARCH">
+    <HOOK_IMPLS>
+     <ITEM ID="2 ">
+      <SOURCE>
+       <ITEM>  Data YGPL_051MA76jI3iw6lNB9Um_SAdm type REF TO cl_session_admin_W.</ITEM>
+       <ITEM>  Data YGPL_051MA76jI3iw6lNB9Um_Sess type REF TO cl_session_memory.</ITEM>
+       <ITEM>  Data YGPL_051MA76jI3iw6lNB9Um_files type cl_session_memory=&gt;ty_files.</ITEM>
+       <ITEM>*  Data YGPL_051MA76jI3iw6lNB9Um_files TYPE STANDARD TABLE OF arch_files.</ITEM>
+       <ITEM/>
+       <ITEM>  IF YGPL_ARCHIVE=&gt;lo_session_admin is bound.</ITEM>
+       <ITEM>    IF lr_admin-&gt;CURRENT_JOBTYPE = gc_job_wri.</ITEM>
+       <ITEM>      YGPL_051MA76jI3iw6lNB9Um_SAdm ?= lr_admin.</ITEM>
+       <ITEM>      IF YGPL_051MA76jI3iw6lNB9Um_SAdm-&gt;IS_TESTMODE &lt;&gt; gc_boolean_true.</ITEM>
+       <ITEM>* archive already closed =&gt; not working</ITEM>
+       <ITEM>*        CALL FUNCTION &apos;ARCHIVE_GET_ARCHIVE_FILES&apos;</ITEM>
+       <ITEM>*          EXPORTING</ITEM>
+       <ITEM>*            archive_handle                = ARCHIVE_HANDLE</ITEM>
+       <ITEM>*          tables</ITEM>
+       <ITEM>*            archive_files                 = YGPL_051MA76jI3iw6lNB9Um_files</ITEM>
+       <ITEM>*          EXCEPTIONS</ITEM>
+       <ITEM>*            WRONG_ACCESS_TO_ARCHIVE       = 1</ITEM>
+       <ITEM>*            INTERNAL_ERROR                = 2</ITEM>
+       <ITEM>*            OTHERS                        = 3.</ITEM>
+       <ITEM>*        ASSERT sy-subrc = 0.</ITEM>
+       <ITEM>        YGPL_051MA76jI3iw6lNB9Um_Sess ?= lr_admin-&gt;get_instance( lr_admin-&gt;c_cl_session_memory ).</ITEM>
+       <ITEM>        YGPL_051MA76jI3iw6lNB9Um_files = YGPL_051MA76jI3iw6lNB9Um_Sess-&gt;get_all_files( ).</ITEM>
+       <ITEM>        YGPL_ARCHIVE=&gt;ON_finish( YGPL_051MA76jI3iw6lNB9Um_files ).</ITEM>
+       <ITEM>      ENDIF.</ITEM>
+       <ITEM>    ENDIF.</ITEM>
+       <ITEM>  ENDIF.</ITEM>
+      </SOURCE>
+     </ITEM>
+    </HOOK_IMPLS>
+    <SAVE_ENHINCINX>
+     <ITEM ENHNAME="YGPL_ARCH_GET_FILES" VERSION="I" PROGRAMNAME="SAPLARCH" ID="2 " ENHMODE="D" FULL_NAME="\FU:ARCHIVE_CLOSE_FILE\SE:END\EI" ENHINCLUDE="YGPL_ARCH_GET_FILES===========E"/>
+    </SAVE_ENHINCINX>
+   </ITEM>
+  </HOOK_IMPLEMENTATIONS>
+ </RAW>
+</ZL_OBJECT>
