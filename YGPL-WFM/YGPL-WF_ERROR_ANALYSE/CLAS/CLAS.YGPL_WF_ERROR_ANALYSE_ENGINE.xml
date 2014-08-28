@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="5B691F5BA59461996FE264F4E2C5C7FE" CODE_SIGNATURE="D9416710C8B6EC76F1DE4D110035EAA6" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_ERROR_ANALYSE_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B0FA8651485B9E5B8BDDDE7A7F3D2E5C" CODE_SIGNATURE="E9207003747D89AF1CE9ED06DE24535B" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_WF_ERROR_ANALYSE_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-WF_ERROR_ANALYSE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_WF_CASE_ANALYSE">
@@ -8,9 +8,14 @@
    </TEXTS>
   </A0_MAINDATA>
   <ALIASES>
+   <ITEM CMPNAME="TD_RANK" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_RANK"/>
+   <ITEM CMPNAME="TD_WF_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WF_ID"/>
+   <ITEM CMPNAME="TD_WI_ID" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TD_WI_ID"/>
    <ITEM CMPNAME="TI_CASE" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TI_CASE"/>
    <ITEM CMPNAME="TI_IMPLEMENTATION" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TI_IMPLEMENTATION"/>
    <ITEM CMPNAME="TO_CONTEXT" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_OBJECT_TYPES" REFCMPNAME="TO_CONTEXT"/>
+   <ITEM CMPNAME="TT_ACTIONS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TT_ACTIONS"/>
+   <ITEM CMPNAME="TT_STEPS" EXPOSURE="2" CMPTYPE="3" REFCLSNAME="YGPL_WF_DATATYPES" REFCMPNAME="TT_STEPS"/>
   </ALIASES>
   <ATTRIBUTS>
    <ITEM CMPNAME="BADIS_CALLED" STATE="1" TYPTYPE="1" TYPE="TT_BADIS">
@@ -56,7 +61,7 @@
     </TEXTS>
    </ITEM>
    <ITEM CMPNAME="T_RANK" STATE="1" ATTDECLTYP="1" TYPTYPE="4">
-    t_rank TYPE SORTED TABLE OF zif_wf_analyse=&gt;td_rank WITH UNIQUE KEY table_line
+    t_rank TYPE SORTED TABLE OF td_rank WITH UNIQUE KEY table_line
 `
     <TEXTS>
      <ITEM LANG="E" TEXT="Rank possible values"/>
@@ -69,8 +74,8 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_WF_DATATYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_WF_IF_FW_COMMUNICATION" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPL_WF_DATATYPES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
+   <ITEM REFCLSNAME="YGPL_WF_IF_FW_COMMUNICATION" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 ">
     <COMPONENTS>
      <ITEM MTDNAME="CASE_MATCH">
       <SOURCE>`
@@ -78,7 +83,7 @@
      </ITEM>
     </COMPONENTS>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_WF_OBJECT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_WF_OBJECT_TYPES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="3 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -121,14 +126,14 @@
      <ITEM SCONAME="WF_LIST" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_WF_LIST"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="ZCX_WF_ANALYSE" LANGU="E"/>
+     <ITEM SCONAME="YCX_GPL_WF_ANALYSE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_case TYPE REF TO analyse_protocol_logs.
-  DATA t_steps TYPE zif_wf_analyse=&gt;tt_steps.
-  DATA t_actions TYPE zif_wf_analyse=&gt;tt_actions.
-  DATA v_wf_id TYPE zif_wf_analyse=&gt;td_wf_id.
-  DATA o_cx TYPE REF TO zcx_wf_analyse.
+  DATA t_steps TYPE tt_steps.
+  DATA t_actions TYPE tt_actions.
+  DATA v_wf_id TYPE td_wf_id.
+  DATA o_cx TYPE REF TO ycx_gpl_wf_analyse.
   DATA msg TYPE string.
   DATA o_obj     TYPE REF TO cl_abap_classdescr.
   DATA s_no_match LIKE LINE OF no_matchs.
@@ -152,21 +157,21 @@
 
     CALL FUNCTION &apos;SWL_GET_PROTOCOL_EXTERN&apos;
       EXPORTING
-        wi_id                         = &lt;obj&gt;-wi_id
-*       LANGUAGE                      = SY-LANGU
-        with_techdetails              = &apos;X&apos;
-        with_errors                   = &apos;X&apos;
-        with_task_data                = &apos;X&apos;
-        with_format_messages          = &apos;X&apos;
+        wi_id                   = &lt;obj&gt;-wi_id
+*       LANGUAGE                = SY-LANGU
+        with_techdetails        = &apos;X&apos;
+        with_errors             = &apos;X&apos;
+        with_task_data          = &apos;X&apos;
+        with_format_messages    = &apos;X&apos;
       TABLES
-        steps                         = t_steps
-        actions_on_workitems          = t_actions
+        steps                   = t_steps
+        actions_on_workitems    = t_actions
       EXCEPTIONS
-        workflow_does_not_exist       = 1
-        error_reading_wfm_log         = 2
-        error_reading_wim_log         = 3
-        error_formatting_log          = 4
-        OTHERS                        = 5.
+        workflow_does_not_exist = 1
+        error_reading_wfm_log   = 2
+        error_reading_wim_log   = 3
+        error_formatting_log    = 4
+        OTHERS                  = 5.
     CASE sy-subrc.
       WHEN 0.
         CLEAR case_has_match.
@@ -185,7 +190,7 @@
                   actions     = t_actions
                   o_comm      = me.
               add_badi( o_case ).
-            CATCH zcx_wf_analyse INTO o_cx.
+            CATCH ycx_gpl_wf_analyse INTO o_cx.
               o_obj ?= cl_abap_classdescr=&gt;describe_by_object_ref( p_object_ref = o_case ).
 * Erreur lors de l&apos;analyse de cas pour WorkItem &amp;1, Badi &amp;2 &amp; Rank &amp;3 !
               MESSAGE i003 WITH &lt;obj&gt;-wi_id o_obj-&gt;absolute_name &lt;r&gt; INTO msg.
@@ -201,16 +206,16 @@
           MOVE-CORRESPONDING &lt;obj&gt; TO s_no_match.
           CALL FUNCTION &apos;SWI_ERROR_ANALYSIS&apos;
             EXPORTING
-              wi_id                             = &lt;obj&gt;-wi_id
-              popup                             = space
-*       LOG_TREE                          =
+              wi_id                       = &lt;obj&gt;-wi_id
+              popup                       = space
+*             LOG_TREE                    =
             IMPORTING
-              t_errors                          = t_msgs
+              t_errors                    = t_msgs
             EXCEPTIONS
-              workitem_does_not_exist           = 1
-              workitem_not_in_error_state       = 2
-              no_diagnostic_possible            = 3
-              OTHERS                            = 4.
+              workitem_does_not_exist     = 1
+              workitem_not_in_error_state = 2
+              no_diagnostic_possible      = 3
+              OTHERS                      = 4.
           IF sy-subrc &lt;&gt; 0.
             MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
                     WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 INTO s_no_match-msg.
@@ -245,7 +250,7 @@
      <ITEM LANG="E" TEXT="Analyse WF en erreur"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="ZCX_WF_ANALYSE" LANGU="E"/>
+     <ITEM SCONAME="YCX_GPL_WF_ANALYSE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA t_list TYPE tt_wf_list.
@@ -294,7 +299,6 @@
   DATA t_filters TYPE enh_badi_filter_impl_it.
   DATA l_obj_name TYPE trobj_name.
   DATA it_enhname TYPE enhname_it.
-  DATA l_wf_id TYPE zwf_hr_sobjid.
   DATA l_compare TYPE tvarv_opti.
   DATA l_high TYPE i.
   FIELD-SYMBOLS:
@@ -450,7 +454,6 @@
     </TEXTS>
     <SOURCE>`
   DATA msg TYPE string.
-  DATA t_msgs TYPE swf_plog_errors_t.
   FIELD-SYMBOLS &lt;case&gt; LIKE LINE OF no_matchs.
 
   CHECK NOT no_matchs IS INITIAL.
