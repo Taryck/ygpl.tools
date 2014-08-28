@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="35A34640D54EB21F214EA423FE5909FA" CODE_SIGNATURE="1D4F15AFBF13B263475D3B2FC270D333" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="5684B68457973D37A0C6BD75685F8884" CODE_SIGNATURE="330FD3A5F6AD857CB3B8124BFB67360B" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN_CHANGE" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -204,7 +204,7 @@ START-OF-SELECTION.
 *&amp;      Form  LOAD_RUN
 *&amp;---------------------------------------------------------------------*
 FORM load_run  USING    p_run_id TYPE ygpl_mt_task=&gt;td_process_id.
-  DATA o_cx TYPE REF TO ygpl_mt_cx.
+  DATA o_cx TYPE REF TO ycx_gpl_multi_thread.
   DATA msg  TYPE string.
   TRY.
       CLEAR o_cond.
@@ -215,7 +215,7 @@ FORM load_run  USING    p_run_id TYPE ygpl_mt_task=&gt;td_process_id.
         MESSAGE text-run TYPE &apos;E&apos;.
       ENDIF.
       o_cond ?= o_run-&gt;conditions.
-    CATCH ygpl_mt_cx_process INTO o_cx.
+    CATCH ycx_gpl_mt_process INTO o_cx.
       msg = o_cx-&gt;get_text( ).
       MESSAGE msg TYPE &apos;E&apos;.
   ENDTRY.
@@ -228,7 +228,7 @@ ENDFORM.                    &quot; LOAD_RUN
 *      --&gt;P_TASK_ID  text
 *----------------------------------------------------------------------*
 FORM load_task  USING    p_task_id TYPE ygpl_mt_task=&gt;td_process_id.
-  DATA o_cx TYPE REF TO ygpl_mt_cx.
+  DATA o_cx TYPE REF TO ycx_gpl_multi_thread.
   DATA msg  TYPE string.
   TRY.
       CLEAR o_cond.
@@ -240,7 +240,7 @@ FORM load_task  USING    p_task_id TYPE ygpl_mt_task=&gt;td_process_id.
         MESSAGE text-run TYPE &apos;E&apos;.
       ENDIF.
       o_cond ?= o_task-&gt;conditions.
-    CATCH ygpl_mt_cx_process INTO o_cx.
+    CATCH ycx_gpl_mt_process INTO o_cx.
       msg = o_cx-&gt;get_text( ).
       MESSAGE msg TYPE &apos;E&apos;.
   ENDTRY.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="AA8220707107B492A069457AD02719D3" CODE_SIGNATURE="E96453F527208BC473A0733D6BD52BEB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="4ACB15F31EF3134B34DC3F0BD46843E0" CODE_SIGNATURE="A5DF81AF8D5DF7F976679437BE961763" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_JOB_MONITORING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -104,7 +104,7 @@
      <ITEM LANG="E" TEXT="Starting Conditions"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="O_CX" STATE="1" ATTDECLTYP="1" TYPTYPE="3" TYPE="YGPL_MT_CX">
+   <ITEM CMPNAME="O_CX" STATE="1" ATTDECLTYP="1" TYPTYPE="3" TYPE="YCX_GPL_MULTI_THREAD">
     <TEXTS>
      <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
     </TEXTS>
@@ -128,7 +128,7 @@
    <ITEM CMPNAME="T_INSTANCES" STATE="1" ATTDECLTYP="1" TYPTYPE="1" TYPE="TT_INSTANCE"/>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_JOB_MONITORING" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIMT_JOB_MONITORING" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
     <COMPONENTS>
      <ITEM MTDNAME="ADD_THREAD">
       <SOURCE>`
@@ -143,9 +143,10 @@
       ID &apos;JOB&apos; FIELD _jobinfo.
     ASSERT sy-subrc = 0.
     IF _jobinfo-jobname = jobname AND _jobinfo-jobcount = jobcount.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_monitor_yourself
-            EXPORTING name = jobname
-                      id = jobcount.
+      RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_yourself
+        EXPORTING
+          name = jobname
+          id   = jobcount.
     ENDIF.
   ENDIF.
 
@@ -191,13 +192,8 @@
             jobcount = &lt;th&gt;-jobcount
           IMPORTING
             job_info = job_info.
-      CATCH ygpl_mt_cx_job_monitoring INTO o_cx.
-        IF o_cx-&gt;is_exception_text( ygpl_mt_cx_job_monitoring=&gt;job_dont_exists ) IS NOT INITIAL.
-*          job_info-status = job_status-aborted.
-          job_info-status = job_status-finished.
-        ELSE.
-          RAISE EXCEPTION o_cx.
-        ENDIF.
+      CATCH ycx_gpl_mt_monitor_dont_exists.
+        job_info-status = job_status-finished.
     ENDTRY.
     &lt;th&gt;-status = job_info-status.
     IF job_info-status = job_status-aborted OR job_info-status = job_status-finished.
@@ -224,8 +220,7 @@
   DATA ls_srvname TYPE btcsrvname.
 
   IF current_job IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
-          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;not_prepared.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_notprepared.
   ENDIF.
 
 * Check step added
@@ -234,17 +229,17 @@
       jobname          = current_job-name
       jobcount         = current_job-id
     IMPORTING
-*        job_info         =
+*     job_info         =
       steps            = _steps
     EXCEPTIONS
       job_doesnt_exist = 1
       OTHERS           = 2.
   ASSERT sy-subrc &lt;&gt; 1.
   IF sy-subrc &lt;&gt; 0 OR _steps IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
-          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;job_has_no_step
-                      name = current_job-name
-                        id = current_job-id.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_has_no_step
+      EXPORTING
+        name = current_job-name
+        id   = current_job-id.
   ENDIF.
 
   IF o_conditions-&gt;define_server IS NOT INITIAL.
@@ -299,9 +294,9 @@
      invalid_target                    = 8
      OTHERS                            = 9.
   IF sy-subrc &gt; 1.
-    o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;JOB_CLOSE&apos;
-                                           classname = &apos;YGPL_MT_CX&apos;
-                                           subrc     = sy-subrc ).
+    o_cx ?= yCX_gpl=&gt;create_from_mf_cx( funcname  = &apos;JOB_CLOSE&apos;
+                                        classname = &apos;YCX_GPL_MT_JOB_MONITORING&apos;
+                                        subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
   ENDIF.
 
@@ -331,7 +326,7 @@
   DATA _priority  TYPE  td_priority.
 
   IF NOT current_job IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;not_closed.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_not_closed.
   ENDIF.
 
   IF group IS INITIAL.
@@ -368,9 +363,9 @@
   IF sy-subrc = 0.
     current_job-name = _jobname.
   ELSE.
-    o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;JOB_OPEN&apos;
-                                           classname = &apos;YGPL_MT_CX&apos;
-                                           subrc     = sy-subrc ).
+    o_cx ?= yCX_gpl=&gt;create_from_mf_cx( funcname  = &apos;JOB_OPEN&apos;
+                                        classname = &apos;YCX_GPL_MT_JOB_MONITORING&apos;
+                                        subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
   ENDIF.
 
@@ -463,9 +458,9 @@
        conflicting_targets              = 27
        OTHERS                           = 28.
     IF sy-subrc &lt;&gt; 0.
-      o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;BP_JOB_MODIFY&apos;
-                                             classname = &apos;YGPL_MT_CX&apos;
-                                             subrc     = sy-subrc ).
+      o_cx ?= ycx_gpl=&gt;create_from_mf_cx( funcname  = &apos;BP_JOB_MODIFY&apos;
+                                          classname = &apos;YCX_GPL_MT_JOB_MONITORING&apos;
+                                          subrc     = sy-subrc ).
       RAISE EXCEPTION o_cx.
     ENDIF.
 
@@ -541,7 +536,7 @@
      </ITEM>
     </COMPONENTS>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -565,9 +560,9 @@
      <ITEM SCONAME="AS_CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TR_AS_NAME"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_MT_JOB_MONITORING" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+       <ITEM LANG="E" TEXT="MT - Job Monitoring : Root exception class"/>
       </TEXTS>
      </ITEM>
     </EXCEPTIONS>
@@ -577,8 +572,7 @@
   my_as_list = all_as_list.
   DELETE my_as_list WHERE name NOT IN as_conditions.
   IF my_as_list IS INITIAL.   &quot; No server
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
-          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;no_server.
+    RAISE EXCEPTION TYPE YCX_GPL_MT_MONITOR_NO_SERVER.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_DELAY" STATE="1" MTDDECLTYP="1">
@@ -682,7 +676,7 @@
 
   _get_as_wp( CHANGING as_list = all_as_list ).</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2">
+   <ITEM CMPNAME="CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDNEWEXC="X">
     <TEXTS>
      <ITEM LANG="E" TEXT="CONSTRUCTOR"/>
     </TEXTS>
@@ -693,14 +687,20 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
+    <EXCEPTIONS>
+     <ITEM SCONAME="YCX_GPL_MT_MONITOR_NO_SERVER" LANGU="E" MTDTYPE="2">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="No application server provided in conditions."/>
+      </TEXTS>
+     </ITEM>
+    </EXCEPTIONS>
     <SOURCE>`
   me-&gt;o_conditions = o_conditions.
   ASSERT me-&gt;o_conditions IS BOUND.
   my_as_list = all_as_list.
   DELETE my_as_list WHERE name NOT IN me-&gt;o_conditions-&gt;servers.
   IF my_as_list IS INITIAL.   &quot; No server
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
-          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;no_server.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_no_server.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="DELETE_THREAD" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
@@ -720,11 +720,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MT_JOB_MONITORING" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _job       LIKE LINE OF thread_launched.
@@ -746,33 +742,33 @@
   ENDIF.
   CALL FUNCTION &apos;BP_JOB_DELETE&apos;
     EXPORTING
-      jobcount                       = jobcount
-      jobname                        = jobname
-*     FORCEDMODE                     = &apos; &apos;
-*     COMMITMODE                     = &apos;X&apos;
+      jobcount                 = jobcount
+      jobname                  = jobname
+*     FORCEDMODE               = &apos; &apos;
+*     COMMITMODE               = &apos;X&apos;
     EXCEPTIONS
-      cant_delete_event_entry        = 1
-      cant_delete_job                = 2
-      cant_delete_joblog             = 3
-      cant_delete_steps              = 4
-      cant_delete_time_entry         = 5
-      cant_derelease_successor       = 6
-      cant_enq_predecessor           = 7
-      cant_enq_successor             = 8
-      cant_enq_tbtco_entry           = 9
-      cant_update_predecessor        = 10
-      cant_update_successor          = 11
-      commit_failed                  = 12
-      jobcount_missing               = 13
-      jobname_missing                = 14
-      job_does_not_exist             = 15
-      job_is_already_running         = 16
-      no_delete_authority            = 17
-      OTHERS                         = 18.
+      cant_delete_event_entry  = 1
+      cant_delete_job          = 2
+      cant_delete_joblog       = 3
+      cant_delete_steps        = 4
+      cant_delete_time_entry   = 5
+      cant_derelease_successor = 6
+      cant_enq_predecessor     = 7
+      cant_enq_successor       = 8
+      cant_enq_tbtco_entry     = 9
+      cant_update_predecessor  = 10
+      cant_update_successor    = 11
+      commit_failed            = 12
+      jobcount_missing         = 13
+      jobname_missing          = 14
+      job_does_not_exist       = 15
+      job_is_already_running   = 16
+      no_delete_authority      = 17
+      OTHERS                   = 18.
   IF sy-subrc &lt;&gt; 0.
-    o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname  = &apos;BP_JOB_DELETE&apos;
-                                           classname = &apos;YGPL_MT_CX&apos;
-                                           subrc     = sy-subrc ).
+    o_cx ?= ycx_gpl=&gt;create_from_mf_cx( funcname  = &apos;BP_JOB_DELETE&apos;
+                                        classname = &apos;YCX_GPL_MT_JOB_MONITORING&apos;
+                                        subrc     = sy-subrc ).
     RAISE EXCEPTION o_cx.
   ENDIF.</SOURCE>
    </ITEM>
@@ -910,11 +906,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MT_JOB_MONITORING" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
 **********************************************************************
@@ -980,14 +972,14 @@
       job_doesnt_have_steps       = 3
       OTHERS                      = 4.
   IF ret_val &lt;&gt; 0 OR sy-subrc = 2.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_job_monitoring
-          EXPORTING textid = ygpl_mt_cx_job_monitoring=&gt;job_dont_exists
-                      name = jobname
-                        id = jobcount.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_monitor_dont_exists
+      EXPORTING
+        name = jobname
+        id   = jobcount.
   ELSEIF sy-subrc &lt;&gt; 0.
-    o_cx ?= ygpl_mt_cx=&gt;create_from_mf_cx( funcname = &apos;BP_JOB_READ&apos;
-                                              subrc = sy-subrc
-                                          classname = &apos;YGPL_MT_CX_JOB_MONITORING&apos; ).
+    o_cx ?= ycx_gpl=&gt;create_from_mf_cx( funcname = &apos;BP_JOB_READ&apos;
+                                           subrc = sy-subrc
+                                       classname = &apos;YCX_GPL_MT_JOB_MONITORING&apos; ).
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="GET_THREAD_DETAILS" STATE="1" MTDDECLTYP="1">

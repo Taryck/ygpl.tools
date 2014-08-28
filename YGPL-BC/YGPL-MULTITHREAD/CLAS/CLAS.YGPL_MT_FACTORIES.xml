@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C4128DE7C50E18B39C181D48C0EEECB9" CODE_SIGNATURE="277FE123803DDBF12F165C955ACA4BDB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_FACTORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="EA9B88E288083D9228E25DA1197D3389" CODE_SIGNATURE="9506A0EB5E1C285A38EC0261B5E3F3CD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_FACTORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" WITH_UNIT_TESTS="X">
@@ -93,8 +93,8 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_MT_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
+   <ITEM REFCLSNAME="YGPL_MT_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -171,16 +171,16 @@ CLASS abap_unit_testclass DEFINITION FOR TESTING   &quot;#AU Duration Medium
 
     METHODS: setup.
     METHODS: teardown.
-    METHODS: global_test FOR TESTING RAISING ygpl_mt_cx.
-    METHODS: check_run_constencies IMPORTING o_run TYPE ti_run RAISING ygpl_mt_cx.
-    METHODS: check_task_constencies IMPORTING o_task TYPE ti_task RAISING ygpl_mt_cx.
-    METHODS: check_process_messaging IMPORTING o_process TYPE ti_process RAISING ygpl_mt_cx.
+    METHODS: global_test FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: check_run_constencies IMPORTING o_run TYPE ti_run RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: check_task_constencies IMPORTING o_task TYPE ti_task RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: check_process_messaging IMPORTING o_process TYPE ti_process RAISING YCX_GPL_MULTI_THREAD.
 
-    METHODS: create_new_categories FOR TESTING RAISING ygpl_mt_cx.
-    METHODS: create_new_job_monitoring FOR TESTING RAISING ygpl_mt_cx.
-    METHODS: create_new_run_conditions FOR TESTING RAISING ygpl_mt_cx.
-    METHODS: create_new_start_conditions FOR TESTING RAISING ygpl_mt_cx.
-    METHODS: create_new_status FOR TESTING RAISING ygpl_mt_cx.
+    METHODS: create_new_categories FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: create_new_job_monitoring FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: create_new_run_conditions FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: create_new_start_conditions FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
+    METHODS: create_new_status FOR TESTING RAISING YCX_GPL_MULTI_THREAD.
 ENDCLASS.       &quot;Abap_Unit_Testclass
 * ----------------------------------------------------------------------
 CLASS abap_unit_testclass IMPLEMENTATION.
@@ -540,11 +540,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_PROCESS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA process_id TYPE td_process_id.
@@ -568,11 +564,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="O_CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_FULL_CONDITIONS" PAROPTIONL="X" PARPREFERD="X"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA run_id TYPE td_process_id.
@@ -603,11 +595,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions_run.</SOURCE>
@@ -624,11 +612,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions.</SOURCE>
@@ -666,11 +650,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA task_id    TYPE td_process_id.
@@ -709,11 +689,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_mt_conditions_task.</SOURCE>
@@ -740,11 +716,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="PROCESS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PROCESS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -765,11 +737,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="PROCESS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PROCESS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -790,11 +758,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_MESSAGING"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_process TYPE ti_process.
@@ -810,11 +774,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_DATA_BLOC"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE lcl_data_handler.</SOURCE>
@@ -829,11 +789,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="RUN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_PARENT"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -857,11 +813,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="RUN" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_RUN"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -890,11 +842,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA s_map  LIKE LINE OF table.
@@ -917,11 +865,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_OBJECTS_CONSUMING"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
 *  DATA o_obj TYPE REF TO object.
@@ -942,11 +886,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_PROCESS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -967,11 +907,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_RUN"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -1018,11 +954,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO object.
@@ -1089,11 +1021,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="3" TYPE="OBJECT"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object
@@ -1110,11 +1038,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="3" TYPE="OBJECT"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object
@@ -1131,11 +1055,7 @@ ENDCLASS.       &quot;Abap_Unit_Testclass</LOCAL_TEST_CLASS>
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="3" TYPE="OBJECT"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_obj TYPE REF TO ygpl_mt_task.

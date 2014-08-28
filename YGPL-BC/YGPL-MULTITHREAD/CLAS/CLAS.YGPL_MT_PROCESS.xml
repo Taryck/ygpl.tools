@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="1323C7BEE381BD3544153306E54239B6" CODE_SIGNATURE="8E84A77851EEDF6464EEDBB599986096" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="373BB5BD2030AC6386B8E6D3D83650C2" CODE_SIGNATURE="EA12BAFE5F91A6E7094E34821AA970DD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_PROCESS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X" MSG_ID="YGPL_MT">
@@ -86,7 +86,7 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_PROCESS" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIMT_PROCESS" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
     <COMPONENTS>
      <ITEM MTDNAME="AUTOSAVE">
       <SOURCE>`
@@ -189,9 +189,9 @@
     FROM ygplmt_process
     WHERE process_id = me-&gt;process_id.
   IF sy-subrc &lt;&gt; 0 OR _data-client &lt;&gt; sy-mandt.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_process
-          EXPORTING textid = ygpl_mt_cx_process=&gt;do_not_exists
-                process_id = me-&gt;process_id.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_process_not_exists
+      EXPORTING
+        process_id = me-&gt;process_id.
   ENDIF.
   status = _data-int_status.
   user_status = _data-usr_status.
@@ -284,11 +284,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E" MTDTYPE="2"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA length   TYPE i.
@@ -430,11 +426,7 @@
      <ITEM LANG="E" TEXT="Lock record exclusive"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
@@ -445,11 +437,7 @@
      <ITEM LANG="E" TEXT="Lock record &amp; sharing"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
@@ -463,11 +451,7 @@
      <ITEM SCONAME="VALUE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_PROCESS_STATUS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA t_st TYPE td_process_status.
@@ -490,11 +474,7 @@
      <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;finished&quot;'/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   set_int_status( system_status-process-finished ).</SOURCE>
@@ -504,11 +484,7 @@
      <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;in progress&quot;'/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   set_int_status( system_status-process-in_progress ).</SOURCE>
@@ -518,11 +494,7 @@
      <ITEM LANG="E" TEXT='Mettre à jour le statut &quot;stop requested&quot;'/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   set_int_status( system_status-process-stop_requested ).</SOURCE>
@@ -535,11 +507,7 @@
      <ITEM SCONAME="VALUE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_USER_STATUS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA t_st TYPE td_user_status.
@@ -562,11 +530,7 @@
      <ITEM LANG="E" TEXT="Unlock record (with exclusive option)"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
@@ -577,11 +541,7 @@
      <ITEM LANG="E" TEXT="Unlock record (lock with sharing option)"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
@@ -592,11 +552,7 @@
      <ITEM LANG="E" TEXT="Delete Processus definition"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Categories exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _key TYPE td_process_id.
@@ -607,10 +563,10 @@
       WHERE process_id = me-&gt;process_id.
     IF sy-subrc = 0.
       my_key = _key.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_database
-            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                   tablename = my_table
-                   key_value = my_key.
+      RAISE EXCEPTION TYPE ycx_gpl_mt_db_delete_failed
+        EXPORTING
+          tablename = my_table
+          key_value = my_key.
     ENDIF.
   ENDIF.</SOURCE>
    </ITEM>
@@ -636,7 +592,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -686,11 +647,11 @@
       ELSE.
         user = sy-msgv1.
         _key = process_id.
-        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                      object_name = &apos;MT Process Data&apos;(tds)
-                       object_key = _key
-                             user = user.
+        RAISE EXCEPTION TYPE ycx_gpl_mt_lock_foreign
+          EXPORTING
+            object_name = &apos;MT Process Data&apos;(tds)
+            object_key  = _key
+            user        = user.
       ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
     ELSE.
@@ -733,11 +694,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA mode	TYPE ts_mode.

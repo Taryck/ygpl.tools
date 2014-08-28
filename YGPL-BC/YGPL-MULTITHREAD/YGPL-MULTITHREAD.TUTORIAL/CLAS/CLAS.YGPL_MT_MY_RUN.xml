@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="57BE8662C8571C1BBA0BD7266F4D5028" CODE_SIGNATURE="4F0DA761FA0A5F75BCD77D9EB07591CB" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="10E9E23DE19830DFA8BC383204444816" CODE_SIGNATURE="E2BD00BD7D2A3CA1F03E7AB794B53D9D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MY_RUN" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -37,9 +37,9 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
+   <ITEM REFCLSNAME="YGPL_MT_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 "/>
+   <ITEM REFCLSNAME="YGPL_MT_MY_DATA_DEFINITION" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="3 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -68,11 +68,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;add_objects( dependencies = dependencies
@@ -95,11 +91,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;add_thread( jobid = jobid
@@ -113,11 +105,7 @@
      <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_FULL_CONDITIONS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E" MTDTYPE="2"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_conditions   TYPE ygpl_mt_factories=&gt;ti_full_conditions.
@@ -178,11 +166,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;informations-&gt;set_information( category = my_categories-task_param
@@ -193,11 +177,7 @@
      <ITEM LANG="E" TEXT="Start threads automaticly"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;start_threads( ) .</SOURCE>
@@ -207,11 +187,7 @@
      <ITEM LANG="E" TEXT="Start threads automaticly"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;job_monitoring-&gt;debug = abap_true.
@@ -223,11 +199,7 @@
      <ITEM LANG="E" TEXT="Start threads automaticly"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;set_task_classname( &apos;YGPL_MT_MY_TASK&apos; ).
@@ -257,11 +229,7 @@
      <ITEM LANG="E" TEXT="Wait Thread progressing"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_engine-&gt;wait_progress( ).</SOURCE>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="81BA75339F1D5E883080426244362FC3" CODE_SIGNATURE="D81E99C9F4480210227983CB9684F596" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="53960298A853676149354014DAD92066" CODE_SIGNATURE="DDC8EAFEA36FD2A2B1DA5FE9E1C6B639" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_ORACLE_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_DBA_COMMON_ENGINE"/>
  </DEPENDENCIES>
@@ -71,8 +71,8 @@ AS</ITEM>
       tables_list = s_cache-tables.
       indexes_list = s_cache-indexes.
       EXIT.
-    CATCH ygpl_ds_cx_memory.
-    CATCH ygpl_ds_cx_obsolete.
+    CATCH ycx_gpl_ds_memory.
+    CATCH ycx_gpl_ds_obsolete.
   ENDTRY.
 
 * Table size
@@ -89,7 +89,7 @@ AS</ITEM>
           id       = cache_id
           value    = s_cache
           validity = cache_validity.
-    CATCH ygpl_ds_cx_memory.
+    CATCH ycx_gpl_ds_memory.
 * Can&apos;t be saved in shared memory : too big ??
   ENDTRY.</SOURCE>
    </ITEM>
@@ -196,11 +196,7 @@ AS</ITEM>
      <ITEM SCONAME="TABLE_NAME" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_TABLE_NAME"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA rc TYPE i.
@@ -226,7 +222,7 @@ AS</ITEM>
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_DBA_COMMON_ENGINE" MTDNAME="YGPLIDBA_TABLES_STATISTICS~GET_TABLE_STATS">
+   <ITEM REFCLSNAME="YGPL_DBA_COMMON_ENGINE" MTDNAME="YGPLIDBA_TABLES_STATISTICS~GET_TABLE_STATS" EXPOSURE="2">
     <SOURCE>`
   DATA stats TYPE ts_ora_table_index_stats.
   DATA index LIKE LINE OF result-indexes.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6A0F0C2CCDE2AEF45EDBF0E155D41A92" CODE_SIGNATURE="BB2F510C3CD18336409853F4707AB02A" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
+<ZL_OBJECT CHECKSUM="3CA2F7FCABCDF525C32838E4A7CFBFF9" CODE_SIGNATURE="15841DD0400812AE7CEE47B432569875" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TUTORIAL_LAUNCH" TYPE="PROG" VERSION="1.0">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD.TUTORIAL" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VARCL="X" SUBC="1" APPL="Y" RSTAT="T" RMAND="060" RLOAD="E" FIXPT="X" UCCHECK="X"/>
@@ -117,7 +117,7 @@ AT SELECTION-SCREEN.
 START-OF-SELECTION.
   DATA o_conditions TYPE ygpl_mt_interfaces=&gt;ti_full_conditions.
   DATA s_param      TYPE ygpl_mt_my_run=&gt;ts_my_run_parameters.
-  DATA o_cx         TYPE REF TO ygpl_mt_cx.
+  DATA o_cx         TYPE REF TO ycx_gpl_multi_thread.
   DATA msg          TYPE string.
   DATA s_limits     TYPE ygpl_mt_typespool=&gt;ts_limits.
 *  IF NOT clr_all IS INITIAL.
@@ -154,7 +154,7 @@ START-OF-SELECTION.
 * Prepare MT
       CALL METHOD my_run-&gt;add_objects
         EXPORTING
-          OBJECTS      = it_objects
+          objects      = it_objects
           dependencies = it_dep.
 
 * Before starting Clear Controle table
@@ -176,7 +176,7 @@ START-OF-SELECTION.
 
 * Watching Threads.
       my_run-&gt;wait_progress( ).
-    CATCH ygpl_mt_cx INTO o_cx.
+    CATCH ycx_gpl_multi_thread INTO o_cx.
       msg = o_cx-&gt;get_text( ).
       MESSAGE msg TYPE &apos;A&apos;.
   ENDTRY.
@@ -337,7 +337,7 @@ FORM create_worklist .
 
     w_lang-langu = &lt;wa&gt;-langu.
     w_lang-text = &lt;wa&gt;-text.
-    int = STRLEN( w_lang-text ).
+    int = strlen( w_lang-text ).
     ADD int TO w_obj-weight.
     APPEND w_lang TO w_obj-lang.
 

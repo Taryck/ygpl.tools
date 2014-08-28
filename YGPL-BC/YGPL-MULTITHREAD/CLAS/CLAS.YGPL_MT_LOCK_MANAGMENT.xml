@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="6EC2020720592CF4E6FDCF5F9B42FBFB" CODE_SIGNATURE="EB8FCBCD4874DA4C211351F27C197640" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="DB147EA9704D87D00E8553370684357B" CODE_SIGNATURE="850994809C39FD33B2A7F2AC168F9762" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_LOCK_MANAGMENT" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
+  <ITEM TYPE="CLAS" NAME="YCX_GPL_MULTI_THREAD_LOCKS"/>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_CX_LOCKS"/>
  </DEPENDENCIES>
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
@@ -56,11 +57,12 @@
   </ATTRIBUTS>
   <DEFERRED>
    <CLASSES>
+    <ITEM TYPEGROUP="YCX_GPL_MULTI_THREAD_LOCKS" TPUTYPE="1" EXPLICIT="X" IMPLICIT="X"/>
     <ITEM TYPEGROUP="YGPL_MT_CX_LOCKS" TPUTYPE="1" EXPLICIT="X"/>
    </CLASSES>
   </DEFERRED>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_MT_CONSTANTS" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -93,11 +95,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   result = check_lock_exists( process_id = process_id
@@ -117,11 +115,7 @@
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_BOOLEAN"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA t_locks TYPE STANDARD TABLE OF seqg3.
@@ -164,17 +158,13 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   IF NOT lock_mode CO &apos;SEX&apos;.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;invalid_lock_mode
-                 lock_mode = lock_mode.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_lock_mode_invalid
+      EXPORTING
+        lock_mode = lock_mode.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_TIMEOUT" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
@@ -242,7 +232,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -271,7 +266,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -306,11 +306,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
       <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
       </TEXTS>
      </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _key TYPE string.
@@ -369,11 +370,10 @@
           WHEN OTHERS.
             object_name = &apos;Unknow lock kind&apos;(txx).
         ENDCASE.
-        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                      object_name = object_name
-                       object_key = _key
-                             user = user.
+        RAISE EXCEPTION TYPE YCX_GPL_MT_LOCK_FOREIGN
+              EXPORTING object_name = object_name
+                         object_key = _key
+                               user = user.
       ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
     ELSE.
@@ -504,11 +504,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CALL FUNCTION &apos;ENQUEUE_EYGPLMT_LOCKS&apos;
@@ -544,7 +540,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -577,7 +578,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -650,7 +656,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -671,7 +682,8 @@
                             mode = modes-information-read
                          timeout = 3 ).
         EXIT.
-      CATCH ygpl_mt_cx_locks.
+*      CATCH ycx_gpl_mt_locks.
+      CATCH ycx_gpl_mt_lock_foreign.
         WAIT UP TO 3 SECONDS.
     ENDTRY.
   ENDDO.
@@ -692,7 +704,12 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -713,7 +730,8 @@
                             mode = modes-process-read
                          timeout = 3 ).
         EXIT.
-      CATCH ygpl_mt_cx_locks.
+*      CATCH ycx_gpl_mt_locks.
+      CATCH ycx_gpl_mt_lock_foreign.
         WAIT UP TO 3 SECONDS.
     ENDTRY.
   ENDDO.
@@ -766,7 +784,7 @@
    </ITEM>
   </TEXTSPOOL>
   <TYPES>
-   <ITEM CMPNAME="TD_OBJECT_NAME" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPL_MT_CX_LOCKS=&gt;TD_OBJECT_NAME"/>
+   <ITEM CMPNAME="TD_OBJECT_NAME" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="YCX_GPL_MT_LOCKS=&gt;TD_OBJECT_NAME"/>
   </TYPES>
  </RAW>
 </ZL_OBJECT>

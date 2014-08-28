@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="947E555FDFCD38987CD5E9B25410FDC2" CODE_SIGNATURE="17E927AE1B3D6A13471E450A56E3E281" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="B972B247667CC2A957E5BEECD3261C62" CODE_SIGNATURE="00EA34B4A2AE5619D6FE68914646CA9A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_RUN" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PARENT"/>
  </DEPENDENCIES>
@@ -81,7 +81,7 @@
    <ITEM REFCLSNAME="YGPL_MT_FACTORIES" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_RUN" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIMT_RUN" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
     <COMPONENTS>
      <ITEM MTDNAME="ADD_OBJECTS">
       <SOURCE>`
@@ -174,7 +174,7 @@
       o_handler-&gt;new_bloc( ).         &quot; Ablities to create new blocs
       o_handler-&gt;process_batch( ).    &quot; Process Batch is defined
 *      o_handler-&gt;delete( ).
-    CATCH ygpl_cx.    &quot; functional error =&gt; OK
+    CATCH ycx_gpl.    &quot; functional error =&gt; OK
     CATCH cx_sy_create_object_error INTO o_cx_create.    &quot; Type not valid
       ASSERT 0 = 1.
     CATCH cx_sy_dyn_call_param_missing.                  &quot; Parameters invalid
@@ -226,11 +226,7 @@
      <ITEM SCONAME="CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_BASE_CONDITIONS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_cond       TYPE REF TO ygpl_mt_conditions_run.
@@ -289,7 +285,7 @@
                 o_job_monitoring-&gt;delete_thread( jobname = &lt;job&gt;-jobname
                                                 jobcount = &lt;job&gt;-jobcount ).
                 ADD 1 TO task_count.
-              CATCH ygpl_mt_cx.
+              CATCH ycx_gpl_mt_job_monitoring.
             ENDTRY.
           ENDLOOP.
           IF sy-subrc = 0.
@@ -353,11 +349,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E" MTDTYPE="2"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA length TYPE i.
@@ -448,7 +440,7 @@
      <ITEM LANG="E" TEXT="Handle BEFORE_SLEEP_MODE event of Job Monitoring"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_ME"/>
+     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   IF NOT o_messaging-&gt;handle_messages( ) IS INITIAL.
@@ -460,7 +452,7 @@
      <ITEM LANG="E" TEXT="Handle conditions change (confirmed)"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_ME"/>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1" TYPTYPE="1" TYPE="TO_ME"/>
     </PARAMETERS>
     <SOURCE>`
 *  DATA o_cond TYPE to_conditions.
@@ -485,7 +477,7 @@
      <ITEM LANG="E" TEXT="Recieving new running conditions"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
 *New running conditions recieved. Changes will be applied and propagated.
@@ -508,8 +500,8 @@
      <ITEM LANG="E" TEXT="Handle new specific message"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CATEGORY" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
-     <ITEM SCONAME="RAWDATA" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="CATEGORY" CMPTYPE="1" MTDTYPE="1"/>
+     <ITEM SCONAME="RAWDATA" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   RAISE EVENT recieving_specific_message
@@ -521,10 +513,10 @@
      <ITEM LANG="E" TEXT="Handle SUBMIT_THREAD event of Job Monitoring =&gt; Raise event"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBID"/>
-     <ITEM SCONAME="JOBNAME" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_JOBNAME"/>
-     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TO_ME"/>
-     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_COUNT"/>
+     <ITEM SCONAME="JOBCOUNT" CMPTYPE="1" MTDTYPE="1"/>
+     <ITEM SCONAME="JOBNAME" CMPTYPE="1" MTDTYPE="1"/>
+     <ITEM SCONAME="O_JOB_MONITORING" CMPTYPE="1" MTDTYPE="1"/>
+     <ITEM SCONAME="THREAD_NUMBER" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   IF NOT task_classname IS INITIAL.
@@ -545,7 +537,7 @@
      <ITEM LANG="E" TEXT="Handle new task definition"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="TASK_DEFINITION" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="TASK_DEFINITION" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   DATA t_joblist    TYPE tt_joblist.
@@ -580,7 +572,7 @@
           ASSERT sy-subrc = 0.
 * New Thread #&amp;1 - &amp;2(&amp;3) - started (&amp;4)
           MESSAGE s008 WITH &lt;j&gt;-num &lt;j&gt;-jobname &lt;j&gt;-jobcount task_definition-process_id.
-        CATCH ygpl_mt_cx_monitor_yourself.                  &quot; Issue 3
+        CATCH ycx_gpl_mt_monitor_yourself.                  &quot; Issue 3
 * Issue 3 : Case when a task in launched within a run : Ignore this
       ENDTRY.
     ELSE.                                         &quot; task knowed
@@ -662,7 +654,7 @@
      <ITEM LANG="E" TEXT="Handle thread end signal"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="JOB" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_JOBLIST"/>
+     <ITEM SCONAME="JOB" CMPTYPE="1" MTDTYPE="1" TYPTYPE="1" TYPE="TS_JOBLIST"/>
     </PARAMETERS>
     <SOURCE>`
   o_messaging-&gt;handle_messages( ).  &quot; Check for task stop signal
@@ -734,11 +726,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_msg     TYPE to_messaging.
@@ -759,11 +747,7 @@
      <ITEM LANG="E" TEXT="A Thread has been scheduled : Starting =&gt; In progress"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   IF status &lt;&gt; system_status-process-in_progress.
@@ -778,11 +762,7 @@
      <ITEM LANG="E" TEXT="Update object count in DB"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _left TYPE i.
@@ -802,11 +782,7 @@
      <ITEM LANG="E" TEXT="Write Conditions from DB"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA d_cond_ser TYPE td_serialized.
@@ -818,18 +794,18 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_CONDITIONS">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_CONDITIONS" EXPOSURE="1">
     <SOURCE>`
   apply_new_conditions( object ).
   super-&gt;set_conditions( object ).
   set_conditions_handler( ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_INFORMATIONS">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_INFORMATIONS" EXPOSURE="1">
     <SOURCE>`
   super-&gt;set_informations( object ).
   set_informations_handler( ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_INT_STATUS">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_INT_STATUS" EXPOSURE="1">
     <SOURCE>`
   DATA t_st TYPE TD_PROCESS_STATUS.
 
@@ -849,29 +825,29 @@
   ENDIF.
 *  status = value.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_MESSAGING">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_MESSAGING" EXPOSURE="1">
     <SOURCE>`
   super-&gt;set_messaging( object ).
   set_messaging_handler( ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_MESSAGING_HANDLER">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="SET_MESSAGING_HANDLER" EXPOSURE="1">
     <SOURCE>`
   super-&gt;set_messaging_handler( ).
   SET HANDLER handle_new_conditions handle_task_definition handle_specific_message FOR me-&gt;o_messaging.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE" EXPOSURE="2">
     <SOURCE>`
   super-&gt;ygplimt_process~autosave( ).
   write_conditions( ).
   CHECK NOT f_has_changed IS INITIAL.
   save( ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~READ">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~READ" EXPOSURE="2">
     <SOURCE>`
   super-&gt;read( ).
   task_list = ygpl_mt_task=&gt;get_run_tasks( me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~SAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="YGPLIMT_PROCESS~SAVE" EXPOSURE="2">
     <SOURCE>`
   DATA _run TYPE ygplmt_runs.
 
@@ -903,7 +879,7 @@
   write_conditions( ).
   CLEAR f_has_changed.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="_DELETE">
+   <ITEM REFCLSNAME="YGPL_MT_PARENT" MTDNAME="_DELETE" EXPOSURE="1">
     <SOURCE>`
   DATA _key TYPE td_process_id.
   DATA o_task TYPE ti_task.
@@ -927,10 +903,10 @@
       WHERE run_id = me-&gt;process_id.
     IF sy-subrc = 0.
       my_key = _key.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_database
-            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                   tablename = my_table
-                   key_value = my_key.
+      RAISE EXCEPTION TYPE ycx_gpl_mt_db_delete_failed
+        EXPORTING
+          tablename = my_table
+          key_value = my_key.
     ENDIF.
   ENDIF.
   super-&gt;_delete( ).</SOURCE>

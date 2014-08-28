@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="9AE4B2B74FC1051D640FB347C092AAB3" CODE_SIGNATURE="5A213C3963C881E3A0FAD2393AAEFFFD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_LOCK_RELEASE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="02477C58BF6727210E2EB9F1D4044AF4" CODE_SIGNATURE="B239EDC019BAB32B03891BE63B7B1E83" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_LOCK_RELEASE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-UNLOCK_ON_COMMIT" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -68,7 +68,7 @@
      <ITEM SCONAME="STRUCTURE" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="ANY"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_CX_LOCK_RELEASE" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="Lock Release exception class"/>
       </TEXTS>
@@ -89,15 +89,13 @@
 
   o_desc = cl_abap_typedescr=&gt;describe_by_data( structure ).
   IF o_desc-&gt;kind &lt;&gt; cl_abap_typedescr=&gt;kind_struct.
-    RAISE EXCEPTION TYPE ygpl_cx_lock_release
-          EXPORTING textid = ygpl_cx_lock_release=&gt;not_a_flat_structure
-                 data_name =  o_desc-&gt;absolute_name.
+    RAISE EXCEPTION TYPE YCX_GPL_LR_NOT_A_FLAT_STRUCT
+          EXPORTING data_name =  o_desc-&gt;absolute_name.
   ENDIF.
   o_st ?= o_desc.
   IF o_st-&gt;struct_kind &lt;&gt; cl_abap_structdescr=&gt;structkind_flat.
-    RAISE EXCEPTION TYPE ygpl_cx_lock_release
-          EXPORTING textid = ygpl_cx_lock_release=&gt;not_a_flat_structure
-                 data_name =  o_st-&gt;absolute_name.
+    RAISE EXCEPTION TYPE YCX_GPL_LR_NOT_A_FLAT_STRUCT
+          EXPORTING data_name =  o_desc-&gt;absolute_name.
   ENDIF.
 
   l-kind = kind.

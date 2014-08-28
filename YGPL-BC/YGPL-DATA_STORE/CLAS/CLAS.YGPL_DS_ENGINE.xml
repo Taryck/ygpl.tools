@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="719B158A7622E14B211457C0D960D447" CODE_SIGNATURE="EE10D78831D38EF3520BB20E1EBF285A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_ENGINE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="74F0022DD2AEC36DB230E533B42C6017" CODE_SIGNATURE="F60F24B677974D8A8A8FCE15FA5C44F3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_ENGINE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -26,8 +26,8 @@
    <ITEM REFCLSNAME="YGPLIDS_STORE" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
-   <ITEM REFCLSNAME="IF_SERIALIZABLE_OBJECT" EXPOSURE="2" STATE="1" RELTYPE="1"/>
-   <ITEM REFCLSNAME="YGPL_DS_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="IF_SERIALIZABLE_OBJECT" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
+   <ITEM REFCLSNAME="YGPL_DS_TYPESPOOL" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -51,19 +51,15 @@
      <ITEM SCONAME="DATA" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TS_DATA"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CHECK data IS NOT INITIAL.
 * Authority check
   IF data-confidential IS NOT INITIAL AND
      data-owner &lt;&gt; sy-uname.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
-          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+    RAISE EXCEPTION TYPE YCX_GPL_DS_authorization
+          EXPORTING textid = YCX_GPL_DS_authorization=&gt;confidential_store.
   ENDIF.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CLASS_CONSTRUCTOR" EXPOSURE="2" STATE="1" MTDTYPE="2" MTDDECLTYP="1">
@@ -110,11 +106,7 @@
      <ITEM SCONAME="ID" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STORE_ID"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA d_key TYPE string.
@@ -124,9 +116,9 @@
     WHERE id = id.
   IF sy-dbcnt = 0 OR sy-subrc &lt;&gt; 0.
     d_key = id.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_database
+    RAISE EXCEPTION TYPE YCX_GPL_DS_database
       EXPORTING
-        textid = ygpl_ds_cx_database=&gt;delete_error
+        textid = YCX_GPL_DS_database=&gt;delete_error
            key = d_key.
   ENDIF.</SOURCE>
    </ITEM>
@@ -147,11 +139,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA d_ts_val   TYPE td_timestamp.
@@ -165,18 +153,18 @@
                  data = value
              FROM SHARED BUFFER ygplds_cache(__) ID d_id.
     CATCH cx_sy_import_mismatch_error.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_memory
-            EXPORTING textid = ygpl_ds_cx_memory=&gt;import_error
+      RAISE EXCEPTION TYPE YCX_GPL_DS_memory
+            EXPORTING textid = YCX_GPL_DS_memory=&gt;import_error
                           id = id.
   ENDTRY.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_memory
-          EXPORTING textid = ygpl_ds_cx_memory=&gt;import_error
+    RAISE EXCEPTION TYPE YCX_GPL_DS_memory
+          EXPORTING textid = YCX_GPL_DS_memory=&gt;import_error
                         id = id.
   ENDIF.
   IF d_ts_val &lt; d_ts_now.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_obsolete
-          EXPORTING &quot; textid = ygpl_ds_cx_not_found=&gt;shared_memory_not_found
+    RAISE EXCEPTION TYPE YCX_GPL_DS_obsolete
+          EXPORTING &quot; textid = YCX_GPL_DS_not_found=&gt;shared_memory_not_found
                         id = id.
   ENDIF.</SOURCE>
    </ITEM>
@@ -193,11 +181,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA s_xml      TYPE string.
@@ -212,14 +196,14 @@
       CALL TRANSFORMATION id SOURCE XML s_xml
            RESULT store = result.
     CATCH cx_xslt_serialization_error INTO o_cx.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+      RAISE EXCEPTION TYPE YCX_GPL_DS_serialize
         EXPORTING
-          textid = ygpl_ds_cx_serialize=&gt;xslt_serialization_error
+          textid = YCX_GPL_DS_serialize=&gt;xslt_serialization_error
           previous = o_cx.
     CATCH cx_transformation_error INTO o_cx.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+      RAISE EXCEPTION TYPE YCX_GPL_DS_serialize
         EXPORTING
-          textid = ygpl_ds_cx_serialize=&gt;transformation_error
+          textid = YCX_GPL_DS_serialize=&gt;transformation_error
           previous = o_cx.
   ENDTRY.</SOURCE>
    </ITEM>
@@ -235,11 +219,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT result TYPE ygpl_ds_store.</SOURCE>
@@ -257,19 +237,15 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   SELECT SINGLE * INTO result
     FROM ygplds_storage
     WHERE id = id.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_not_found
-          EXPORTING textid = ygpl_ds_cx_not_found=&gt;store_not_found
+    RAISE EXCEPTION TYPE YCX_GPL_DS_not_found
+          EXPORTING textid = YCX_GPL_DS_not_found=&gt;store_not_found
                         id = id.
   ENDIF.
 
@@ -287,11 +263,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_cx       TYPE REF TO cx_root.
@@ -322,14 +294,14 @@
       CALL TRANSFORMATION id SOURCE store = o_store
            RESULT XML s_xml.
     CATCH cx_xslt_serialization_error INTO o_cx.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+      RAISE EXCEPTION TYPE YCX_GPL_DS_serialize
         EXPORTING
-          textid = ygpl_ds_cx_serialize=&gt;xslt_serialization_error
+          textid = YCX_GPL_DS_serialize=&gt;xslt_serialization_error
           previous = o_cx.
     CATCH cx_transformation_error INTO o_cx.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_serialize
+      RAISE EXCEPTION TYPE YCX_GPL_DS_serialize
         EXPORTING
-          textid = ygpl_ds_cx_serialize=&gt;transformation_error
+          textid = YCX_GPL_DS_serialize=&gt;transformation_error
           previous = o_cx.
   ENDTRY.
 
@@ -339,14 +311,14 @@
   IF sy-subrc &lt;&gt; 0.
     d_key = o_store-&gt;id.
     IF f_exists = abap_true.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_database
+      RAISE EXCEPTION TYPE YCX_GPL_DS_database
         EXPORTING
-          textid = ygpl_ds_cx_database=&gt;update_error
+          textid = YCX_GPL_DS_database=&gt;update_error
              key = d_key.
     ELSE.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_database
+      RAISE EXCEPTION TYPE YCX_GPL_DS_database
         EXPORTING
-          textid = ygpl_ds_cx_database=&gt;insert_error
+          textid = YCX_GPL_DS_database=&gt;insert_error
              key = d_key.
     ENDIF.
   ENDIF.</SOURCE>
@@ -373,11 +345,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA d_ts       TYPE td_timestamp.
@@ -394,13 +362,13 @@
                  data = value
              TO SHARED BUFFER ygplds_cache(__) ID d_id COMPRESSION ON.
     CATCH cx_sy_export_buffer_no_memory.
-      RAISE EXCEPTION TYPE ygpl_ds_cx_memory
-            EXPORTING textid = ygpl_ds_cx_memory=&gt;export_error
+      RAISE EXCEPTION TYPE YCX_GPL_DS_memory
+            EXPORTING textid = YCX_GPL_DS_memory=&gt;export_error
                           id = id.
   ENDTRY.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_memory
-          EXPORTING textid = ygpl_ds_cx_memory=&gt;export_error
+    RAISE EXCEPTION TYPE YCX_GPL_DS_memory
+          EXPORTING textid = YCX_GPL_DS_memory=&gt;export_error
                         id = id.
   ENDIF.</SOURCE>
    </ITEM>
@@ -469,17 +437,17 @@
      <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TD_VALIDITY" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="I">
+   <ITEM CMPNAME="TD_VALIDITY" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="1" TYPE="I">
     <TEXTS>
      <ITEM LANG="E" TEXT="Time (in sec) of validity of cache"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TO_STORE" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLIDS_STORE">
+   <ITEM CMPNAME="TO_STORE" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPLIDS_STORE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Data Store Interface"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TS_DATA" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="YGPLDS_STORAGE">
+   <ITEM CMPNAME="TS_DATA" EXPOSURE="2" STATE="1" EDITORDER="3 " TYPTYPE="1" TYPE="YGPLDS_STORAGE">
     <TEXTS>
      <ITEM LANG="E" TEXT="Storage of information as Store object in database"/>
     </TEXTS>

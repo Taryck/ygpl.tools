@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F40E3C5C0A921EE23D3B2685BFF6C803" CODE_SIGNATURE="1437571F9C48273DEF4CAB1A783420D2" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="78C75C40146CA6E65F94B93013F699C2" CODE_SIGNATURE="C11A1C11AF6090B0BA84A994B0C5F926" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_TASK" TYPE="CLAS" VERSION="1.01">
  <DEPENDENCIES>
   <ITEM TYPE="CLAS" NAME="YGPL_MT_PROCESS_4MT"/>
  </DEPENDENCIES>
@@ -96,7 +96,7 @@
    <ITEM REFCLSNAME="YGPL_MT_PARENT" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_TASK" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIMT_TASK" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
     <COMPONENTS>
      <ITEM MTDNAME="CONFIRM_BATCH">
       <SOURCE>`
@@ -115,7 +115,7 @@
   CHECK f_stop_requested IS INITIAL.
   TRY.
       o_objects-&gt;get_batch( IMPORTING objects = objects ).
-    CATCH ygpl_mt_cx_object_semaphore.  &quot; Taks can&apos;t get new work and will stop, this problem don&apos;t need a recovery
+    CATCH ycx_gpl_mt_object_semaphore.  &quot; Taks can&apos;t get new work and will stop, this problem don&apos;t need a recovery
 * Can&apos;t Get object Semaphore =&gt; Task will stop
       MESSAGE i022(ygpl_mt_cx).
   ENDTRY.</SOURCE>
@@ -200,11 +200,7 @@
      <ITEM SCONAME="CONDITIONS" CMPTYPE="1" PARPASSTYP="1" TYPTYPE="1" TYPE="TI_BASE_CONDITIONS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA o_cond       TYPE REF TO ygpl_mt_conditions_task.
@@ -231,11 +227,7 @@
      <ITEM LANG="E" TEXT="Action to do before Getting batch or recovery"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   autosave( ).
@@ -258,11 +250,7 @@
      <ITEM LANG="E" TEXT="Confirm stop"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA s_info TYPE ts_process_definition.
@@ -308,11 +296,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E" MTDTYPE="2">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E" MTDTYPE="2"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA length TYPE i.
@@ -377,11 +361,7 @@
      <ITEM LANG="E" TEXT="Create default Object consumming"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   data o_obj type to_objects.
@@ -406,11 +386,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   FIELD-SYMBOLS: &lt;t&gt; LIKE LINE OF task_list.
@@ -430,11 +406,7 @@
      <ITEM LANG="E" TEXT="Check mail :-)"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA now      TYPE timestampl.
@@ -450,7 +422,7 @@
      <ITEM LANG="E" TEXT="Recieving new running conditions"/>
     </TEXTS>
     <PARAMETERS>
-     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1" PARPASSTYP="1"/>
+     <ITEM SCONAME="CONDITIONS" CMPTYPE="1" MTDTYPE="1"/>
     </PARAMETERS>
     <SOURCE>`
   DATA o_cond TYPE to_conditions.
@@ -488,11 +460,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   result = o_objects-&gt;has_objects_to_recover( ).</SOURCE>
@@ -554,11 +522,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CHECK is_new = abap_true.
@@ -569,11 +533,7 @@
      <ITEM LANG="E" TEXT="Set stop signal"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   f_stop_requested = abap_true.
@@ -598,11 +558,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_run-&gt;o_informations-&gt;get_information( EXPORTING category = category
@@ -630,11 +586,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _key TYPE string.
@@ -675,11 +627,11 @@
       ELSE.
         user = sy-msgv1.
         _key = process_id.
-        RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-              EXPORTING textid = ygpl_mt_cx_locks=&gt;foreign_lock
-                      object_name = &apos;MT Process Data&apos;(tds)
-                       object_key = _key
-                             user = user.
+        RAISE EXCEPTION TYPE ycx_gpl_mt_lock_foreign
+          EXPORTING
+            object_name = &apos;MT Process Data&apos;(tds)
+            object_key  = _key
+            user        = user.
       ENDIF.
 *  else if sy-subrc &lt;&gt; 0.
     ELSE.
@@ -727,11 +679,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   o_messaging-&gt;send_message( archive = archive
@@ -743,11 +691,7 @@
      <ITEM LANG="E" TEXT="Send task definition is needed"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA s_info TYPE ts_process_definition.
@@ -774,11 +718,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA f_no_msg TYPE td_boolean.
@@ -809,11 +749,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   ygpl_mt_lock_managment=&gt;check_lock_mode( lock_mode ).
@@ -829,19 +765,19 @@
    </ITEM>
   </METHODS>
   <REDEFINITIONS>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_EXCLUSIVE" EXPOSURE="1">
     <SOURCE>`
   super-&gt;lock_exclusive( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_WITH_SHARE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="LOCK_WITH_SHARE" EXPOSURE="1">
     <SOURCE>`
   super-&gt;lock_with_share( ).
   _lock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
         process_id = me-&gt;process_id ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_INT_STATUS">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_INT_STATUS" EXPOSURE="1">
     <SOURCE>`
   DATA t_st TYPE TD_PROCESS_STATUS.
 
@@ -861,31 +797,31 @@
   ENDIF.
 *  status = value.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_MESSAGING_HANDLER">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="SET_MESSAGING_HANDLER" EXPOSURE="1">
     <SOURCE>`
   super-&gt;set_messaging_handler( ).
   SET HANDLER handle_new_conditions FOR o_messaging.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_EXCLUSIVE" EXPOSURE="1">
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-write
           process_id = me-&gt;process_id ).
   super-&gt;unlock_exclusive( ) .</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_WITH_SHARE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="UNLOCK_WITH_SHARE" EXPOSURE="1">
     <SOURCE>`
   _unlock( lock_mode = ygpl_mt_lock_managment=&gt;lock_modes-read
           process_id = me-&gt;process_id ).
   super-&gt;unlock_with_share( ).</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~AUTOSAVE" EXPOSURE="2">
     <SOURCE>`
   super-&gt;ygplimt_process~autosave( ).
   CHECK NOT f_has_changed IS INITIAL.
   save( ).
   CLEAR f_has_changed.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~READ">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~READ" EXPOSURE="2">
     <SOURCE>`
   DATA _task TYPE ygplmt_tasks.
 
@@ -895,9 +831,9 @@
     FROM ygplmt_tasks
     WHERE task_id = process_id.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_process
-          EXPORTING textid = ygpl_mt_cx_process=&gt;not_task
-                process_id = me-&gt;process_id.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_process_not_task
+      EXPORTING
+        process_id = me-&gt;process_id.
   ENDIF.
   unlock_with_share( ).
 
@@ -906,7 +842,7 @@
   status = _task-int_status.
   user_status = _task-usr_status.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~SAVE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="YGPLIMT_PROCESS~SAVE" EXPOSURE="2">
     <SOURCE>`
   DATA _task TYPE ygplmt_tasks.
 
@@ -920,7 +856,7 @@
   MODIFY ygplmt_tasks FROM _task.
   ASSERT sy-subrc = 0.</SOURCE>
    </ITEM>
-   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="_DELETE">
+   <ITEM REFCLSNAME="YGPL_MT_PROCESS_4MT" MTDNAME="_DELETE" EXPOSURE="1">
     <SOURCE>`
   DATA _key TYPE td_process_id.
   o_messaging-&gt;delete_process( ).
@@ -931,10 +867,10 @@
       WHERE task_id = me-&gt;process_id.
     IF sy-subrc = 0.
       my_key = _key.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_database
-            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                   tablename = my_table
-                   key_value = my_key.
+      RAISE EXCEPTION TYPE ycx_gpl_mt_db_delete_failed
+        EXPORTING
+          tablename = my_table
+          key_value = my_key.
     ENDIF.
   ENDIF.
   super-&gt;_delete( ).</SOURCE>

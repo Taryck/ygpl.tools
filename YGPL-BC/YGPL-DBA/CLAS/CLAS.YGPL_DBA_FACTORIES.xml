@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="C16F381F368913DFCED305B517BEF89B" CODE_SIGNATURE="2AA64A3839405CEE6D8AB5121E9F0D02" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_FACTORIES" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="34547D3AEE14008E8C98957BE87668B3" CODE_SIGNATURE="8E5486A14181752CE114C4340EB12813" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DBA_FACTORIES" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DBA" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X" WITH_UNIT_TESTS="X">
@@ -22,7 +22,7 @@
    </ITEM>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1"/>
+   <ITEM REFCLSNAME="YGPL_DBA_INTERFACES" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 "/>
   </INTERFACES>
   <LOCAL>
    <TYPES>`
@@ -36,6 +36,8 @@
    <MACROS>`
 *&quot;* use this source file for any macro definitions you need
 *&quot;* in the implementation part of the class</MACROS>
+   <LOCAL_TEST_CLASS>`
+*&quot;* use this source file for your ABAP unit test classes</LOCAL_TEST_CLASS>
   </LOCAL>
   <METHODS>
    <ITEM CMPNAME="CREATE_CHECK_INDEXES" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
@@ -46,11 +48,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_CHECK_INDEXES"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_dba_check_indexes.</SOURCE>
@@ -63,11 +61,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_CHECK_TABLE"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_dba_check_tables.</SOURCE>
@@ -80,11 +74,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_CHECK_TABLE"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_dba_check_tables_w_stats.</SOURCE>
@@ -106,11 +96,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA dbms TYPE dbcon_dbms.
@@ -132,7 +118,7 @@
     WHEN &apos;DB6&apos;.
   ENDCASE.
   IF object IS NOT BOUND.
-    RAISE EXCEPTION TYPE ygpl_dba_cx_no_engine
+    RAISE EXCEPTION TYPE YCX_GPL_DBA_NO_ENGINE
         EXPORTING db_kind = dbms.
   ENDIF.</SOURCE>
    </ITEM>
@@ -144,11 +130,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_TABLE_LIST"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CREATE OBJECT object TYPE ygpl_dba_table_list.</SOURCE>
@@ -165,11 +147,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   IF NOT o_engine_singleton IS BOUND.
@@ -185,11 +163,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_OBJECT_SIZE"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   object ?= get_engine( ).</SOURCE>
@@ -202,11 +176,7 @@
      <ITEM SCONAME="OBJECT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TI_OBJECT_STATISTICS"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DBA_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DBA : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DBA" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   object ?= get_engine( ).</SOURCE>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="ECDE3E61E0BC35DC4F0C6D212F762BEB" CODE_SIGNATURE="1C0F8468098F773043F9244A0456621D" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_STATUS" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="60D4C067A5889776279CF91E24189424" CODE_SIGNATURE="72AA4D810CFB22A048C3D963D44B8497" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_STATUS" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -66,26 +66,26 @@
   FIELD-SYMBOLS &lt;wa&gt; LIKE LINE OF my_keys.
 
   IF key IN r_system_status.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;system_status
-                  status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_system_status
+      EXPORTING
+        status = key.
   ENDIF.
   IF do_exists( key ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
-                  status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_do_not_exists
+      EXPORTING
+        status = key.
   ENDIF.
 
   READ TABLE my_keys WITH TABLE KEY key = key ASSIGNING &lt;wa&gt;.
   IF sy-subrc = 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;status_already_added
-                  status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_already_added
+      EXPORTING
+        status = key.
   ELSE. &quot; unexpected but handled
     wa-key = key.
     INSERT wa INTO TABLE my_keys.
     ASSERT sy-subrc = 0.
-    F_HAS_CHANGED = abap_true.
+    f_has_changed = abap_true.
   ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="CLEAR_SPECIFIC_STATUS">
@@ -100,21 +100,21 @@
      <ITEM MTDNAME="IS_VALID_STATUS">
       <SOURCE>`
   IF key IN r_system_status.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;system_status
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_system_status
+      EXPORTING
+        status = key.
   ENDIF.
   IF do_exists( key ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_do_not_exists
+      EXPORTING
+        status = key.
   ENDIF.
 
   READ TABLE my_keys WITH TABLE KEY key = key TRANSPORTING NO FIELDS.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;status_not_define
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_not_define
+      EXPORTING
+        status = key.
   ENDIF.
   result = abap_true.</SOURCE>
      </ITEM>
@@ -198,21 +198,21 @@
     </PARAMETERS>
     <SOURCE>`
   IF NOT key IN r_system_status.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;not_system_status
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_not_system_st
+      EXPORTING
+        status = key.
   ENDIF.
   IF do_exists( key ) IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;status_do_not_exists
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_do_not_exists
+      EXPORTING
+        status = key.
   ENDIF.
 
   READ TABLE system_keys TRANSPORTING NO FIELDS WITH TABLE KEY key = key.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_status
-          EXPORTING textid = ygpl_mt_cx_status=&gt;not_system_status
-                    status = key.
+    RAISE EXCEPTION TYPE ycx_gpl_mt_st_not_system_st
+      EXPORTING
+        status = key.
   ENDIF.
   result = abap_true.</SOURCE>
    </ITEM>

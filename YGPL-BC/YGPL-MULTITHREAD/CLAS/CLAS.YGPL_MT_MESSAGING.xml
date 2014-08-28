@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="F6B6BA19958D049C22906EC31288219C" CODE_SIGNATURE="2BD25870FCADCABC2723F3A73E4E1776" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="FB4B30877D1149267011A6E538764D91" CODE_SIGNATURE="04346CD417A6D84A40C666E46C2BBBA3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_MT_MESSAGING" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -69,7 +69,7 @@
    <ITEM REFCLSNAME="YGPL_MT_PROCESS" STATE="1"/>
   </FRIENDS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIMT_MESSAGING" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIMT_MESSAGING" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="1 ">
     <COMPONENTS>
      <ITEM MTDNAME="CONV_RAW2DATA">
       <SOURCE>`
@@ -94,10 +94,10 @@
       WHERE process_id = o_process-&gt;process_id.
     IF sy-subrc = 0.
       my_key = _key.
-      RAISE EXCEPTION TYPE ygpl_mt_cx_database
-            EXPORTING textid = ygpl_mt_cx_database=&gt;delete_failed
-                   tablename = my_table
-                   key_value = my_key.
+      RAISE EXCEPTION TYPE ycx_gpl_mt_db_delete_failed
+        EXPORTING
+          tablename = my_table
+          key_value = my_key.
     ENDIF.
   ENDIF.</SOURCE>
      </ITEM>
@@ -221,7 +221,12 @@
      <ITEM LANG="E" TEXT="Get Semaphore"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
+     <ITEM SCONAME="YCX_GPL_LOCK_RELEASE" LANGU="E">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Lock Release exception class"/>
+      </TEXTS>
+     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E">
       <TEXTS>
        <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
       </TEXTS>
@@ -230,9 +235,9 @@
     <SOURCE>`
 
   IF NOT f_semaphore IS INITIAL.
-    RAISE EXCEPTION TYPE ygpl_mt_cx_locks
-          EXPORTING textid = ygpl_mt_cx_locks=&gt;semaphore_already_defined
-               object_name = &apos;Message Semaphore&apos;(tms).
+    RAISE EXCEPTION TYPE ycx_gpl_mt_lock_semaphore
+      EXPORTING
+        object_name = &apos;Message Semaphore&apos;(tms).
   ENDIF.
 * Get global Lock on object processing.
   ygpl_mt_lock_managment=&gt;get_messages_semaphore( o_process-&gt;process_id ).
@@ -278,11 +283,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   FIELD-SYMBOLS:
@@ -357,11 +358,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
 **********************************************************************
@@ -436,11 +433,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA conditions TYPE string.
@@ -471,11 +464,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   CHECK NOT ygpl_mt_categories=&gt;is_system_category( category ) IS INITIAL.
@@ -539,11 +528,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
   DATA _msg TYPE ygplmt_messages.

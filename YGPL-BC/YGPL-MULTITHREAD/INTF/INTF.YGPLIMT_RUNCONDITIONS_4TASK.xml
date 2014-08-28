@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="8630FB114CEA9F99867FB769D9BC208A" CODE_SIGNATURE="C8AAB6775060CBE2C3746CB2F7F3998A" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLIMT_RUNCONDITIONS_4TASK" TYPE="INTF" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="099FEC89616FC9C19155A4EC938852B2" CODE_SIGNATURE="C20438E41A6F0ED80888E0C0117FB7CA" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPLIMT_RUNCONDITIONS_4TASK" TYPE="INTF" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-MULTITHREAD" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" UNICODE="X">
@@ -81,11 +81,7 @@
      <ITEM LANG="E" TEXT="Apply conditions change"/>
     </TEXTS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_BATCH_RATE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
@@ -99,13 +95,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_CATEGORIES" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -118,13 +107,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_JOB_PRIORITY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -137,13 +119,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_MAXIMUM_BATCH_SIZE" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -156,13 +131,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_MAXIMUM_MEMORY" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -175,13 +143,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_MESSAGE_LOOKUP_TIME" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -194,13 +155,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_PROGRESSION" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -213,13 +167,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_SERVERS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -233,11 +180,7 @@
      </ITEM>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_MULTI_THREAD" LANGU="E"/>
     </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_STATUS" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
@@ -251,13 +194,6 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
    <ITEM CMPNAME="SET_STOP_REQUESTED" EXPOSURE="2" STATE="1" MTDNEWEXC="X">
     <TEXTS>
@@ -270,22 +206,15 @@
       </TEXTS>
      </ITEM>
     </PARAMETERS>
-    <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_MT_CX" LANGU="E">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="MultyThread : Root exception class"/>
-      </TEXTS>
-     </ITEM>
-    </EXCEPTIONS>
    </ITEM>
   </METHODS>
   <TYPES>
-   <ITEM CMPNAME="TI_CATEGORIES" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLIMT_CATEGORIES">
+   <ITEM CMPNAME="TI_CATEGORIES" EXPOSURE="2" STATE="1" EDITORDER="1 " TYPTYPE="3" TYPE="YGPLIMT_CATEGORIES">
     <TEXTS>
      <ITEM LANG="E" TEXT="MT Categories"/>
     </TEXTS>
    </ITEM>
-   <ITEM CMPNAME="TI_STATUS" EXPOSURE="2" STATE="1" TYPTYPE="3" TYPE="YGPLIMT_STATUS">
+   <ITEM CMPNAME="TI_STATUS" EXPOSURE="2" STATE="1" EDITORDER="2 " TYPTYPE="3" TYPE="YGPLIMT_STATUS">
     <TEXTS>
      <ITEM LANG="E" TEXT="Status for Process/Bloc/Objects"/>
     </TEXTS>

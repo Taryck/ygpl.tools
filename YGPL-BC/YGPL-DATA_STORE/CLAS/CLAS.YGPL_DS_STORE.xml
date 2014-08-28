@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="4262CD16552DE6233F3D8A6735AC0F42" CODE_SIGNATURE="C8528AE3434A8EC09A535E26F8D90F45" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="FE10B59642E1753DDCF75421C51C8512" CODE_SIGNATURE="CBDD12420A5D3E8A5EFFBAF77A35EFE3" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_DS_STORE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-DATA_STORE" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -29,7 +29,7 @@
    <ITEM CMPNAME="INFORMATIONS" EXPOSURE="1" STATE="1" TYPTYPE="1" TYPE="TT_INFOS"/>
   </ATTRIBUTS>
   <INTERFACES>
-   <ITEM REFCLSNAME="YGPLIDS_STORE" EXPOSURE="2" STATE="1" RELTYPE="1">
+   <ITEM REFCLSNAME="YGPLIDS_STORE" EXPOSURE="2" STATE="1" RELTYPE="1" EDITORDER="2 ">
     <COMPONENTS>
      <ITEM MTDNAME="ADD_INFO">
       <SOURCE>`
@@ -63,8 +63,8 @@
   s_info-size = get_mem_size( value ).
   INSERT s_info INTO TABLE me-&gt;informations.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_already_exists
-          EXPORTING textid = ygpl_ds_cx_already_exists=&gt;value_already_exists
+    RAISE EXCEPTION TYPE YCX_GPL_DS_already_exists
+          EXPORTING textid = YCX_GPL_DS_already_exists=&gt;value_already_exists
                  info_name = name.
   ENDIF.
   ADD s_info-size TO memory_size.</SOURCE>
@@ -86,8 +86,8 @@
   READ TABLE me-&gt;informations ASSIGNING &lt;i&gt;
       WITH TABLE KEY name = name.
   IF sy-subrc &lt;&gt; 0.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_not_found
-          EXPORTING textid = ygpl_ds_cx_not_found=&gt;value_not_found
+    RAISE EXCEPTION TYPE YCX_GPL_DS_not_found
+          EXPORTING textid = YCX_GPL_DS_not_found=&gt;value_not_found
                  info_name = name.
   ENDIF.
   CASE _desc-&gt;kind.
@@ -124,8 +124,8 @@
   IF me-&gt;owner = sy-uname OR me-&gt;confidential IS INITIAL.
     me-&gt;confidential = flag_conf-is_confidential.
   ELSE.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
-          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+    RAISE EXCEPTION TYPE YCX_GPL_DS_authorization
+          EXPORTING textid = YCX_GPL_DS_authorization=&gt;confidential_store.
   ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="SET_HOLD_DATE">
@@ -134,8 +134,8 @@
   IF me-&gt;owner = sy-uname OR me-&gt;confidential IS INITIAL.
     me-&gt;hold_date = value.
   ELSE.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
-          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+    RAISE EXCEPTION TYPE YCX_GPL_DS_authorization
+          EXPORTING textid = YCX_GPL_DS_authorization=&gt;confidential_store.
   ENDIF.</SOURCE>
      </ITEM>
      <ITEM MTDNAME="SET_NOT_CONFIDENTIAL">
@@ -144,8 +144,8 @@
   IF me-&gt;owner = sy-uname OR me-&gt;confidential IS INITIAL.
     me-&gt;confidential = flag_conf-not_confidential.
   ELSE.
-    RAISE EXCEPTION TYPE ygpl_ds_cx_authorization
-          EXPORTING textid = ygpl_ds_cx_authorization=&gt;confidential_store.
+    RAISE EXCEPTION TYPE YCX_GPL_DS_authorization
+          EXPORTING textid = YCX_GPL_DS_authorization=&gt;confidential_store.
   ENDIF.</SOURCE>
      </ITEM>
     </COMPONENTS>
@@ -173,11 +173,7 @@
      <ITEM SCONAME="ID" CMPTYPE="1" MTDTYPE="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TD_STORE_ID" PAROPTIONL="X"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E" MTDTYPE="2">
-      <TEXTS>
-       <ITEM LANG="E" TEXT="DataStore : Root exception class"/>
-      </TEXTS>
-     </ITEM>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E" MTDTYPE="2"/>
     </EXCEPTIONS>
     <SOURCE>`
   IF id IS INITIAL.
@@ -197,7 +193,7 @@
      <ITEM SCONAME="RESULT" CMPTYPE="1" PARDECLTYP="3" TYPTYPE="1" TYPE="TD_STORE_ID"/>
     </PARAMETERS>
     <EXCEPTIONS>
-     <ITEM SCONAME="YGPL_DS_CX" LANGU="E"/>
+     <ITEM SCONAME="YCX_GPL_DATA_STORE" LANGU="E"/>
     </EXCEPTIONS>
     <SOURCE>`
 **********************************************************************
@@ -211,7 +207,7 @@
 *     EV_GUID_22       =
 *     EV_GUID_32       = BLOC_ID.</SOURCE>
    </ITEM>
-   <ITEM CMPNAME="GET_MEM_SIZE" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+   <ITEM CMPNAME="GET_MEM_SIZE" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get memory use"/>
     </TEXTS>
