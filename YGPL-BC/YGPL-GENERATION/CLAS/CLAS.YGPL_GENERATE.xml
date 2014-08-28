@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<ZL_OBJECT CHECKSUM="BD042F59F294DE400B7EE515B1E840FE" CODE_SIGNATURE="55F53FA51D2BEA28F67C9F767C903C63" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
+<ZL_OBJECT CHECKSUM="7DE75796737B0589F63A41A7A84380BA" CODE_SIGNATURE="F2484DC4B30A7B184902C34F6D95F8C8" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_GENERATE" TYPE="CLAS" VERSION="1.01">
  <DIRECTORY DEVCLASS="YGPL-GENERATION" MASTERLANG="E"/>
  <RAW>
   <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
@@ -408,7 +408,7 @@ AS</ITEM>
     </PARAMETERS>
     <SOURCE>`
   DATA:
-    _wb_manager TYPE REF TO  if_wb_manager,   &quot;#EC NEEDED
+    _wb_manager TYPE REF TO  if_wb_manager,                 &quot;#EC NEEDED
     it_obj TYPE tt_det_obj,
     it_det_obj TYPE tt_det_obj.
 *  FIELD-SYMBOLS:
@@ -427,21 +427,20 @@ AS</ITEM>
   it_det_obj = get_inactive_objects( it_list ).
   CALL FUNCTION &apos;RS_WORKING_OBJECTS_ACTIVATE&apos;
     EXPORTING
-*     SUPPRESS_SYNTAX_CHECK        =
-*     SUPPRESS_GENERATION          =
-*     P_WB_MANAGER                 =
-*     SUPPRESS_INSERT              =
-      activate_ddic_objects        = &apos;X&apos;
-*     WITH_POPUP                   = &apos; &apos;
-*     CWB_MODE                     =
+*     SUPPRESS_SYNTAX_CHECK  =
+*     SUPPRESS_GENERATION    =
+*     P_WB_MANAGER           =
+*     SUPPRESS_INSERT        =
+      activate_ddic_objects  = &apos;X&apos;
+*     WITH_POPUP             = &apos; &apos;
+*     CWB_MODE               =
     TABLES
-      OBJECTS                      = it_det_obj
+      objects                = it_det_obj
     EXCEPTIONS
-      excecution_error             = 1
-      cancelled                    = 2
-      insert_into_corr_error       = 3
-      OTHERS                       = 4
-            .
+      excecution_error       = 1
+      cancelled              = 2
+      insert_into_corr_error = 3
+      OTHERS                 = 4.
   IF sy-subrc &lt;&gt; 0.
 * MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
 *         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
@@ -451,7 +450,7 @@ AS</ITEM>
     EXPORTING
       p_wb_manager = _wb_manager
     TABLES
-      OBJECTS      = it_det_obj.
+      objects      = it_det_obj.
 *  ELSE.
 *    it_det_obj = conv_list( it_list ).
 *    LOOP AT it_det_obj ASSIGNING &lt;obj&gt;.
@@ -464,7 +463,7 @@ AS</ITEM>
 *          OBJECTS      = it_obj.
 *    ENDLOOP.
 *  ENDIF.
-  check_inactive_objects( CHANGING obj_list = it_list ).</SOURCE>
+  check_inactive_objects_int( CHANGING obj_list = it_list ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ACTIVATE_NONDDIC" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -484,7 +483,7 @@ AS</ITEM>
     </PARAMETERS>
     <SOURCE>`
   DATA:
-    _wb_manager TYPE REF TO  if_wb_manager,   &quot;#EC NEEDED
+    _wb_manager TYPE REF TO  if_wb_manager,                 &quot;#EC NEEDED
     it_obj TYPE tt_det_obj,
     it_det_obj TYPE tt_det_obj.
   FIELD-SYMBOLS:
@@ -505,7 +504,7 @@ AS</ITEM>
       EXPORTING
         p_wb_manager = _wb_manager
       TABLES
-        OBJECTS      = it_det_obj.
+        objects      = it_det_obj.
   ELSE.
     it_det_obj = conv_list( it_list ).
     LOOP AT it_det_obj ASSIGNING &lt;obj&gt;.
@@ -515,10 +514,10 @@ AS</ITEM>
         EXPORTING
           p_wb_manager = _wb_manager
         TABLES
-          OBJECTS      = it_obj.
+          objects      = it_obj.
     ENDLOOP.
   ENDIF.
-  check_inactive_objects( CHANGING obj_list = it_list ).</SOURCE>
+  check_inactive_objects_int( CHANGING obj_list = it_list ).</SOURCE>
    </ITEM>
    <ITEM CMPNAME="ACTIVATE_OBJECTS" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
@@ -856,6 +855,24 @@ AS</ITEM>
   ENDLOOP.</SOURCE>
    </ITEM>
    <ITEM CMPNAME="CHECK_INACTIVE_OBJECTS" EXPOSURE="2" STATE="1" MTDDECLTYP="1">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Get inactive objects"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="OBJ_LIST" CMPTYPE="1" PARDECLTYP="2" PARPASSTYP="1" TYPTYPE="1" TYPE="TT_COMPKEYS">
+      <TEXTS>
+       <ITEM LANG="E" TEXT="Objects list"/>
+      </TEXTS>
+     </ITEM>
+    </PARAMETERS>
+    <SOURCE>`
+  DATA lt_obj_list TYPE tt_objlist.
+
+  lt_obj_list = compkeys_2_objlist( obj_list ).
+  check_inactive_objects_int( CHANGING obj_list = lt_obj_list ).
+  obj_list = objlist_2_compkeys( lt_obj_list ).</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="CHECK_INACTIVE_OBJECTS_INT" EXPOSURE="1" STATE="1" MTDDECLTYP="1">
     <TEXTS>
      <ITEM LANG="E" TEXT="Get inactive objects"/>
     </TEXTS>
