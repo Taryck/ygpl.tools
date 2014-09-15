@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="F234C06BAC2CB3838660EAC1137C84AF" CODE_SIGNATURE="CA886E3C6FE539FE30C9DB37EEFF4489" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_SET_UPDATE_TASK_LOCAL" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-COMMON" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" CLSFINAL="X" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Set Update Task Local after each commit">U1&amp;FUNCTIONALITY&amp;
+ASEasily allow to set update task local after each end of LUW
+U1&amp;RELATIONS&amp;
+AS
+U1&amp;EXAMPLE&amp;
+AS
+U1&amp;HINTS&amp;
+ASLook at ABAP documentation of instruction SET UPDATE TASK LOCAL. It&apos;s
+  says : &quot;At the beginning of every SAP LUW, the local update function is
+  deactivated. If you want to use it, you must reactivate it again before
+  the first update function module is registered.&quot;
+U1&amp;FURTHER_SOURCES_OF_INF&amp;
+AS</ITEM>
+   </TEXTS>
+  </A0_MAINDATA>
+  <ATTRIBUTS>
+   <ITEM CMPNAME="LAST_COMMIT" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_TIMESTAMP">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Datetime of last transaction end"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="UPDATE_TASK_LOCAL" EXPOSURE="2" STATE="1" ATTDECLTYP="1" ATTRDONLY="X" TYPTYPE="1" TYPE="TD_FLAG">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Is Update Task Local is on"/>
+    </TEXTS>
+   </ITEM>
+  </ATTRIBUTS>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type declarations (class
+*&quot;* definitions, interfaces or data types) you need for method
+*&quot;* implementation or private method&apos;s signature</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* local class implementation for public class
+*&quot;* use this source file for the implementation part of
+*&quot;* local helper classes</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+  <METHODS>
+   <ITEM CMPNAME="SET_UPDATE_TASK_LOCAL_OFF" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Disable Update task local for next commit"/>
+    </TEXTS>
+    <SOURCE>`
+  CLEAR update_task_local.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="SET_UPDATE_TASK_LOCAL_ON" EXPOSURE="2" STATE="1" MTDDECLTYP="1" MTDNEWEXC="X">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Set Update task local for next commit"/>
+    </TEXTS>
+    <SOURCE>`
+  UPDATE_TASK_LOCAL = abap_true.
+  SET UPDATE TASK LOCAL.</SOURCE>
+   </ITEM>
+   <ITEM CMPNAME="TRANSACTION_FINISHED" STATE="1" MTDTYPE="1" MTDDECLTYP="1" REFCLSNAME="CL_SYSTEM_TRANSACTION_STATE" REFCMPNAME="TRANSACTION_FINISHED">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Event called at each transaction end"/>
+    </TEXTS>
+    <PARAMETERS>
+     <ITEM SCONAME="KIND" CMPTYPE="1" MTDTYPE="1" TYPTYPE="1" TYPE="TRANS_END"/>
+    </PARAMETERS>
+    <SOURCE>`
+  GET TIME STAMP FIELD last_commit.
+  IF update_task_local = abap_true.
+    SET UPDATE TASK LOCAL.
+  ENDIF.</SOURCE>
+   </ITEM>
+  </METHODS>
+  <TYPEGROUPS>
+   <ITEM TYPEGROUP="ABAP" EXPLICIT="X"/>
+  </TYPEGROUPS>
+  <TYPES>
+   <ITEM CMPNAME="TD_FLAG" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="ABAP_BOOL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="Flag for update task local"/>
+    </TEXTS>
+   </ITEM>
+   <ITEM CMPNAME="TD_TIMESTAMP" EXPOSURE="2" STATE="1" TYPTYPE="1" TYPE="TIMESTAMPL">
+    <TEXTS>
+     <ITEM LANG="E" TEXT="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+    </TEXTS>
+   </ITEM>
+  </TYPES>
+ </RAW>
+</ZL_OBJECT>
