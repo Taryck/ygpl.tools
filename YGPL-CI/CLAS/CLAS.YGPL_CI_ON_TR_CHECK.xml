@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="8C5AC514C0CE383CFE1833DF5BC42667" CODE_SIGNATURE="C41176C06180B6BC46114943729751CD" CONNECTOR="39AC0A4B07A5A05AE1000000AC120173" NAME="YGPL_CI_ON_TR_CHECK" TYPE="CLAS" VERSION="1.01">
+ <DIRECTORY DEVCLASS="YGPL-CI" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA LANGU="E" EXPOSURE="2" STATE="1" CLSCCINCL="X" FIXPT="X" UNICODE="X">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="Enforce CI without error"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <LOCAL>
+   <TYPES>`
+*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</TYPES>
+   <IMPLEMENTATIONS>`
+*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</IMPLEMENTATIONS>
+   <MACROS>`
+*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</MACROS>
+  </LOCAL>
+ </RAW>
+</ZL_OBJECT>

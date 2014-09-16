@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="6BF012DC50633A87B476E737C6EA1663" CONNECTOR="4181014E2AC27D33E1000000AC1201D6" NAME="YGPL_CI_MANDATORY" TYPE="ENHO" VERSION="0.0">
+ <DIRECTORY DEVCLASS="YGPL-CI" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA VERSION="A" LANGU="E" TYPE="RDEF" TOOL_TYPE="HOOK_IMPL">
+   <TEXTS>
+    <ITEM LANG="E" TEXT="YGPL : Code Inspector is mandatory"/>
+   </TEXTS>
+  </A0_MAINDATA>
+  <HOOK_IMPLEMENTATIONS>
+   <ITEM PGMID="R3TR" ORG_OBJ_TYPE="FUGR" ORG_OBJ_NAME="STR7">
+    <HOOK_IMPLS>
+     <ITEM ID="1 ">
+      <SOURCE>
+       <ITEM>  loop at gt_lines TRANSPORTING NO FIELDS</ITEM>
+       <ITEM>    where errors &lt;&gt; 0</ITEM>
+       <ITEM>       OR critical_errors &lt;&gt; 0.</ITEM>
+       <ITEM>    exit.</ITEM>
+       <ITEM>  endloop.</ITEM>
+       <ITEM>  IF sy-subrc = 0.      &quot; Error present</ITEM>
+       <ITEM>    MESSAGE e653(tk) RAISING canceled_by_user.</ITEM>
+       <ITEM>  ENDIF.</ITEM>
+      </SOURCE>
+     </ITEM>
+    </HOOK_IMPLS>
+    <SAVE_ENHINCINX>
+     <ITEM ENHNAME="YGPL_CI_MANDATORY" VERSION="I" PROGRAMNAME="SAPLSTR7" ID="1 " ENHMODE="D" FULL_NAME="\FU:TRINT_INSPECT_OBJECTS\SE:END\EI" ENHINCLUDE="YGPL_CI_MANDATORY=============E"/>
+    </SAVE_ENHINCINX>
+   </ITEM>
+  </HOOK_IMPLEMENTATIONS>
+ </RAW>
+</ZL_OBJECT>
