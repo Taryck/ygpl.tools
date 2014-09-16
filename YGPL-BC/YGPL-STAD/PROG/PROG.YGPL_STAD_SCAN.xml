@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ZL_OBJECT CHECKSUM="0B24B1655201E49E90F9DFA8924F9FB3" CODE_SIGNATURE="77E6ACA9C9D4330D526A89092D5A59C8" CONNECTOR="AAAD0A4B07A5A05AE1000000AC120173" NAME="YGPL_STAD_SCAN" TYPE="PROG" VERSION="1.0">
+ <DIRECTORY DEVCLASS="YGPL-STAD" MASTERLANG="E"/>
+ <RAW>
+  <A0_MAINDATA EDTX="X" VARCL="X" SUBC="1" RSTAT="T" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X"/>
+  <SOURCE>`
+*&amp;---------------------------------------------------------------------*
+*&amp; Report  YTBE_STAD_READ
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT  ygpl_stad_scan.
+
+TYPE-POOLS : abap.
+
+TYPES:
+  td_rep TYPE string,
+  td_file TYPE string.
+
+PARAMETERS:
+  p_rep TYPE td_rep LOWER CASE,
+  p_dest TYPE td_rep LOWER CASE.
+
+PARAMETERS:
+  p_srv TYPE msxxlist-name LOWER CASE,
+  p_sydid TYPE sy-sysid DEFAULT sy-sysid.
+
+TYPES:
+  tt_files TYPE STANDARD TABLE OF string.
+
+INITIALIZATION.
+  DATA lv_rep TYPE char16384.
+  CALL FUNCTION &apos;GENERAL_GET_APP_SERVER_NAME&apos;
+    IMPORTING
+      server_name        = p_srv
+    EXCEPTIONS
+      error_reading_name = 1
+      OTHERS             = 2.
+  ASSERT sy-subrc = 0.
+
+* get name of directory with the error files
+  CALL &apos;C_SAPGPARAM&apos; ID &apos;NAME&apos;  FIELD &apos;DIR_ATRA&apos;
+                     ID &apos;VALUE&apos; FIELD lv_rep.
+  WRITE:/ sy-subrc.
+  p_dest = p_rep = lv_rep.
+
+START-OF-SELECTION.
+  DATA o_parsing TYPE ygpl_stad_record_set=&gt;to_data_parsing.
+  DATA lv_file_ok TYPE abap_bool.
+  DATA source_file TYPE td_file.
+  DATA target_file TYPE td_file.
+  DATA t_list TYPE tt_files.
+  DATA ls_file TYPE ygpl_stad_files.
+  FIELD-SYMBOLS:
+    &lt;f&gt; LIKE LINE OF t_list.
+
+  CREATE OBJECT o_parsing TYPE ygpl_stad_parsing_default
+    EXPORTING
+      line_structure = &apos;YGPL_STAD_DATA_FULL&apos;
+      sysid          = p_sydid
+      server_name    = p_srv.
+  CONCATENATE sy-datum &apos;.txt&apos; INTO target_file.
+  PERFORM do_file USING source_file target_file.
+
+*  PERFORM get_file_list USING p_rep CHANGING t_list.
+*  LOOP AT t_list ASSIGNING &lt;f&gt;.
+*    source_file = &lt;f&gt;.
+*    CONCATENATE source_file &apos;.txt&apos; INTO target_file.
+*    PERFORM check_files USING source_file target_file CHANGING lv_file_ok.
+*    IF lv_file_ok = abap_true.
+*      PERFORM do_file USING source_file target_file.
+*    ELSE.
+*      WRITE:/ &apos;Skip File (already done) : &apos;, source_file.
+*    ENDIF.
+*  ENDLOOP.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  DO_FILE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;P_SOURCE_FILE  text
+*      --&gt;P_TARGET_FILE  text
+*----------------------------------------------------------------------*
+FORM do_file  USING    p_source_file TYPE td_file
+                       p_target_file TYPE td_file.
+
+  DATA o_set     TYPE REF TO if_swnc_statrec.
+  DATA lv_source TYPE swncstatfilename.
+  DATA lv_target TYPE ygpl_stad_record_set_full=&gt;td_filename.
+  DATA:
+    lv_count TYPE i,
+    lv_start TYPE timestampl,
+    lv_end   TYPE timestampl,
+    lv_delay TYPE timestampl.
+
+* Exceptions
+  DATA: ex_read_error TYPE REF TO cx_swnc_read_error,
+        ex_maxread    TYPE REF TO cx_swnc_max_records_read.
+
+  GET TIME STAMP FIELD lv_start.
+  IF p_source_file IS NOT INITIAL.     CONCATENATE p_rep p_source_file INTO lv_source.       ENDIF.
+  CONCATENATE p_dest p_target_file INTO lv_target.
+  CREATE OBJECT o_set TYPE ygpl_stad_record_set_full
+    EXPORTING
+      stad_filename   = lv_source
+      output_filename = lv_target
+      o_data_parsing  = o_parsing.
+* Read Standard Statistic -------------------------------------------
+  TRY.
+      o_set-&gt;do_read( ).
+    CATCH cx_swnc_read_error INTO ex_read_error.
+*     Kernel error when reading records.
+      RAISE read_error.
+*      CATCH cx_swnc_max_records_read INTO ex_maxread.
+*     Reached limit of maximal number of records.
+* No filter frovide no max reccord exception
+  ENDTRY.
+
+  GET TIME STAMP FIELD lv_end.
+  lv_count = o_set-&gt;get_mainrecords_count( ).
+  lv_delay = cl_abap_tstmp=&gt;subtract( tstmp1 = lv_end
+                                      tstmp2 = lv_start ).
+
+  WRITE:/ p_source_file,lv_count, lv_delay.
+  PERFORM confirm_file USING p_target_file.
+ENDFORM.                    &quot; DO_FILE
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_FILE_LIST
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;P_P_REP  text
+*----------------------------------------------------------------------*
+FORM get_file_list  USING    p_rep TYPE td_rep
+                 CHANGING   t_list TYPE tt_files.
+  DATA lv_param TYPE sxpgcolist-parameters.
+  DATA lt_result TYPE STANDARD TABLE OF btcxpm.
+  DATA lv_file  LIKE LINE OF t_list.
+  DATA lv_pos   TYPE i.
+  DATA lv_filen TYPE string.
+  FIELD-SYMBOLS:
+    &lt;l&gt; LIKE LINE OF lt_result.
+
+  CONCATENATE p_rep &apos;stat.DAT?*.&apos; INTO lv_param.
+  CALL FUNCTION &apos;SXPG_COMMAND_EXECUTE&apos;
+    EXPORTING
+      commandname                         = &apos;LIST_DB2DUMP&apos;
+      additional_parameters               = lv_param
+*     OPERATINGSYSTEM                     = SY-OPSYS
+*     TARGETSYSTEM                        = SY-HOST
+*     DESTINATION                         =
+*     STDOUT                              = &apos;X&apos;
+*     STDERR                              = &apos;X&apos;
+*     TERMINATIONWAIT                     = &apos;X&apos;
+*     TRACE                               =
+*     DIALOG                              =
+*   IMPORTING
+*     STATUS                              =
+*     EXITCODE                            =
+   TABLES
+     exec_protocol                       = lt_result
+   EXCEPTIONS
+     no_permission                       = 1
+     command_not_found                   = 2
+     parameters_too_long                 = 3
+     security_risk                       = 4
+     wrong_check_call_interface          = 5
+     program_start_error                 = 6
+     program_termination_error           = 7
+     x_error                             = 8
+     parameter_expected                  = 9
+     too_many_parameters                 = 10
+     illegal_command                     = 11
+     wrong_asynchronous_parameters       = 12
+     cant_enq_tbtco_entry                = 13
+     jobcount_generation_error           = 14
+     OTHERS                              = 15.
+  ASSERT sy-subrc = 0.
+
+  CLEAR t_list.
+  LOOP AT lt_result ASSIGNING &lt;l&gt;.
+    FIND REGEX &apos;stat\.DAT...&apos; IN &lt;l&gt;-message MATCH OFFSET lv_pos.
+    CHECK sy-subrc = 0.
+    lv_file = &lt;l&gt;-message+lv_pos.
+    CHECK lv_file &lt;&gt; &apos;stat.DAT&apos;.      &quot; Current STAD File
+    lv_filen = lv_file+8.
+    CHECK lv_filen CO &apos;0123456789&apos;.
+    FIND REGEX &apos;stat\.DAT.*\.txt&apos; IN lv_file MATCH OFFSET lv_pos.
+    CHECK sy-subrc &lt;&gt; 0.
+    APPEND lv_file TO t_list.
+  ENDLOOP.
+
+ENDFORM.                    &quot; GET_FILE_LIST
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHECK_FILES
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;P_SOURCE_FILE  text
+*      --&gt;P_TARGET_FILE  text
+*      &lt;--P_LV_FILE_OK  text
+*----------------------------------------------------------------------*
+FORM check_files  USING    p_source_file TYPE td_file
+                           p_target_file TYPE td_file
+                  CHANGING f_ok TYPE abap_bool.
+
+  DATA lv_hash TYPE string.
+  DATA lv_filename TYPE td_file.
+
+  f_ok = abap_false.
+  PERFORM create_file_hash USING p_source_file
+                        CHANGING lv_hash.
+  ls_file-md5hash = lv_hash.
+  ls_file-filename = p_source_file.
+  SELECT SINGLE * INTO ls_file
+    FROM ygpl_stad_files
+    WHERE md5hash = ls_file-md5hash
+      AND filename = ls_file-filename.
+  IF sy-subrc &lt;&gt; 0.
+    CONCATENATE p_dest p_target_file INTO lv_filename.
+    OPEN DATASET lv_filename FOR INPUT IN BINARY MODE.
+    IF sy-subrc = 0.
+      CLOSE DATASET lv_filename.
+    ELSE.
+      f_ok = abap_true.
+    ENDIF.
+  ENDIF.
+ENDFORM.                    &quot; CHECK_FILES
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_FILE_HASH
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      --&gt;P_P_SOURCE_FILE  text
+*      &lt;--P_LV_HASH  text
+*----------------------------------------------------------------------*
+FORM create_file_hash  USING    p_source_file TYPE td_file
+                       CHANGING p_hash.
+  DATA o_engine TYPE REF TO cl_abap_message_digest.
+  DATA lv_filename TYPE td_file.
+  DATA lv_xstring TYPE xstring.
+  DATA lv_pos TYPE i.
+  DATA lv_size TYPE i.
+
+  CONCATENATE p_rep p_source_file INTO lv_filename.
+  o_engine = cl_abap_message_digest=&gt;get_instance( &apos;MD5&apos; ).
+  OPEN DATASET lv_filename FOR INPUT IN BINARY MODE.
+  DO.
+    READ DATASET lv_filename INTO lv_xstring MAXIMUM LENGTH 32768.   &quot; 32Ko
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ENDIF.
+    lv_size = xstrlen( lv_xstring ).
+    o_engine-&gt;update( if_data = lv_xstring ).
+*                    if_offset = lv_pos
+*                    if_length = lv_size ).
+*    o_engine-&gt;update( if_data = lv_xstring
+*                    if_offset = lv_pos
+*                    if_length = lv_size ).
+    ADD lv_size TO lv_pos.
+  ENDDO.
+  CLOSE DATASET lv_filename.
+*  TRY.
+  CALL METHOD o_engine-&gt;digest
+*    EXPORTING
+*      if_data          =
+*      if_offset        = 0
+*      if_length        = 0
+*    IMPORTING
+*      ef_hashstring    =
+*      ef_hashxstring   =
+*      ef_hashb64string =
+*      ef_hashx         =
+      .
+*   CATCH cx_abap_message_digest .
+*  ENDTRY.
+  p_hash = o_engine-&gt;to_string( ).
+
+ENDFORM.                    &quot; CREATE_FILE_HASH
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CONFIRM_FILE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  --&gt;  p1        text
+*  &lt;--  p2        text
+*----------------------------------------------------------------------*
+FORM confirm_file USING    p_file TYPE td_file.
+  DATA lv_filename TYPE td_file.
+
+  CONCATENATE p_dest p_file INTO lv_filename.
+  OPEN DATASET lv_filename FOR INPUT IN BINARY MODE.
+  IF sy-subrc = 0.
+    CLOSE DATASET lv_filename.
+    GET TIME STAMP FIELD ls_file-insert_ts.
+    INSERT ygpl_stad_files FROM ls_file.
+    COMMIT WORK.
+  ENDIF.
+ENDFORM.                    &quot; CONFIRM_FILE</SOURCE>
+  <TEXTSPOOL>
+   <ITEM ID="R">
+    <TEXTS>
+     <ITEM LANGU="E" ENTRY="Lecture STAD" LENGTH="12 "/>
+    </TEXTS>
+   </ITEM>
+  </TEXTSPOOL>
+ </RAW>
+</ZL_OBJECT>
